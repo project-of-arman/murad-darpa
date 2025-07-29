@@ -28,8 +28,23 @@ export async function getRoutines(): Promise<Routine[]> {
     return mockRoutines as Routine[];
   }
   try {
-    const [rows] = await pool.query('SELECT * FROM routines ORDER BY class_name, FIELD(day_of_week, "রবিবার", "সোমবার", "মঙ্গলবার", "বুধবার", "বৃহস্পতিবার"), period');
-    return rows as Routine[];
+    const [rows] = await pool.query<Routine[]>('SELECT * FROM routines');
+    
+    // Sort in application code for better performance than `FIELD` in SQL
+    const dayOrder = ["রবিবার", "সোমবার", "মঙ্গলবার", "বুধবার", "বৃহস্পতিবার"];
+    rows.sort((a, b) => {
+        if (a.class_name < b.class_name) return -1;
+        if (a.class_name > b.class_name) return 1;
+        const dayA = dayOrder.indexOf(a.day_of_week);
+        const dayB = dayOrder.indexOf(b.day_of_week);
+        if (dayA < dayB) return -1;
+        if (dayA > dayB) return 1;
+        if (a.period < b.period) return -1;
+        if (a.period > b.period) return 1;
+        return 0;
+    });
+
+    return rows;
   } catch (error) {
     console.error('Failed to fetch routines, returning mock data:', error);
     return mockRoutines as Routine[];
