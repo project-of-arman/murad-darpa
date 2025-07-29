@@ -37,7 +37,7 @@ export default async function AdminSettingsPage() {
   return (
     <div className="space-y-6">
         <div className="text-left mb-8">
-            <h1 className="text-3xl font-bold text-primary">সেটিংস</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-primary">সেটিংস</h1>
             <p className="text-muted-foreground mt-1">
                 আপনার ওয়েবসাইটের সাধারণ সেটিংস, স্কুলের তথ্য এবং অ্যাডমিন অ্যাকাউন্ট পরিচালনা করুন।
             </p>

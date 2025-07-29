@@ -11,7 +11,7 @@ export default async function AdminDashboardPage() {
     return (
         <>
             <div className="text-left mb-8">
-                <h1 className="text-3xl font-bold text-primary">অ্যাডমিন ড্যাশবোর্ড</h1>
+                <h1 className="text-2xl md:text-3xl font-bold text-primary">অ্যাডমিন ড্যাশবোর্ড</h1>
                 <p className="text-muted-foreground mt-1">এখান থেকে আপনার ওয়েবসাইটের কনটেন্ট এবং ফিচার পরিচালনা করুন।</p>
             </div>
 

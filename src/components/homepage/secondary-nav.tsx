@@ -160,8 +160,8 @@ export default function SecondaryNav({ schoolName }: { schoolName: string }) {
                             <span className="text-xl font-bold text-primary">মেনু</span>
                             </Link>
                         </SheetHeader>
-                        <ScrollArea className="flex-grow">
-                            <nav className="mt-8 flex flex-col gap-2 pr-4">
+                        <ScrollArea className="flex-grow ">
+                            <nav className="mt-8 flex  flex-col gap-2 pl-4 ">
                                 {navLinks.map((link) =>
                                 (link.subLinks && link.subLinks.length > 0) ? (
                                     <Accordion type="single" collapsible key={link.id} className="w-full">
