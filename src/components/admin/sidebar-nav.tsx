@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import {
@@ -35,7 +36,8 @@ import {
   GalleryHorizontal,
   ClipboardList,
   Sidebar as SidebarIcon,
-  Palette
+  Palette,
+  Navigation
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -96,6 +98,7 @@ const navItems = [
       icon: Palette,
       subItems: [
         { href: "/admin/school-details", icon: Building2, label: "স্কুল বিস্তারিত" },
+        { href: "/admin/nav-manager", icon: Navigation, label: "নেভিগেশন মেনু" },
         { href: "/admin/sidebar", icon: SidebarIcon, label: "সাইডবার" },
         { href: "/admin/contact", icon: MessageSquare, label: "যোগাযোগ পেজ" },
         { href: "/admin/settings", icon: Settings, label: "সাধারণ সেটিংস" },
