@@ -5,10 +5,16 @@ import pool from '../db';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 
-const formSchema = z.object({
+const createFormSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters."),
   password: z.string().min(6, "Password must be at least 6 characters."),
 });
+
+const updateFormSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters."),
+  newPassword: z.string().min(6, "Password must be at least 6 characters.").optional(),
+});
+
 
 type AuthResult = { success: boolean; error?: string };
 
@@ -26,17 +32,27 @@ CREATE TABLE `admin_users` (
 */
 
 export async function hasAdminAccount(): Promise<boolean> {
-    if (!pool) return false; // If no DB, assume no admin for setup flow
+    if (!pool) return false;
     try {
         const [rows] = await pool.query<{ count: number }[]>('SELECT COUNT(*) as count FROM admin_users');
         return rows[0].count > 0;
     } catch (error: any) {
-        // If table doesn't exist, treat as no admin accounts
         if (error.code === 'ER_NO_SUCH_TABLE') {
             return false;
         }
         console.error("Failed to check for admin account:", error);
-        return false; // Fail safe
+        return false;
+    }
+}
+
+export async function getAdminUsername(): Promise<string | null> {
+    if (!pool) return null;
+    try {
+        const [rows] = await pool.query<any[]>('SELECT username FROM admin_users LIMIT 1');
+        return rows[0]?.username || null;
+    } catch (error) {
+        console.error("Failed to get admin username:", error);
+        return null;
     }
 }
 
@@ -49,7 +65,7 @@ export async function createAdmin(formData: FormData): Promise<AuthResult> {
     }
 
     const data = Object.fromEntries(formData.entries());
-    const parsed = formSchema.safeParse(data);
+    const parsed = createFormSchema.safeParse(data);
 
     if (!parsed.success) {
         return { success: false, error: parsed.error.errors.map(e => e.message).join(', ') };
@@ -67,6 +83,34 @@ export async function createAdmin(formData: FormData): Promise<AuthResult> {
             return { success: false, error: 'Username already exists.' };
         }
         console.error('Failed to create admin:', error);
+        return { success: false, error: 'An unexpected error occurred.' };
+    }
+}
+
+export async function updateAdminCredentials(formData: FormData): Promise<AuthResult> {
+    if (!pool) return { success: false, error: 'Database not connected.' };
+
+    const data = Object.fromEntries(formData.entries());
+    const parsed = updateFormSchema.safeParse(data);
+
+     if (!parsed.success) {
+        return { success: false, error: parsed.error.errors.map(e => e.message).join(', ') };
+    }
+    
+    try {
+        const { username, newPassword } = parsed.data;
+        const fieldsToUpdate: {[key: string]: any} = { username };
+
+        if (newPassword) {
+            fieldsToUpdate.password = await bcrypt.hash(newPassword, 10);
+        }
+
+        // There should only be one admin, so we update the first one found.
+        await pool.query('UPDATE admin_users SET ? ORDER BY id LIMIT 1', [fieldsToUpdate]);
+        
+        return { success: true };
+    } catch(e: any) {
+        console.error('Failed to update admin credentials:', e);
         return { success: false, error: 'An unexpected error occurred.' };
     }
 }

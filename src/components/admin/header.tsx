@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User, Bell } from "lucide-react";
+import { LogOut, User, Bell, Settings } from "lucide-react";
 import { SidebarTrigger } from "../ui/sidebar";
 import { useEffect, useState } from "react";
 import { getNotices, Notice } from "@/lib/notice-data";
@@ -107,8 +107,12 @@ export default function AdminHeader({ onLogout }: AdminHeaderProps) {
                 <DropdownMenuContent align="end">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Support</DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href="/admin/settings">
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Settings</span>
+                    </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={onLogout}>
                     <LogOut className="mr-2 h-4 w-4" />

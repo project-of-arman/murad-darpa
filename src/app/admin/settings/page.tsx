@@ -3,11 +3,16 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { getSiteSettings } from "@/lib/settings-data";
 import SettingsForm from "@/components/admin/settings/settings-form";
 import SchoolInfoForm from "@/components/admin/settings/school-info-form";
+import AdminAccountForm from "@/components/admin/settings/admin-account-form";
 import type { SchoolInfo } from "@/lib/school-data";
+import { getAdminUsername } from "@/lib/actions/auth-actions";
 import { toDataURL } from "@/lib/utils";
 
 export default async function AdminSettingsPage() {
-  const settingsData = await getSiteSettings();
+  const [settingsData, username] = await Promise.all([
+    getSiteSettings(),
+    getAdminUsername()
+  ]);
   
   // Convert any buffer data to base64 strings before passing to client components
   const settings = {
@@ -46,6 +51,18 @@ export default async function AdminSettingsPage() {
                 ওয়েবসাইটের বিভিন্ন জায়গায় প্রদর্শিত স্কুলের নাম, ঠিকানা ও লোগো এখান থেকে পরিবর্তন করুন।
                 </p>
                 <SchoolInfoForm schoolInfo={schoolInfo} />
+            </CardContent>
+        </Card>
+        
+        <Card>
+            <CardHeader>
+                <CardTitle>অ্যাডমিন অ্যাকাউন্ট</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p className="text-muted-foreground mb-4">
+                আপনার অ্যাডমিন ইউজারনেম এবং পাসওয়ার্ড পরিবর্তন করুন।
+                </p>
+                <AdminAccountForm username={username || ''} />
             </CardContent>
         </Card>
     </div>
