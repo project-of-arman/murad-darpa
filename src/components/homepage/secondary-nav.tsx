@@ -189,7 +189,7 @@ export default function SecondaryNav({ schoolName }: { schoolName: string }) {
                         </ScrollArea>
                     </SheetContent>
                 </Sheet>
-                <p className="text-sm sm:hiddin font-medium text-primary">{schoolName}</p>
+               <Link href="/"> <p className="text-sm sm:hiddin font-medium text-primary truncate">{schoolName}</p></Link>
             </div>
           
         </div>
