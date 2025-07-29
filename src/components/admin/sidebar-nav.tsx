@@ -34,7 +34,8 @@ import {
   Settings,
   GalleryHorizontal,
   ClipboardList,
-  Sidebar as SidebarIcon
+  Sidebar as SidebarIcon,
+  Palette
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -52,24 +53,34 @@ const navItems = [
     label: "স্কুল সম্পর্কিত",
     icon: BookOpen,
     subItems: [
-      { href: "/admin/school-details", icon: Building2, label: "স্কুল বিস্তারিত" },
       { href: "/admin/notices", icon: Bell, label: "নোটিশ" },
       { href: "/admin/routine", icon: Calendar, label: "রুটিন" },
       { href: "/admin/exam-routine", icon: ClipboardList, label: "পরীক্ষার রুটিন" },
       { href: "/admin/syllabus", icon: Book, label: "সিলেবাস" },
-      { href: "/admin/students", icon: User, label: "শিক্ষার্থী" },
-      { href: "/admin/teachers", icon: Users, label: "শিক্ষক" },
-      { href: "/admin/staff", icon: Users, label: "কর্মচারী" },
-      { href: "/admin/committee", icon: Users, label: "কমিটি" },
+      { href: "/admin/results", icon: Trophy, label: "ফলাফল" },
     ],
   },
+  {
+      label: "ব্যবহারকারী",
+      icon: Users,
+      subItems: [
+          { href: "/admin/students", icon: User, label: "শিক্ষার্থী" },
+          { href: "/admin/teachers", icon: Users, label: "শিক্ষক" },
+          { href: "/admin/staff", icon: Users, label: "কর্মচারী" },
+          { href: "/admin/committee", icon: Users, label: "কমিটি" },
+      ]
+  },
+  {
+      label: "কনটেন্ট",
+      icon: FileText,
+      subItems: [
+          { href: "/admin/pages", icon: StickyNote, label: "পেজ" },
+          { href: "/admin/admission-guidelines", icon: FileText, label: "ভর্তি নির্দেশিকা" },
+          { href: "/admin/important-links", icon: Link2, label: "গুরুত্বপূর্ণ লিংক" },
+          { href: "/admin/forms", icon: File, label: "সকল ফরমস" },
+      ]
+  },
   { href: "/admin/notifications", icon: Bell, label: "ঘোষণা" },
-  { href: "/admin/results", icon: Trophy, label: "ফলাফল" },
-  { href: "/admin/admission-guidelines", icon: FileText, label: "ভর্তি নির্দেশিকা" },
-  { href: "/admin/pages", icon: StickyNote, label: "পেজ" },
-   { href: "/admin/important-links", icon: Link2, label: "গুরুত্বপূর্ণ লিংক" },
-  { href: "/admin/sidebar", icon: SidebarIcon, label: "সাইডবার" },
-  { href: "/admin/forms", icon: File, label: "সকল ফরমস" },
   {
     label: "গ্যালারি",
     icon: ImageIcon,
@@ -79,8 +90,16 @@ const navItems = [
         { href: "/admin/gallery/videos", icon: Video, label: "ভিডিও গ্যালারি" }
     ]
   },
-  { href: "/admin/contact", icon: MessageSquare, label: "যোগাযোগ ও ফিডব্যাক" },
-  { href: "/admin/settings", icon: Settings, label: "সাইট সেটিংস" },
+  {
+      label: "ওয়েবসাইট সেটিংস",
+      icon: Palette,
+      subItems: [
+        { href: "/admin/school-details", icon: Building2, label: "স্কুল বিস্তারিত" },
+        { href: "/admin/sidebar", icon: SidebarIcon, label: "সাইডবার" },
+        { href: "/admin/contact", icon: MessageSquare, label: "যোগাযোগ পেজ" },
+        { href: "/admin/settings", icon: Settings, label: "সাধারণ সেটিংস" },
+      ]
+  }
 ];
 
 export default function AdminSidebarNav() {
