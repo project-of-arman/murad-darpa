@@ -43,7 +43,7 @@ export default async function AdminSettingsPage() {
             </p>
         </div>
 
-        <Tabs defaultValue="site_settings" className="w-full">
+        <Tabs defaultValue="school_info" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="school_info">স্কুলের তথ্য</TabsTrigger>
                 <TabsTrigger value="site_settings">সাইট সেটিংস</TabsTrigger>
