@@ -4,7 +4,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { getNotices, Notice } from "@/lib/notice-data";
-import { Bell, CheckCircle } from "lucide-react";
+import { Bell, CheckCircle, CheckCheck } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -97,8 +97,13 @@ export default function NotificationsPage() {
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>জরুরী ঘোষণা</CardTitle>
-                 {notices.length > 0 && <Button onClick={handleMarkAllAsRead}>সবগুলো পঠিত হিসেবে চিহ্নিত করুন</Button>}
+                <CardTitle className="text-2xl md:text-3xl font-bold text-primary">জরুরী ঘোষণা</CardTitle>
+                 {notices.length > 0 && (
+                    <Button onClick={handleMarkAllAsRead} size="sm">
+                        <CheckCheck className="h-4 w-4 md:mr-2" />
+                        <span className="hidden md:inline">সবগুলো পঠিত হিসেবে চিহ্নিত করুন</span>
+                    </Button>
+                 )}
             </CardHeader>
             <CardContent>
                 {loading ? (
