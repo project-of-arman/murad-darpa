@@ -25,7 +25,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import * as LucideIcons from 'lucide-react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 const formSchema = z.object({
   title: z.string().min(1, "শিরোনাম আবশ্যক"),
