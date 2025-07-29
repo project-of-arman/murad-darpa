@@ -33,7 +33,7 @@ import { Video, deleteVideo } from "@/lib/video-data";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
 const ITEMS_PER_PAGE = 10;
@@ -93,7 +93,8 @@ export default function VideoTable({ videos }: { videos: Video[] }) {
             className="max-w-sm"
         />
       </div>
-      <div className="border rounded-md">
+       {/* Desktop View */}
+      <div className="border rounded-md hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -156,6 +157,34 @@ export default function VideoTable({ videos }: { videos: Video[] }) {
             )}
           </TableBody>
         </Table>
+      </div>
+
+        {/* Mobile View */}
+      <div className="md:hidden space-y-4">
+        {paginatedVideos.length > 0 ? paginatedVideos.map((video) => (
+            <Card key={video.id}>
+                 <CardContent className="p-4 flex gap-4">
+                    <Image
+                        src={video.thumbnail}
+                        alt={video.title}
+                        width={100}
+                        height={60}
+                        className="rounded-md object-cover"
+                    />
+                    <div className="space-y-1">
+                        <CardTitle className="text-base">{video.title}</CardTitle>
+                    </div>
+                </CardContent>
+                <CardFooter className="flex justify-end gap-2">
+                     <Button variant="outline" size="sm" asChild>
+                        <Link href={`/admin/gallery/videos/edit/${video.id}`}>সম্পাদনা</Link>
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(video)}>মুছুন</Button>
+                </CardFooter>
+            </Card>
+        )) : (
+            <p className="text-center text-muted-foreground py-8">কোনো ভিডিও পাওয়া যায়নি।</p>
+        )}
       </div>
 
        {totalPages > 1 && (

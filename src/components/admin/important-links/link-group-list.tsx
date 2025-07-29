@@ -93,7 +93,7 @@ export default function LinkGroupList({ groups }: { groups: ImportantLinkGroup[]
         <div className="space-y-6">
             {groups.map((group) => (
                 <Card key={group.id} className="border-primary/20">
-                    <CardHeader className="flex flex-row items-center justify-between bg-muted/50">
+                    <CardHeader className="flex flex-col sm:flex-row items-center justify-between bg-muted/50">
                         <CardTitle>{group.title}</CardTitle>
                         <div className="flex gap-2">
                             <Button asChild size="sm" variant="outline"><Link href={`/admin/important-links/groups/edit/${group.id}`}><Edit className="mr-2 h-4 w-4" />সম্পাদনা</Link></Button>
