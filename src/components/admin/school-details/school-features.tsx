@@ -25,6 +25,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import * as LucideIcons from 'lucide-react';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card';
 
 const formSchema = z.object({
   title: z.string().min(1, "শিরোনাম আবশ্যক"),
@@ -142,7 +143,9 @@ export default function SchoolFeatures({ features }: { features: SchoolFeature[]
                     </DialogContent>
                 </Dialog>
             </div>
-            <div className="border rounded-md">
+            
+            {/* Desktop View */}
+            <div className="border rounded-md hidden md:block">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -189,6 +192,46 @@ export default function SchoolFeatures({ features }: { features: SchoolFeature[]
                         ))}
                     </TableBody>
                 </Table>
+            </div>
+
+            {/* Mobile View */}
+            <div className="md:hidden space-y-4">
+                {features.map((item) => (
+                    <Card key={item.id}>
+                        <CardHeader className="pb-4">
+                            <div className="flex items-center gap-2">
+                                <IconComponent name={item.icon} />
+                                <CardTitle className="text-base">{item.title}</CardTitle>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="text-sm pt-0">
+                             <p className="text-muted-foreground">{item.description}</p>
+                        </CardContent>
+                        <CardFooter className="flex justify-end gap-2">
+                            <Dialog open={editItemId === item.id} onOpenChange={(isOpen) => setEditItemId(isOpen ? item.id : null)}>
+                                <DialogTrigger asChild>
+                                    <Button variant="outline" size="sm">সম্পাদনা</Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader><DialogTitle>বৈশিষ্ট্য সম্পাদনা করুন</DialogTitle></DialogHeader>
+                                    <FeatureForm feature={item} onFinished={onFormFinished} />
+                                </DialogContent>
+                            </Dialog>
+                             <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                     <Button variant="destructive" size="sm">মুছুন</Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader><AlertDialogTitle>আপনি কি নিশ্চিত?</AlertDialogTitle><AlertDialogDescription>এই বৈশিষ্ট্যটি স্থায়ীভাবে মুছে ফেলা হবে।</AlertDialogDescription></AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>বাতিল</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleDelete(item.id)} className="bg-destructive hover:bg-destructive/90">মুছুন</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </CardFooter>
+                    </Card>
+                ))}
             </div>
         </div>
     );
