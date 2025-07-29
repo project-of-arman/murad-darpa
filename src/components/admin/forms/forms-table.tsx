@@ -41,14 +41,14 @@ import { MoreHorizontal, Trash, Eye, CheckCircle, XCircle } from "lucide-react";
 import { getSubmissionDetails, updateSubmissionStatus, deleteSubmission } from "@/lib/actions/forms-actions";
 import type { FormSubmission, FormConfig } from "@/lib/config/forms-config";
 import { useToast } from "@/hooks/use-toast";
-import { CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 
 const ITEMS_PER_PAGE = 10;
 
 
-function ViewSubmissionDialog({ formType, submissionId }: { formType: string; submissionId: number; }) {
+function ViewSubmissionDialog({ formType, submissionId, isMobile }: { formType: string; submissionId: number; isMobile?: boolean; }) {
   const [details, setDetails] = useState<FormSubmission | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -64,7 +64,11 @@ function ViewSubmissionDialog({ formType, submissionId }: { formType: string; su
   return (
     <Dialog onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-7 w-7"><Eye className="h-4 w-4" /></Button>
+        {isMobile ? (
+          <Button variant="outline" size="sm">বিস্তারিত দেখুন</Button>
+        ) : (
+          <Button variant="ghost" size="icon" className="h-7 w-7"><Eye className="h-4 w-4" /></Button>
+        )}
       </DialogTrigger>
       <DialogContent className="max-w-3xl">
         <DialogHeader><DialogTitle>আবেদনের বিস্তারিত</DialogTitle></DialogHeader>
@@ -180,7 +184,9 @@ export default function FormsTable({ formType, submissions, config }: { formType
             className="max-w-sm"
         />
       </div>
-      <div className="border rounded-md">
+
+      {/* Desktop View */}
+      <div className="border rounded-md hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -242,6 +248,58 @@ export default function FormsTable({ formType, submissions, config }: { formType
             )}
           </TableBody>
         </Table>
+      </div>
+
+       {/* Mobile View */}
+       <div className="md:hidden space-y-4">
+        {paginatedSubmissions.length > 0 ? paginatedSubmissions.map((submission) => (
+            <Card key={submission.id}>
+                <CardHeader className="p-4">
+                    <CardTitle className="text-base">{submission[primaryColumn]}</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 pt-0 space-y-1 text-sm">
+                    {config.columns.filter(c => !c.isPrimary).map(col => (
+                        <p key={col.key}>
+                            <strong>{col.label}: </strong>
+                             {col.key === 'status' ? (
+                                <Badge variant={getStatusVariant(submission[col.key])} className="ml-1">{submission[col.key]}</Badge>
+                            ) : (
+                                renderCellContent(submission[col.key])
+                            )}
+                        </p>
+                    ))}
+                </CardContent>
+                <CardFooter className="p-4 pt-0 flex justify-end gap-2">
+                   <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm">পদক্ষেপ</Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                           <DropdownMenuItem onSelect={() => handleStatusUpdate(submission.id, 'approved')}>
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              অনুমোদন করুন
+                           </DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => handleStatusUpdate(submission.id, 'rejected')}>
+                              <XCircle className="mr-2 h-4 w-4" />
+                              প্রত্যাখ্যান করুন
+                           </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onSelect={() => handleDeleteClick(submission)}
+                            className="text-destructive"
+                          >
+                            <Trash className="mr-2 h-4 w-4" />
+                            মুছুন
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <ViewSubmissionDialog formType={formType} submissionId={submission.id} isMobile={true} />
+                </CardFooter>
+            </Card>
+        )) : (
+            <div className="text-center text-muted-foreground py-8">
+                কোনো আবেদন পাওয়া যায়নি।
+            </div>
+        )}
       </div>
       
       {totalPages > 1 && (
