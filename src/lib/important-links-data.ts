@@ -75,7 +75,7 @@ type SaveResult = { success: boolean; error?: string };
 export async function getLinkGroupById(id: number | string): Promise<ImportantLinkGroup | null> {
     if (!pool) return null;
     try {
-        const [rows] = await pool.query<ImportantLinkGroup[]>('SELECT id, title, data_ai_hint, sort_order, IF(image IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image)), NULL) as image FROM important_link_groups WHERE id = ?', [id]);
+        const rows = await queryWithRetry<ImportantLinkGroup[]>('SELECT id, title, data_ai_hint, sort_order, IF(image IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image)), NULL) as image FROM important_link_groups WHERE id = ?', [id]);
         return rows[0] || null;
     } catch (error) {
         console.error('Failed to fetch link group:', error);
@@ -101,10 +101,10 @@ export async function saveLinkGroup(formData: FormData, id?: number): Promise<Sa
             if (imageBuffer) {
                 fieldsToUpdate.image = imageBuffer;
             }
-            await pool.query('UPDATE important_link_groups SET ? WHERE id = ?', [fieldsToUpdate, id]);
+            await queryWithRetry('UPDATE important_link_groups SET ? WHERE id = ?', [fieldsToUpdate, id]);
         } else {
             if (!imageBuffer) return { success: false, error: 'Image is required for new groups' };
-            await pool.query('INSERT INTO important_link_groups (title, sort_order, data_ai_hint, image) VALUES (?, ?, ?, ?)', [data.title, data.sort_order, data.data_ai_hint, imageBuffer]);
+            await queryWithRetry('INSERT INTO important_link_groups (title, sort_order, data_ai_hint, image) VALUES (?, ?, ?, ?)', [data.title, data.sort_order, data.data_ai_hint, imageBuffer]);
         }
         
         revalidatePath('/admin/important-links');
@@ -119,8 +119,8 @@ export async function deleteLinkGroup(id: number): Promise<SaveResult> {
     if (!pool) return { success: false, error: "Database not connected" };
     
     try {
-        await pool.query('DELETE FROM important_links WHERE group_id = ?', [id]);
-        await pool.query('DELETE FROM important_link_groups WHERE id = ?', [id]);
+        await queryWithRetry('DELETE FROM important_links WHERE group_id = ?', [id]);
+        await queryWithRetry('DELETE FROM important_link_groups WHERE id = ?', [id]);
         revalidatePath('/admin/important-links');
         revalidatePath('/(site)/');
         return { success: true };
@@ -132,7 +132,7 @@ export async function deleteLinkGroup(id: number): Promise<SaveResult> {
 export async function getLinkById(id: number | string): Promise<Link | null> {
     if (!pool) return null;
     try {
-        const [rows] = await pool.query<Link[]>('SELECT * FROM important_links WHERE id = ?', [id]);
+        const rows = await queryWithRetry<Link[]>('SELECT * FROM important_links WHERE id = ?', [id]);
         return rows[0] || null;
     } catch (error) {
         console.error('Failed to fetch link:', error);
@@ -153,9 +153,9 @@ export async function saveLink(formData: FormData, id?: number): Promise<SaveRes
         };
 
         if (id) {
-            await pool.query('UPDATE important_links SET ? WHERE id = ?', [data, id]);
+            await queryWithRetry('UPDATE important_links SET ? WHERE id = ?', [data, id]);
         } else {
-            await pool.query('INSERT INTO important_links (text, href, sort_order, group_id) VALUES (?, ?, ?, ?)', [data.text, data.href, data.sort_order, data.group_id]);
+            await queryWithRetry('INSERT INTO important_links (text, href, sort_order, group_id) VALUES (?, ?, ?, ?)', [data.text, data.href, data.sort_order, data.group_id]);
         }
         
         revalidatePath('/admin/important-links');
@@ -170,7 +170,7 @@ export async function deleteLink(id: number): Promise<SaveResult> {
     if (!pool) return { success: false, error: "Database not connected" };
     
     try {
-        await pool.query('DELETE FROM important_links WHERE id = ?', [id]);
+        await queryWithRetry('DELETE FROM important_links WHERE id = ?', [id]);
         revalidatePath('/admin/important-links');
         revalidatePath('/(site)/');
         return { success: true };

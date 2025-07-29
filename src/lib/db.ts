@@ -7,27 +7,6 @@ declare const global: typeof globalThis & {
 
 let pool: mysql.Pool;
 
-// Function to retry a query on connection errors
-export async function queryWithRetry<T>(query: string, params: any[] = [], retries = 3, delay = 100): Promise<T> {
-  if (!pool) {
-    throw new Error("Database not connected.");
-  }
-  for (let i = 0; i < retries; i++) {
-    try {
-      const [rows] = await pool.query(query, params);
-      return rows as T;
-    } catch (error: any) {
-      if ((error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') && i < retries - 1) {
-        console.warn(`Query failed with ${error.code} on attempt ${i + 1}. Retrying in ${delay}ms...`);
-        await new Promise(res => setTimeout(res, delay));
-        continue;
-      }
-      throw error;
-    }
-  }
-  throw new Error("Database query failed after multiple retries.");
-}
-
 function getPool() {
   // If the pool is already cached on the global object (in a dev environment), use it.
   if (process.env.NODE_ENV !== 'production' && global.dbPool) {
@@ -89,3 +68,26 @@ function getPool() {
 // Export the initialized pool.
 const db = getPool();
 export default db;
+
+
+// Function to retry a query on connection errors
+export async function queryWithRetry<T>(query: string, params: any[] = [], retries = 3, delay = 100): Promise<T> {
+  const currentPool = getPool();
+  if (!currentPool) {
+    throw new Error("Database not connected.");
+  }
+  for (let i = 0; i < retries; i++) {
+    try {
+      const [rows] = await currentPool.query(query, params);
+      return rows as T;
+    } catch (error: any) {
+      if ((error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') && i < retries - 1) {
+        console.warn(`Query failed with ${error.code} on attempt ${i + 1}. Retrying in ${delay}ms...`);
+        await new Promise(res => setTimeout(res, delay));
+        continue;
+      }
+      throw error;
+    }
+  }
+  throw new Error("Database query failed after multiple retries.");
+}
