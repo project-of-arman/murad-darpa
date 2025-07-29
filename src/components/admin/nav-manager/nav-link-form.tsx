@@ -20,10 +20,11 @@ import { NavLink, saveNavLink } from "@/lib/nav-data";
 import * as LucideIcons from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-const iconNames = Object.keys(LucideIcons).filter(k => 
-    typeof LucideIcons[k as keyof typeof LucideIcons] === 'object' && 
+const iconNames = Object.keys(LucideIcons || {}).filter(k => 
+    typeof (LucideIcons as any)[k] === 'object' && 
     k[0] === k[0].toUpperCase()
 ).sort();
+
 
 const IconComponent = ({ name }: { name: string | null | undefined }) => {
     if (!name) return null;
