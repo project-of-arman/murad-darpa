@@ -160,16 +160,16 @@ export default function ResultsTable({ results }: { results: ResultWithStudentIn
        <div className="md:hidden space-y-4">
         {paginatedResults.length > 0 ? paginatedResults.map((result) => (
             <Card key={result.id}>
-                <CardHeader>
+                <CardHeader className="p-4">
                     <CardTitle>{result.student_name}</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4 pt-0 text-sm space-y-1">
                     <p><strong>রোল:</strong> {result.student_roll}</p>
                     <p><strong>শ্রেণী:</strong> {result.class_name}</p>
                     <p><strong>পরীক্ষা:</strong> {result.exam_name}</p>
                     <p><strong>GPA:</strong> {result.final_gpa}</p>
                 </CardContent>
-                <CardFooter className="flex justify-end gap-2">
+                <CardFooter className="flex justify-end gap-2 p-2 pt-0 border-t">
                     <Button variant="outline" size="sm" asChild>
                         <Link href={`/admin/results/edit/${result.id}`}>সম্পাদনা</Link>
                     </Button>
