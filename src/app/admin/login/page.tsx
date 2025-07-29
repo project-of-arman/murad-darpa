@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -8,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Lock } from 'lucide-react';
 import { login } from '@/lib/actions/auth-actions';
+import Link from 'next/link';
 
 interface LoginPageProps {
   onLoginSuccess: () => void;
@@ -30,7 +32,7 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
     } else {
       toast({
         title: 'Login Failed',
-        description: result.error || 'Incorrect username or password. Please try again.',
+        description: result.error || 'Incorrect credentials. Please try again.',
         variant: 'destructive',
       });
     }
@@ -48,16 +50,23 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
         <form onSubmit={handleLogin}>
           <CardContent className="space-y-4">
              <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="identifier">Username, Email, or Phone</Label>
               <Input
-                id="username"
-                name="username"
-                placeholder="Enter your username"
+                id="identifier"
+                name="identifier"
+                placeholder="Enter your username, email, or phone"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+                <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Password</Label>
+                    <Link href="/admin/forgot-password"
+                        className="text-sm text-primary hover:underline"
+                    >
+                        Forgot password?
+                    </Link>
+                </div>
               <Input
                 id="password"
                 name="password"

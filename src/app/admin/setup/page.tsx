@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState } from 'react';
@@ -65,6 +66,26 @@ export default function AdminSetupPage({ onSetupSuccess }: AdminSetupPageProps) 
                                 id="username"
                                 name="username"
                                 placeholder="Choose a username"
+                                required
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="email">Email</Label>
+                            <Input
+                                id="email"
+                                name="email"
+                                type="email"
+                                placeholder="Enter your email"
+                                required
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="phone">Phone</Label>
+                            <Input
+                                id="phone"
+                                name="phone"
+                                type="tel"
+                                placeholder="Enter your phone number"
                                 required
                             />
                         </div>

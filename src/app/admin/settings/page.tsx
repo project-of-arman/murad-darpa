@@ -1,17 +1,18 @@
 
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { getSiteSettings } from "@/lib/settings-data";
 import SettingsForm from "@/components/admin/settings/settings-form";
 import SchoolInfoForm from "@/components/admin/settings/school-info-form";
 import AdminAccountForm from "@/components/admin/settings/admin-account-form";
 import type { SchoolInfo } from "@/lib/school-data";
-import { getAdminUsername } from "@/lib/actions/auth-actions";
+import { getAdminAccount } from "@/lib/actions/auth-actions";
 import { toDataURL } from "@/lib/utils";
 
 export default async function AdminSettingsPage() {
-  const [settingsData, username] = await Promise.all([
+  const [settingsData, adminAccount] = await Promise.all([
     getSiteSettings(),
-    getAdminUsername()
+    getAdminAccount()
   ]);
   
   // Convert any buffer data to base64 strings before passing to client components
@@ -62,7 +63,7 @@ export default async function AdminSettingsPage() {
                 <p className="text-muted-foreground mb-4">
                 আপনার অ্যাডমিন ইউজারনেম এবং পাসওয়ার্ড পরিবর্তন করুন।
                 </p>
-                <AdminAccountForm username={username || ''} />
+                <AdminAccountForm account={adminAccount} />
             </CardContent>
         </Card>
     </div>

@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -9,10 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { updateAdminCredentials } from "@/lib/actions/auth-actions";
+import { updateAdminCredentials, AdminAccount } from "@/lib/actions/auth-actions";
 
 const formSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters."),
+  email: z.string().email("Invalid email address."),
+  phone: z.string().min(1, "Phone number is required."),
   newPassword: z.string().min(6, "New password must be at least 6 characters.").optional().or(z.literal('')),
   confirmPassword: z.string().optional(),
 }).refine((data) => data.newPassword === data.confirmPassword, {
@@ -22,13 +25,15 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function AdminAccountForm({ username }: { username: string }) {
+export default function AdminAccountForm({ account }: { account: AdminAccount | null }) {
   const { toast } = useToast();
   const router = useRouter();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-        username: username,
+        username: account?.username || '',
+        email: account?.email || '',
+        phone: account?.phone || '',
         newPassword: '',
         confirmPassword: '',
     },
@@ -46,6 +51,8 @@ export default function AdminAccountForm({ username }: { username: string }) {
 
     const formData = new FormData();
     formData.append('username', values.username);
+    formData.append('email', values.email);
+    formData.append('phone', values.phone);
     if (values.newPassword) {
       formData.append('newPassword', values.newPassword);
     }
@@ -68,6 +75,16 @@ export default function AdminAccountForm({ username }: { username: string }) {
           <Label htmlFor="username">ইউজারনেম</Label>
           <Input id="username" {...register("username")} />
           {errors.username && <p className="text-sm font-medium text-destructive">{errors.username.message}</p>}
+        </FormItem>
+        <FormItem>
+          <Label htmlFor="email">ইমেইল</Label>
+          <Input id="email" type="email" {...register("email")} />
+          {errors.email && <p className="text-sm font-medium text-destructive">{errors.email.message}</p>}
+        </FormItem>
+        <FormItem>
+          <Label htmlFor="phone">ফোন নম্বর</Label>
+          <Input id="phone" type="tel" {...register("phone")} />
+          {errors.phone && <p className="text-sm font-medium text-destructive">{errors.phone.message}</p>}
         </FormItem>
         <FormItem>
           <Label htmlFor="newPassword">নতুন পাসওয়ার্ড (খালি রাখলে পরিবর্তন হবে না)</Label>
