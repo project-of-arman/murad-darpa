@@ -20,7 +20,7 @@ export default async function EditNavLinkPage({ params }: { params: { id: string
         <CardTitle>নেভিগেশন লিংক সম্পাদনা করুন</CardTitle>
       </CardHeader>
       <CardContent>
-        <NavLinkForm link={link} allLinks={allLinks} />
+        <NavLinkForm link={link} allLinks={allLinks} parentId={link.parent_id || undefined} />
       </CardContent>
     </Card>
   );

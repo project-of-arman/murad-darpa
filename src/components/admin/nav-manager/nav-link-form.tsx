@@ -25,7 +25,8 @@ const iconNames = Object.keys(LucideIcons).filter(k =>
     k[0] === k[0].toUpperCase()
 ).sort();
 
-const IconComponent = ({ name }: { name: string }) => {
+const IconComponent = ({ name }: { name: string | null | undefined }) => {
+    if (!name) return null;
     const Icon = LucideIcons[name as keyof typeof LucideIcons] as React.ElementType;
     return Icon ? <Icon className="h-4 w-4" /> : null;
 };
@@ -98,11 +99,11 @@ export function NavLinkForm({ link, allLinks, parentId }: { link?: NavLink, allL
                 name="icon"
                 control={control}
                 render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value || ""}>
+                    <Select onValueChange={(value) => field.onChange(value === 'none' ? null : value)} value={field.value || 'none'}>
                         <SelectTrigger><SelectValue placeholder="আইকন নির্বাচন করুন" /></SelectTrigger>
                         <SelectContent>
                             <ScrollArea className="h-72">
-                                <SelectItem value="">No Icon</SelectItem>
+                                <SelectItem value="none">No Icon</SelectItem>
                                 {iconNames.map(iconName => (
                                     <SelectItem key={iconName} value={iconName}>
                                         <div className="flex items-center gap-2">
