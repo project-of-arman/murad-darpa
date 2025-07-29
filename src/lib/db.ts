@@ -7,21 +7,26 @@ declare const global: typeof globalThis & {
 
 let pool: mysql.Pool;
 
-// Function to retry getting a connection
-async function getReliableConnection(poolInstance: mysql.Pool, retries = 3, delay = 100): Promise<mysql.PoolConnection> {
-    for (let i = 0; i < retries; i++) {
-        try {
-            const connection = await poolInstance.getConnection();
-            return connection;
-        } catch (error: any) {
-            console.warn(`Failed to get DB connection on attempt ${i + 1}. Retrying...`);
-            if (i === retries - 1) throw error; // Rethrow last error
-            await new Promise(res => setTimeout(res, delay));
-        }
+// Function to retry a query on connection errors
+export async function queryWithRetry<T>(query: string, params: any[] = [], retries = 3, delay = 100): Promise<T> {
+  if (!pool) {
+    throw new Error("Database not connected.");
+  }
+  for (let i = 0; i < retries; i++) {
+    try {
+      const [rows] = await pool.query(query, params);
+      return rows as T;
+    } catch (error: any) {
+      if ((error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') && i < retries - 1) {
+        console.warn(`Query failed with ${error.code} on attempt ${i + 1}. Retrying in ${delay}ms...`);
+        await new Promise(res => setTimeout(res, delay));
+        continue;
+      }
+      throw error;
     }
-    throw new Error("Could not get a database connection after multiple retries.");
+  }
+  throw new Error("Database query failed after multiple retries.");
 }
-
 
 function getPool() {
   // If the pool is already cached on the global object (in a dev environment), use it.
@@ -70,7 +75,7 @@ function getPool() {
   pool = newPool;
 
   // Add a simple test to ensure the pool is working on creation.
-  getReliableConnection(pool).then(conn => {
+  pool.getConnection().then(conn => {
     console.log("Successfully connected to the database.");
     conn.release();
   }).catch(err => {

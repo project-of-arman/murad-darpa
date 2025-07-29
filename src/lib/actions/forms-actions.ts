@@ -2,7 +2,7 @@
 
 'use server';
 
-import pool from '../db';
+import pool, { queryWithRetry } from '../db';
 import { revalidatePath } from 'next/cache';
 import type { FormSubmission } from '../config/forms-config';
 import { formConfigs } from '../config/forms-config';
@@ -18,24 +18,7 @@ It provides functions to:
 */
 
 // ========= HELPERS =========
-
-async function queryWithRetry<T>(query: string, params: any[] = [], retries = 3, delay = 100): Promise<T> {
-  for (let i = 0; i < retries; i++) {
-    try {
-      if (!pool) throw new Error("Database not connected.");
-      const [rows] = await pool.query(query, params);
-      return rows as T;
-    } catch (error: any) {
-      if ((error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') && i < retries - 1) {
-        console.warn(`Query failed with ${error.code}. Retrying in ${delay}ms...`);
-        await new Promise(res => setTimeout(res, delay));
-        continue;
-      }
-      throw error;
-    }
-  }
-  throw new Error("Database query failed after multiple retries.");
-}
+// The queryWithRetry helper is now in db.ts
 
 
 // ========= DATA FETCHING =========

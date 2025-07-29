@@ -1,7 +1,7 @@
 
 'use server';
 
-import pool from './db';
+import pool, { queryWithRetry } from './db';
 import { revalidatePath } from 'next/cache';
 import { toDataURL } from './utils';
 
@@ -56,15 +56,14 @@ export async function getImportantLinkGroups(): Promise<ImportantLinkGroup[]> {
         return mockLinkCards;
     }
     try {
-        const [groups] = await pool.query('SELECT id, title, data_ai_hint, sort_order, IF(image IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image)), NULL) as image FROM important_link_groups ORDER BY sort_order ASC');
-        const linkGroups = groups as ImportantLinkGroup[];
-
-        for (const group of linkGroups) {
-            const [links] = await pool.query('SELECT * FROM important_links WHERE group_id = ? ORDER BY sort_order ASC', [group.id]);
-            group.links = links as Link[];
+        const groups = await queryWithRetry<ImportantLinkGroup[]>('SELECT id, title, data_ai_hint, sort_order, IF(image IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image)), NULL) as image FROM important_link_groups ORDER BY sort_order ASC');
+        
+        for (const group of groups) {
+            const links = await queryWithRetry<Link[]>('SELECT * FROM important_links WHERE group_id = ? ORDER BY sort_order ASC', [group.id]);
+            group.links = links;
         }
 
-        return linkGroups;
+        return groups;
     } catch (error) {
         console.error('Failed to fetch important link groups, returning mock data:', error);
         return mockLinkCards;
