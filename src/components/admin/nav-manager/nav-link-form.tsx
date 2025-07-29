@@ -77,10 +77,13 @@ export function NavLinkForm({ link, allLinks, parentId }: { link?: NavLink, allL
                 name="parent_id"
                 control={control}
                 render={({ field }) => (
-                     <Select onValueChange={field.onChange} value={field.value?.toString() || ""}>
+                     <Select 
+                        onValueChange={(value) => field.onChange(value === 'none' ? null : Number(value))} 
+                        value={field.value?.toString() ?? 'none'}
+                     >
                         <SelectTrigger><SelectValue placeholder="No Parent" /></SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">No Parent</SelectItem>
+                            <SelectItem value="none">No Parent</SelectItem>
                             {allLinks.filter(l => !l.parent_id && l.id !== link?.id).map(l => (
                                 <SelectItem key={l.id} value={l.id.toString()}>{l.title}</SelectItem>
                             ))}
