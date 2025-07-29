@@ -4,6 +4,7 @@
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ApplicationChartProps {
     data: {
@@ -21,6 +22,8 @@ const chartConfig = {
 
 
 export default function ApplicationsChart({ data }: ApplicationChartProps) {
+    const isMobile = useIsMobile();
+    
     if (!data || data.length === 0) {
         return (
             <div className="flex items-center justify-center h-64">
@@ -33,18 +36,18 @@ export default function ApplicationsChart({ data }: ApplicationChartProps) {
         <div className="h-80 w-full">
             <ChartContainer config={chartConfig} className="w-full h-full">
                 <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data} margin={{ top: 20, right: 20, bottom: 5, left: 0 }}>
+                    <BarChart data={data} margin={{ top: 20, right: 20, bottom: isMobile ? 5 : 40, left: 0 }}>
                         <CartesianGrid vertical={false} />
                         <XAxis
                             dataKey="name"
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
-                            angle={-45}
-                            textAnchor="end"
-                            height={70}
+                            angle={isMobile ? 0 : -45}
+                            textAnchor={isMobile ? "middle" : "end"}
+                            height={isMobile ? 10 : 70}
                             interval={0}
-                            tick={{ fontSize: 12 }}
+                            tick={isMobile ? { dy: 10, fontSize: 0 } : { fontSize: 12 }}
                         />
                          <YAxis allowDecimals={false} />
                         <ChartTooltip

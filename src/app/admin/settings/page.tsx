@@ -45,8 +45,8 @@ export default async function AdminSettingsPage() {
 
         <Tabs defaultValue="site_settings" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="site_settings">সাইট সেটিংস</TabsTrigger>
                 <TabsTrigger value="school_info">স্কুলের তথ্য</TabsTrigger>
+                <TabsTrigger value="site_settings">সাইট সেটিংস</TabsTrigger>
                 <TabsTrigger value="admin_account">অ্যাডমিন অ্যাকাউন্ট</TabsTrigger>
             </TabsList>
             <TabsContent value="site_settings">
