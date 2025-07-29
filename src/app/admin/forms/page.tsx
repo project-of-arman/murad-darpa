@@ -1,7 +1,7 @@
 
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { getFormSubmissions } from "@/lib/actions/forms-actions";
+import { getFormSubmissions, getPendingSubmissionCounts } from "@/lib/actions/forms-actions";
 import { formConfigs } from "@/lib/config/forms-config";
 import FormsTabs from "@/components/admin/forms/forms-tabs";
 import type { FormSubmission } from "@/lib/config/forms-config";
@@ -9,9 +9,11 @@ import type { FormSubmission } from "@/lib/config/forms-config";
 export default async function AdminFormsPage() {
   const formTypes = Object.keys(formConfigs);
 
-  // Fetch data for all tabs concurrently
-  const allSubmissionsPromises = formTypes.map(formType => getFormSubmissions(formType));
-  const allSubmissionsArray = await Promise.all(allSubmissionsPromises);
+  // Fetch all data concurrently
+  const [allSubmissionsArray, pendingCounts] = await Promise.all([
+    Promise.all(formTypes.map(formType => getFormSubmissions(formType))),
+    getPendingSubmissionCounts()
+  ]);
 
   const submissionsByType: Record<string, FormSubmission[]> = {};
   formTypes.forEach((formType, index) => {
@@ -28,6 +30,7 @@ export default async function AdminFormsPage() {
           formTypes={formTypes}
           formConfigs={formConfigs}
           submissionsByType={submissionsByType}
+          pendingCounts={pendingCounts}
         />
       </CardContent>
     </Card>

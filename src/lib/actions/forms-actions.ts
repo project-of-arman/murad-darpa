@@ -1,4 +1,5 @@
 
+
 'use server';
 
 import pool from '../db';
@@ -116,4 +117,22 @@ export async function deleteSubmission(formType: string, id: number): Promise<Mu
     console.error(`Failed to delete submission for ${formType} with id ${id}:`, (error as Error).message);
     return { success: false, error: 'Database error' };
   }
+}
+
+export async function getPendingSubmissionCounts(): Promise<Record<string, number>> {
+    const counts: Record<string, number> = {};
+    if (!pool) return {};
+
+    for (const formType in formConfigs) {
+        const config = formConfigs[formType];
+        try {
+            const query = `SELECT COUNT(*) as count FROM ${config.tableName} WHERE status = 'pending'`;
+            const rows = await queryWithRetry<{ count: number }[]>(query);
+            counts[formType] = rows[0]?.count || 0;
+        } catch (error) {
+            // If table doesn't exist, count is 0.
+            counts[formType] = 0;
+        }
+    }
+    return counts;
 }
