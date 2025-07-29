@@ -7,6 +7,22 @@ declare const global: typeof globalThis & {
 
 let pool: mysql.Pool;
 
+// Function to retry getting a connection
+async function getReliableConnection(poolInstance: mysql.Pool, retries = 3, delay = 100): Promise<mysql.PoolConnection> {
+    for (let i = 0; i < retries; i++) {
+        try {
+            const connection = await poolInstance.getConnection();
+            return connection;
+        } catch (error: any) {
+            console.warn(`Failed to get DB connection on attempt ${i + 1}. Retrying...`);
+            if (i === retries - 1) throw error; // Rethrow last error
+            await new Promise(res => setTimeout(res, delay));
+        }
+    }
+    throw new Error("Could not get a database connection after multiple retries.");
+}
+
+
 function getPool() {
   // If the pool is already cached on the global object (in a dev environment), use it.
   if (process.env.NODE_ENV !== 'production' && global.dbPool) {
@@ -52,6 +68,15 @@ function getPool() {
   }
   
   pool = newPool;
+
+  // Add a simple test to ensure the pool is working on creation.
+  getReliableConnection(pool).then(conn => {
+    console.log("Successfully connected to the database.");
+    conn.release();
+  }).catch(err => {
+    console.error("Failed to establish initial database connection:", err);
+  });
+
 
   return pool;
 }
