@@ -162,7 +162,7 @@ export default function PageTable({ pages }: { pages: Page[] }) {
        <div className="md:hidden space-y-4">
         {paginatedPages.length > 0 ? paginatedPages.map((page) => (
           <Card key={page.id}>
-             <CardHeader>
+             <CardHeader className="p-4">
               <div className="flex items-center gap-4">
                 <Image 
                   src={page.thumbnail || "https://placehold.co/40x40.png"}
@@ -172,14 +172,14 @@ export default function PageTable({ pages }: { pages: Page[] }) {
                   className="rounded-md object-cover"
                 />
                 <div>
-                  <CardTitle>{page.title}</CardTitle>
+                  <CardTitle className="text-base">{page.title}</CardTitle>
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-4 pb-2">
               <p><strong>স্লাগ:</strong> /{page.slug}</p>
             </CardContent>
-            <CardFooter className="flex justify-end gap-2">
+            <CardFooter className="flex justify-end gap-2 p-2">
               <Button variant="ghost" size="sm" asChild>
                   <Link href={`/${page.slug}`} target="_blank">দেখুন</Link>
               </Button>

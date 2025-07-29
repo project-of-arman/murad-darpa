@@ -33,6 +33,7 @@ import { GalleryImage, deleteGalleryImage } from "@/lib/gallery-data";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function GalleryImageTable({ images }: { images: GalleryImage[] }) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -61,7 +62,8 @@ export default function GalleryImageTable({ images }: { images: GalleryImage[] }
 
   return (
     <>
-      <div className="border rounded-md">
+      {/* Desktop View */}
+      <div className="border rounded-md hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -121,6 +123,36 @@ export default function GalleryImageTable({ images }: { images: GalleryImage[] }
           </TableBody>
         </Table>
       </div>
+
+      {/* Mobile View */}
+       <div className="md:hidden space-y-4">
+        {images.length > 0 ? images.map((image) => (
+            <Card key={image.id}>
+                 <CardContent className="p-4 flex gap-4">
+                    <Image
+                        src={image.image_url || "https://placehold.co/40x40.png"}
+                        alt={image.title}
+                        width={100}
+                        height={80}
+                        className="rounded-md object-cover"
+                    />
+                    <div className="space-y-1">
+                        <CardTitle className="text-base">{image.title}</CardTitle>
+                        <p className="text-sm">অবস্থান: {image.sort_order}</p>
+                    </div>
+                </CardContent>
+                <CardFooter className="flex justify-end gap-2">
+                     <Button variant="outline" size="sm" asChild>
+                        <Link href={`/admin/gallery/photos/edit/${image.id}`}>সম্পাদনা</Link>
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(image)}>মুছুন</Button>
+                </CardFooter>
+            </Card>
+        )) : (
+            <p className="text-center text-muted-foreground py-8">কোনো ছবি পাওয়া যায়নি।</p>
+        )}
+      </div>
+
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

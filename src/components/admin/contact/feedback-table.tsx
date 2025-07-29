@@ -11,12 +11,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -34,10 +28,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Trash, Eye } from "lucide-react";
+import { Trash, Eye } from "lucide-react";
 import { ContactSubmission, deleteContactSubmission } from "@/lib/contact-data";
 import { useToast } from "@/hooks/use-toast";
-import { CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 
@@ -46,6 +40,7 @@ const ITEMS_PER_PAGE = 10;
 export default function FeedbackTable({ submissions }: { submissions: ContactSubmission[] }) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedSubmission, setSelectedSubmission] = useState<ContactSubmission | null>(null);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
@@ -75,6 +70,11 @@ export default function FeedbackTable({ submissions }: { submissions: ContactSub
     setSelectedSubmission(submission);
     setIsDeleteDialogOpen(true);
   };
+  
+  const handleViewClick = (submission: ContactSubmission) => {
+    setSelectedSubmission(submission);
+    setIsViewDialogOpen(true);
+  }
 
   const handleConfirmDelete = async () => {
     if (selectedSubmission) {
@@ -90,6 +90,23 @@ export default function FeedbackTable({ submissions }: { submissions: ContactSub
     }
   };
 
+  const ViewDialog = ({ submission }: { submission: ContactSubmission }) => (
+      <Dialog open={isViewDialogOpen && selectedSubmission?.id === submission.id} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent>
+            <DialogHeader><DialogTitle>{submission.subject}</DialogTitle></DialogHeader>
+            <div>
+                <p><strong>নাম:</strong> {submission.name}</p>
+                <p><strong>ইমেইল:</strong> {submission.email}</p>
+                <p><strong>তারিখ:</strong> {new Date(submission.created_at).toLocaleString('bn-BD')}</p>
+                <div className="mt-4 pt-4 border-t">
+                    <p>{submission.message}</p>
+                </div>
+            </div>
+        </DialogContent>
+    </Dialog>
+  )
+
+
   return (
     <>
       <div className="mb-4">
@@ -103,7 +120,9 @@ export default function FeedbackTable({ submissions }: { submissions: ContactSub
             className="max-w-sm"
         />
       </div>
-      <div className="border rounded-md">
+
+      {/* Desktop View */}
+      <div className="border rounded-md hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -122,22 +141,7 @@ export default function FeedbackTable({ submissions }: { submissions: ContactSub
                 <TableCell>{submission.subject}</TableCell>
                 <TableCell>{new Date(submission.created_at).toLocaleDateString('bn-BD')}</TableCell>
                 <TableCell className="text-right">
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8"><Eye className="h-4 w-4" /></Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader><DialogTitle>{submission.subject}</DialogTitle></DialogHeader>
-                            <div>
-                                <p><strong>নাম:</strong> {submission.name}</p>
-                                <p><strong>ইমেইল:</strong> {submission.email}</p>
-                                <p><strong>তারিখ:</strong> {new Date(submission.created_at).toLocaleString('bn-BD')}</p>
-                                <div className="mt-4 pt-4 border-t">
-                                    <p>{submission.message}</p>
-                                </div>
-                            </div>
-                        </DialogContent>
-                    </Dialog>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleViewClick(submission)}><Eye className="h-4 w-4" /></Button>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDeleteClick(submission)}>
                         <Trash className="h-4 w-4" />
                     </Button>
@@ -154,6 +158,30 @@ export default function FeedbackTable({ submissions }: { submissions: ContactSub
         </Table>
       </div>
       
+       {/* Mobile View */}
+      <div className="md:hidden space-y-4">
+        {paginatedSubmissions.length > 0 ? paginatedSubmissions.map((submission) => (
+            <Card key={submission.id}>
+                <CardHeader>
+                    <CardTitle>{submission.subject}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p><strong>নাম:</strong> {submission.name}</p>
+                    <p><strong>ইমেইল:</strong> {submission.email}</p>
+                    <p><strong>তারিখ:</strong> {new Date(submission.created_at).toLocaleDateString('bn-BD')}</p>
+                </CardContent>
+                <CardFooter className="flex justify-end gap-2">
+                    <Button variant="outline" size="sm" onClick={() => handleViewClick(submission)}>বিস্তারিত দেখুন</Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(submission)}>মুছুন</Button>
+                </CardFooter>
+            </Card>
+        )) : (
+            <div className="text-center text-muted-foreground py-8">
+                কোনো মতামত পাওয়া যায়নি।
+            </div>
+        )}
+      </div>
+
       {totalPages > 1 && (
         <CardFooter className="flex items-center justify-between pt-4 px-0">
           <span className="text-sm text-muted-foreground">
@@ -165,6 +193,8 @@ export default function FeedbackTable({ submissions }: { submissions: ContactSub
           </div>
         </CardFooter>
       )}
+      
+      {selectedSubmission && <ViewDialog submission={selectedSubmission}/>}
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
@@ -181,4 +211,3 @@ export default function FeedbackTable({ submissions }: { submissions: ContactSub
     </>
   );
 }
-

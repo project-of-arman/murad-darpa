@@ -31,7 +31,7 @@ import { MoreHorizontal, Trash, Edit } from "lucide-react";
 import { ResultWithStudentInfo, deleteResult } from "@/lib/actions/results-actions";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import { CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 
@@ -98,7 +98,8 @@ export default function ResultsTable({ results }: { results: ResultWithStudentIn
             className="max-w-sm"
         />
       </div>
-      <div className="border rounded-md">
+      {/* Desktop View */}
+      <div className="border rounded-md hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -154,6 +155,33 @@ export default function ResultsTable({ results }: { results: ResultWithStudentIn
           </TableBody>
         </Table>
       </div>
+
+       {/* Mobile View */}
+       <div className="md:hidden space-y-4">
+        {paginatedResults.length > 0 ? paginatedResults.map((result) => (
+            <Card key={result.id}>
+                <CardHeader>
+                    <CardTitle>{result.student_name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p><strong>রোল:</strong> {result.student_roll}</p>
+                    <p><strong>শ্রেণী:</strong> {result.class_name}</p>
+                    <p><strong>পরীক্ষা:</strong> {result.exam_name}</p>
+                    <p><strong>GPA:</strong> {result.final_gpa}</p>
+                </CardContent>
+                <CardFooter className="flex justify-end gap-2">
+                    <Button variant="outline" size="sm" asChild>
+                        <Link href={`/admin/results/edit/${result.id}`}>সম্পাদনা</Link>
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(result)}>মুছুন</Button>
+                </CardFooter>
+            </Card>
+        )) : (
+            <div className="text-center text-muted-foreground py-8">
+                কোনো ফলাফল পাওয়া যায়নি।
+            </div>
+        )}
+       </div>
       
       {totalPages > 1 && (
         <CardFooter className="flex items-center justify-between pt-4 px-0">

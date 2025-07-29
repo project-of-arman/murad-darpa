@@ -33,6 +33,7 @@ import { CarouselItem, deleteCarouselItem } from "@/lib/school-data";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function CarouselTable({ items }: { items: CarouselItem[] }) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -61,7 +62,8 @@ export default function CarouselTable({ items }: { items: CarouselItem[] }) {
 
   return (
     <>
-      <div className="border rounded-md">
+      {/* Desktop View */}
+      <div className="border rounded-md hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -121,6 +123,37 @@ export default function CarouselTable({ items }: { items: CarouselItem[] }) {
           </TableBody>
         </Table>
       </div>
+
+      {/* Mobile View */}
+      <div className="md:hidden space-y-4">
+        {items.length > 0 ? items.map((item) => (
+            <Card key={item.id}>
+                 <CardContent className="p-4 flex gap-4">
+                    <Image
+                        src={item.src}
+                        alt={item.title}
+                        width={100}
+                        height={60}
+                        className="rounded-md object-cover"
+                    />
+                    <div className="space-y-1">
+                        <CardTitle className="text-base">{item.title}</CardTitle>
+                        <p className="text-sm">অবস্থান: {item.sort_order}</p>
+                    </div>
+                </CardContent>
+                <CardFooter className="flex justify-end gap-2">
+                     <Button variant="outline" size="sm" asChild>
+                        <Link href={`/admin/gallery/carousel/edit/${item.id}`}>সম্পাদনা</Link>
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(item)}>মুছুন</Button>
+                </CardFooter>
+            </Card>
+        )) : (
+            <p className="text-center text-muted-foreground py-8">কোনো স্লাইড পাওয়া যায়নি।</p>
+        )}
+      </div>
+
+
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

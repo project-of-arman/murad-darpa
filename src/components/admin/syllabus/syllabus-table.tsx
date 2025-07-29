@@ -31,7 +31,7 @@ import { MoreHorizontal, Trash, Edit, Download } from "lucide-react";
 import { Syllabus, deleteSyllabus } from "@/lib/syllabus-data";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import { CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -83,7 +83,8 @@ export default function SyllabusTable({ syllabuses }: { syllabuses: Syllabus[] }
 
   return (
     <>
-      <div className="border rounded-md">
+      {/* Desktop View */}
+      <div className="border rounded-md hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -147,6 +148,40 @@ export default function SyllabusTable({ syllabuses }: { syllabuses: Syllabus[] }
         </Table>
       </div>
       
+       {/* Mobile View */}
+       <div className="md:hidden space-y-4">
+        {paginatedSyllabuses.length > 0 ? paginatedSyllabuses.map((syllabus) => (
+            <Card key={syllabus.id}>
+                <CardHeader>
+                    <CardTitle>{syllabus.subject}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p><strong>শ্রেণী:</strong> {syllabus.class_name}</p>
+                    <div className="mt-2">
+                        {syllabus.file_url ? (
+                            <Button asChild variant="outline" size="sm">
+                                <a href={syllabus.file_url} download target="_blank">
+                                    <Download className="mr-2 h-4 w-4" />
+                                    ডাউনলোড
+                                </a>
+                            </Button>
+                        ) : (
+                            <span className="text-muted-foreground text-xs">ফাইল নেই</span>
+                        )}
+                    </div>
+                </CardContent>
+                <CardFooter className="flex justify-end gap-2">
+                    <Button variant="outline" size="sm" asChild>
+                        <Link href={`/admin/syllabus/edit/${syllabus.id}`}>সম্পাদনা</Link>
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(syllabus)}>মুছুন</Button>
+                </CardFooter>
+            </Card>
+        )) : (
+            <p className="text-center text-muted-foreground py-8">কোনো সিলেবাস পাওয়া যায়নি।</p>
+        )}
+      </div>
+
       {totalPages > 1 && (
         <CardFooter className="flex items-center justify-between pt-4 px-0">
           <span className="text-sm text-muted-foreground">

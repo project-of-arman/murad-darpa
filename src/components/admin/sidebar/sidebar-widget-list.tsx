@@ -33,6 +33,7 @@ import { SidebarWidget, deleteSidebarWidget } from "@/lib/sidebar-data";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
 
 const widgetTypeMap = {
     profile: 'প্রোফাইল',
@@ -67,7 +68,8 @@ export default function SidebarWidgetList({ widgets }: { widgets: SidebarWidget[
 
   return (
     <>
-      <div className="border rounded-md">
+      {/* Desktop View */}
+      <div className="border rounded-md hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -119,6 +121,30 @@ export default function SidebarWidgetList({ widgets }: { widgets: SidebarWidget[
           </TableBody>
         </Table>
       </div>
+
+      {/* Mobile View */}
+      <div className="md:hidden space-y-4">
+        {widgets.length > 0 ? widgets.map((widget) => (
+            <Card key={widget.id}>
+                <CardHeader>
+                    <CardTitle>{widget.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p><strong>ধরণ:</strong> {widgetTypeMap[widget.widget_type]}</p>
+                    <p><strong>অবস্থান:</strong> {widget.sort_order}</p>
+                </CardContent>
+                <CardFooter className="flex justify-end gap-2">
+                    <Button variant="outline" size="sm" asChild>
+                        <Link href={`/admin/sidebar/edit/${widget.id}`}>সম্পাদনা</Link>
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(widget)}>মুছুন</Button>
+                </CardFooter>
+            </Card>
+        )) : (
+             <p className="text-center text-muted-foreground py-8">কোনো উইজেট পাওয়া যায়নি।</p>
+        )}
+      </div>
+
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
