@@ -31,7 +31,7 @@ import { MoreHorizontal, Trash, Edit } from "lucide-react";
 import { ExamRoutine, deleteExamRoutine } from "@/lib/exam-routine-data";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import { CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 
@@ -98,7 +98,8 @@ export default function ExamRoutineTable({ routines }: { routines: ExamRoutine[]
             className="max-w-sm"
         />
       </div>
-      <div className="border rounded-md">
+      {/* Desktop View */}
+      <div className="border rounded-md hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -155,6 +156,33 @@ export default function ExamRoutineTable({ routines }: { routines: ExamRoutine[]
         </Table>
       </div>
       
+       {/* Mobile View */}
+       <div className="md:hidden space-y-4">
+        {paginatedRoutines.length > 0 ? paginatedRoutines.map((routine) => (
+            <Card key={routine.id}>
+                <CardHeader>
+                    <CardTitle>{routine.subject}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                    <p><strong>শ্রেণী:</strong> {routine.class_name}</p>
+                    <p><strong>পরীক্ষা:</strong> {routine.exam_name}</p>
+                    <p><strong>তারিখ:</strong> {new Date(routine.exam_date).toLocaleDateString('bn-BD')}</p>
+                    <p><strong>সময়:</strong> {routine.start_time.substring(0,5)} - {routine.end_time.substring(0,5)}</p>
+                </CardContent>
+                <CardFooter className="flex justify-end gap-2">
+                    <Button variant="outline" size="sm" asChild>
+                        <Link href={`/admin/exam-routine/edit/${routine.id}`}>সম্পাদনা</Link>
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(routine)}>মুছুন</Button>
+                </CardFooter>
+            </Card>
+        )) : (
+            <div className="text-center text-muted-foreground py-8">
+                 কোনো রুটিন পাওয়া যায়নি।
+            </div>
+        )}
+      </div>
+
       {totalPages > 1 && (
         <CardFooter className="flex items-center justify-between pt-4 px-0">
           <span className="text-sm text-muted-foreground">
@@ -182,3 +210,4 @@ export default function ExamRoutineTable({ routines }: { routines: ExamRoutine[]
     </>
   );
 }
+
