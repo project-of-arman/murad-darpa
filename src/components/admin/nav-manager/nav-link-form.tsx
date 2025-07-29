@@ -37,6 +37,13 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+const educationIcons = [
+  'Home', 'Book', 'BookOpen', 'GraduationCap', 'Award', 'Trophy', 
+  'Users', 'User', 'ClipboardList', 'Calendar', 'FileText', 'Newspaper', 
+  'Library', 'Landmark', 'Building', 'PenSquare', 'Edit', 'Info', 'MessageSquare', 'GalleryVerticalEnd'
+].sort();
+
+
 export function NavLinkForm({ link, allLinks, parentId }: { link?: NavLink, allLinks: NavLink[], parentId?: number }) {
   const { toast } = useToast();
   const router = useRouter();
@@ -51,14 +58,6 @@ export function NavLinkForm({ link, allLinks, parentId }: { link?: NavLink, allL
       icon: link?.icon || null,
     },
   });
-
-  const iconNames = React.useMemo(() => 
-    Object.keys(LucideIcons || {}).filter(k => 
-        typeof (LucideIcons as any)[k] === 'object' && 
-        (LucideIcons as any)[k].displayName
-    ).sort()
-  , []);
-
 
   async function onSubmit(values: FormValues) {
     const result = await saveNavLink(values, link?.id);
@@ -108,7 +107,7 @@ export function NavLinkForm({ link, allLinks, parentId }: { link?: NavLink, allL
                         <SelectContent>
                             <ScrollArea className="h-72">
                                 <SelectItem value="none">No Icon</SelectItem>
-                                {iconNames.map(iconName => (
+                                {educationIcons.map(iconName => (
                                     <SelectItem key={iconName} value={iconName}>
                                         <div className="flex items-center gap-2">
                                             <IconComponent name={iconName} />
