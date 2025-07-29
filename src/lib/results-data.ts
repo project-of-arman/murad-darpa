@@ -90,7 +90,8 @@ export async function getResultByRollAndClass(roll: string, className: string): 
             SELECT 
                 r.id, s.roll, s.class_name, s.name_bn as name, r.exam_name,
                 s.father_name_bn as father_name, s.mother_name_bn as mother_name,
-                s.image, s.data_ai_hint, r.final_gpa, r.status
+                IF(s.image IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(s.image)), NULL) as image, 
+                s.data_ai_hint, r.final_gpa, r.status
             FROM results r
             JOIN students s ON r.student_id = s.id
             WHERE s.roll = ? AND s.class_name = ?
