@@ -7,20 +7,21 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Lock } from 'lucide-react';
+import { login } from '@/lib/actions/auth-actions';
 
 interface LoginPageProps {
   onLoginSuccess: () => void;
 }
 
 export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
-  const [password, setPassword] = useState('');
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real application, this would be a call to a server for authentication.
-    // For this example, we'll use a simple hardcoded password.
-    if (password === 'admin') {
+    const formData = new FormData(e.target as HTMLFormElement);
+    const result = await login(formData);
+
+    if (result.success) {
       onLoginSuccess();
       toast({
         title: 'Login Successful',
@@ -29,7 +30,7 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
     } else {
       toast({
         title: 'Login Failed',
-        description: 'Incorrect password. Please try again.',
+        description: result.error || 'Incorrect username or password. Please try again.',
         variant: 'destructive',
       });
     }
@@ -46,14 +47,22 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
         </CardHeader>
         <form onSubmit={handleLogin}>
           <CardContent className="space-y-4">
+             <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                name="username"
+                placeholder="Enter your username"
+                required
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
+                name="password"
                 type="password"
                 placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
