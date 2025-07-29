@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -10,61 +11,66 @@ export function RouteProgressBar() {
   const searchParams = useSearchParams();
   const [progress, setProgress] = React.useState(0);
   const [isVisible, setIsVisible] = React.useState(false);
+  const [isMounted, setIsMounted] = React.useState(false);
 
   React.useEffect(() => {
-    setProgress(0);
+    setIsMounted(true);
+  }, []);
+
+  React.useEffect(() => {
+    if (!isMounted) return;
+    
+    // Reset progress on route change
     setIsVisible(false);
-  }, [pathname, searchParams]);
+    setProgress(0);
+    
+    // Use a timeout to allow the old page to unmount and the new one to start mounting.
+    const startTimer = setTimeout(() => {
+        setIsVisible(true);
+        setProgress(10); // Initial progress
+    }, 100);
+
+    return () => clearTimeout(startTimer);
+  }, [pathname, searchParams, isMounted]);
 
   React.useEffect(() => {
-    let timer: NodeJS.Timeout;
-    
-    // This is a simplified progress simulation.
-    // When the component is first mounted for a new route, start the progress.
-    if (!isVisible && progress === 0) {
-      setIsVisible(true);
-      // Start with a small initial progress
-      setProgress(10); 
-      
-      // Simulate loading progress
-      timer = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 95) {
-            clearInterval(timer);
-            return prev;
-          }
-          // Slow down progress as it gets closer to 100
-          const increment = prev > 80 ? 1 : (prev > 50 ? 5 : 10);
-          return Math.min(prev + increment, 95);
-        });
-      }, 200);
-    }
-    
-    // On cleanup (when new page is fully loaded and this component unmounts),
-    // we want to quickly finish the progress bar.
+    if (!isVisible) return;
+
+    // Simulate loading progress
+    const progressTimer = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 95) {
+          clearInterval(progressTimer);
+          return 95;
+        }
+        const increment = prev > 80 ? 1 : (prev > 50 ? 5 : 10);
+        return Math.min(prev + increment, 95);
+      });
+    }, 200);
+
+    return () => clearInterval(progressTimer);
+  }, [isVisible]);
+
+  // When the component unmounts (new page is fully loaded), we want to quickly finish the progress bar.
+   React.useEffect(() => {
     return () => {
-      clearInterval(timer);
       setProgress(100);
       setTimeout(() => {
           setIsVisible(false);
-          setTimeout(() => setProgress(0), 500);
+          // We don't reset to 0 here because the new instance will handle it.
       }, 500);
     };
-  }, [pathname, searchParams]); // Rerun effect on route change
-  
-   React.useEffect(() => {
-    // When the component unmounts (because the new route has loaded),
-    // we set progress to 100 to complete the bar.
-    return () => {
-      setProgress(100);
-    };
   }, [pathname, searchParams]);
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <Progress
       value={progress}
       className={cn(
-        "fixed top-0 left-0 right-0 h-1 w-full rounded-none bg-transparent transition-opacity duration-300",
+        "fixed top-0 left-0 right-0 h-1 w-full rounded-none bg-transparent transition-opacity duration-300 z-50",
         isVisible ? "opacity-100" : "opacity-0"
       )}
     />
