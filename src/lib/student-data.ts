@@ -93,7 +93,7 @@ export async function getStudents(): Promise<Student[]> {
         return mockStudents;
     }
     try {
-        const [rows] = await pool.query('SELECT id, roll, name_bn as name, class_name, gender, year, image, data_ai_hint FROM students ORDER BY year DESC, class_name, roll ASC');
+        const [rows] = await pool.query('SELECT id, roll, name_bn as name, class_name, gender, year, IF(image IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image)), NULL) as image, data_ai_hint FROM students ORDER BY year DESC, class_name, roll ASC');
         return rows as Student[];
     } catch (error) {
         console.error('Failed to fetch students, returning mock data:', error);
@@ -134,7 +134,7 @@ export async function getStudentByRoll(roll: string): Promise<Student | null> {
         return mockStudents.find(s => s.roll === roll) || null;
     }
     try {
-        const [rows] = await pool.query('SELECT id, roll, name_bn as name, class_name, gender, year, image, data_ai_hint FROM students WHERE roll = ?', [roll]);
+        const [rows] = await pool.query('SELECT id, roll, name_bn as name, class_name, gender, year, IF(image IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image)), NULL) as image, data_ai_hint FROM students WHERE roll = ?', [roll]);
         const students = rows as Student[];
         return students[0] || null;
     } catch (error) {
@@ -231,3 +231,5 @@ export async function deleteStudent(id: number): Promise<SaveResult> {
     return { success: false, error: "একটি সার্ভার ত্রুটি হয়েছে।" };
   }
 }
+
+    
