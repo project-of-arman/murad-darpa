@@ -33,7 +33,7 @@ import { SidebarWidget, deleteSidebarWidget } from "@/lib/sidebar-data";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 const widgetTypeMap = {
     profile: 'প্রোফাইল',
