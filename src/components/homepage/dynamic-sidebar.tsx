@@ -1,14 +1,10 @@
 
-"use client";
-
 import { getSidebarWidgets, SidebarWidget } from "@/lib/sidebar-data";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CheckCircle } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Skeleton } from "../ui/skeleton";
+import { CheckCircle } from "lucide-react";
 
 function ProfileWidget({ widget }: { widget: SidebarWidget }) {
     return (
@@ -98,41 +94,8 @@ function ImageLinkWidget({ widget }: { widget: SidebarWidget }) {
     );
 }
 
-
-const SidebarSkeleton = () => (
-    <div className="space-y-8">
-        {Array.from({ length: 3 }).map((_, i) => (
-            <Card key={i} className="shadow-lg border-primary/20">
-                <CardHeader className="p-0">
-                    <Skeleton className="h-12 w-full rounded-t-lg rounded-b-none" />
-                </CardHeader>
-                <CardContent className="p-4 space-y-4">
-                    <Skeleton className="h-40 w-full" />
-                    <Skeleton className="h-6 w-3/4 mx-auto" />
-                </CardContent>
-            </Card>
-        ))}
-    </div>
-);
-
-
-export default function DynamicSidebar() {
-    const [widgets, setWidgets] = useState<SidebarWidget[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        async function fetchWidgets() {
-            setLoading(true);
-            const fetchedWidgets = await getSidebarWidgets();
-            setWidgets(fetchedWidgets);
-            setLoading(false);
-        }
-        fetchWidgets();
-    }, []);
-    
-    if (loading) {
-        return <SidebarSkeleton />;
-    }
+export default async function DynamicSidebar() {
+    const widgets = await getSidebarWidgets();
 
     return (
         <div className="space-y-8">
