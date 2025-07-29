@@ -15,8 +15,8 @@ export default async function AdminSyllabusPage() {
         <CardTitle>সিলেবাস ব্যবস্থাপনা</CardTitle>
         <Button asChild>
           <Link href="/admin/syllabus/new">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            নতুন সিলেবাস যোগ করুন
+            <PlusCircle className="mx-2 h-4 w-4" />
+          <span className="hidden sm:flex">  নতুন সিলেবাস যোগ করুন</span>
           </Link>
         </Button>
       </CardHeader>

@@ -15,8 +15,8 @@ export default async function AdminNavManagerPage() {
         <CardTitle>নেভিগেশন মেনু ব্যবস্থাপনা</CardTitle>
         <Button asChild>
           <Link href="/admin/nav-manager/new">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            নতুন লিংক যোগ করুন
+            <PlusCircle className="mx-2 h-4 w-4" />
+             <span className="hidden sm:flex">নতুন লিংক যোগ করুন</span>
           </Link>
         </Button>
       </CardHeader>

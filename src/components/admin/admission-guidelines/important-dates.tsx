@@ -22,6 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { saveImportantDate, deleteImportantDate } from "@/lib/actions/admission-guidelines-actions";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 
 
 const formSchema = z.object({
@@ -71,10 +72,12 @@ function DateForm({ date, onFinished }: { date?: ImportantDate, onFinished: () =
 
 export default function ImportantDates({ dates }: { dates: ImportantDate[] }) {
     const [open, setOpen] = useState(false);
+    const [editItemId, setEditItemId] = useState<number | null>(null);
     const router = useRouter();
 
     const onFormFinished = () => {
         setOpen(false);
+        setEditItemId(null);
         router.refresh();
     }
     
@@ -102,7 +105,8 @@ export default function ImportantDates({ dates }: { dates: ImportantDate[] }) {
                     </DialogContent>
                 </Dialog>
             </div>
-            <div className="border rounded-md">
+            {/* Desktop View */}
+            <div className="border rounded-md hidden md:block">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -119,17 +123,13 @@ export default function ImportantDates({ dates }: { dates: ImportantDate[] }) {
                                 <TableCell>{date.date_value}</TableCell>
                                 <TableCell>{date.sort_order}</TableCell>
                                 <TableCell className="text-right">
-                                     <Dialog>
+                                     <Dialog open={editItemId === date.id} onOpenChange={(isOpen) => setEditItemId(isOpen ? date.id : null)}>
                                         <DialogTrigger asChild>
                                             <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
                                         </DialogTrigger>
                                         <DialogContent>
                                             <DialogHeader><DialogTitle>তারিখ সম্পাদনা করুন</DialogTitle></DialogHeader>
-                                            <DateForm date={date} onFinished={() => {
-                                                const closeButton = document.querySelector('[aria-label="Close"]');
-                                                if(closeButton instanceof HTMLElement) closeButton.click();
-                                                router.refresh();
-                                            }} />
+                                            <DateForm date={date} onFinished={onFormFinished} />
                                         </DialogContent>
                                     </Dialog>
                                     
@@ -150,6 +150,43 @@ export default function ImportantDates({ dates }: { dates: ImportantDate[] }) {
                         ))}
                     </TableBody>
                 </Table>
+            </div>
+            {/* Mobile View */}
+            <div className="md:hidden space-y-4">
+                {dates.map((date) => (
+                    <Card key={date.id}>
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-base">{date.label}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-sm">
+                            <p><strong>তারিখ:</strong> {date.date_value}</p>
+                            <p><strong>অবস্থান:</strong> {date.sort_order}</p>
+                        </CardContent>
+                        <CardFooter className="flex justify-end gap-2">
+                            <Dialog open={editItemId === date.id} onOpenChange={(isOpen) => setEditItemId(isOpen ? date.id : null)}>
+                                <DialogTrigger asChild>
+                                    <Button variant="outline" size="sm">সম্পাদনা</Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader><DialogTitle>তারিখ সম্পাদনা করুন</DialogTitle></DialogHeader>
+                                    <DateForm date={date} onFinished={onFormFinished} />
+                                </DialogContent>
+                            </Dialog>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                     <Button variant="destructive" size="sm">মুছুন</Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader><AlertDialogTitle>আপনি কি নিশ্চিত?</AlertDialogTitle><AlertDialogDescription>এই তারিখটি স্থায়ীভাবে মুছে ফেলা হবে।</AlertDialogDescription></AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>বাতিল</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleDelete(date.id)} className="bg-destructive hover:bg-destructive/90">মুছুন</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </CardFooter>
+                    </Card>
+                ))}
             </div>
         </div>
     );

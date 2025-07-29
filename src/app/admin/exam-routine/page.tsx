@@ -15,8 +15,8 @@ export default async function AdminExamRoutinePage() {
         <CardTitle>পরীক্ষার রুটিন ব্যবস্থাপনা</CardTitle>
         <Button asChild>
           <Link href="/admin/exam-routine/new">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            নতুন রুটিন যোগ করুন
+            <PlusCircle className="mx-2 h-4 w-4" />
+           <span className="hidden sm:flex"> নতুন রুটিন যোগ করুন</span>
           </Link>
         </Button>
       </CardHeader>

@@ -21,8 +21,8 @@ export default async function AdminVideosPage() {
         <CardTitle>ভিডিও গ্যালারি ব্যবস্থাপনা</CardTitle>
         <Button asChild>
           <Link href="/admin/gallery/videos/new">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            নতুন ভিডিও যোগ করুন
+            <PlusCircle className="mx-2 h-4 w-4" />
+            <span className="hidden sm:flex">নতুন ভিডিও যোগ করুন</span>
           </Link>
         </Button>
       </CardHeader>

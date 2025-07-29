@@ -15,8 +15,8 @@ export default async function AdminSidebarPage() {
         <CardTitle>সাইডবার ব্যবস্থাপনা</CardTitle>
         <Button asChild>
           <Link href="/admin/sidebar/new">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            নতুন উইজেট যোগ করুন
+            <PlusCircle className="mx-2 h-4 w-4" />
+              <span className="hidden sm:flex">নতুন উইজেট যোগ করুন</span>
           </Link>
         </Button>
       </CardHeader>

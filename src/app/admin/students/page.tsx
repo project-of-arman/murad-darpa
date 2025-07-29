@@ -21,8 +21,8 @@ export default async function AdminStudentsPage() {
         <CardTitle>শিক্ষার্থী ব্যবস্থাপনা</CardTitle>
         <Button asChild>
           <Link href="/admin/students/new">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            নতুন শিক্ষার্থী যোগ করুন
+            <PlusCircle className="mx-2 h-4 w-4" />
+            <span className="hidden sm:flex">নতুন শিক্ষার্থী যোগ করুন</span>
           </Link>
         </Button>
       </CardHeader>

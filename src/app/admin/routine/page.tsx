@@ -15,8 +15,8 @@ export default async function AdminRoutinePage() {
         <CardTitle>রুটিন ব্যবস্থাপনা</CardTitle>
         <Button asChild>
           <Link href="/admin/routine/new">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            নতুন পিরিয়ড যোগ করুন
+            <PlusCircle className="mx-2 h-4 w-4" />
+           <span className="hidden sm:flex"> নতুন পিরিয়ড যোগ করুন</span>
           </Link>
         </Button>
       </CardHeader>

@@ -15,8 +15,8 @@ export default async function AdminImportantLinksPage() {
         <CardTitle>গুরুত্বপূর্ণ লিংক ব্যবস্থাপনা</CardTitle>
         <Button asChild>
           <Link href="/admin/important-links/groups/new">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            নতুন গ্রুপ যোগ করুন
+            <PlusCircle className="mx-2 h-4 w-4" />
+              <span className="hidden sm:flex">নতুন গ্রুপ যোগ করুন</span>
           </Link>
         </Button>
       </CardHeader>

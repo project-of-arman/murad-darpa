@@ -20,8 +20,8 @@ export default async function AdminCommitteePage() {
         <CardTitle>কমিটি ব্যবস্থাপনা</CardTitle>
         <Button asChild>
           <Link href="/admin/committee/new">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            নতুন সদস্য যোগ করুন
+            <PlusCircle className="mx-2 h-4 w-4" />
+            <span className="hidden sm:flex">নতুন সদস্য যোগ করুন</span>
           </Link>
         </Button>
       </CardHeader>

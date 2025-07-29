@@ -16,8 +16,8 @@ export default async function AdminPagesPage() {
         <CardTitle>পেজ ব্যবস্থাপনা</CardTitle>
         <Button asChild>
           <Link href="/admin/pages/new">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            নতুন পেজ যোগ করুন
+            <PlusCircle className="mx-2 h-4 w-4" />
+              <span className="hidden sm:flex">নতুন পেজ যোগ করুন</span>
           </Link>
         </Button>
       </CardHeader>

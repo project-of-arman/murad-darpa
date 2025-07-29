@@ -15,8 +15,8 @@ export default async function AdminPhotosPage() {
         <CardTitle>ছবি গ্যালারি ব্যবস্থাপনা</CardTitle>
         <Button asChild>
           <Link href="/admin/gallery/photos/new">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            নতুন ছবি যোগ করুন
+            <PlusCircle className="mx-2 h-4 w-4" />
+              <span className="hidden sm:flex">  নতুন ছবি যোগ করুন</span>
           </Link>
         </Button>
       </CardHeader>

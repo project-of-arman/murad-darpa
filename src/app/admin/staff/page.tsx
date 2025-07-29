@@ -21,8 +21,8 @@ export default async function AdminStaffPage() {
         <CardTitle>কর্মচারী ব্যবস্থাপনা</CardTitle>
         <Button asChild>
           <Link href="/admin/staff/new">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            নতুন কর্মচারী যোগ করুন
+            <PlusCircle className="mx-2 h-4 w-4" />
+              <span className="hidden sm:flex">নতুন কর্মচারী যোগ করুন</span>
           </Link>
         </Button>
       </CardHeader>
