@@ -32,7 +32,7 @@ import { MoreHorizontal, Trash, Edit, Eye } from "lucide-react";
 import { Page, deletePage } from "@/lib/page-data";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import { CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
 const ITEMS_PER_PAGE = 10;
@@ -90,7 +90,8 @@ export default function PageTable({ pages }: { pages: Page[] }) {
             className="max-w-sm"
         />
       </div>
-      <div className="border rounded-md">
+       {/* Desktop View */}
+      <div className="border rounded-md hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -155,6 +156,44 @@ export default function PageTable({ pages }: { pages: Page[] }) {
             )}
           </TableBody>
         </Table>
+      </div>
+
+       {/* Mobile View */}
+       <div className="md:hidden space-y-4">
+        {paginatedPages.length > 0 ? paginatedPages.map((page) => (
+          <Card key={page.id}>
+             <CardHeader>
+              <div className="flex items-center gap-4">
+                <Image 
+                  src={page.thumbnail || "https://placehold.co/40x40.png"}
+                  alt={page.title}
+                  width={40}
+                  height={40}
+                  className="rounded-md object-cover"
+                />
+                <div>
+                  <CardTitle>{page.title}</CardTitle>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p><strong>স্লাগ:</strong> /{page.slug}</p>
+            </CardContent>
+            <CardFooter className="flex justify-end gap-2">
+              <Button variant="ghost" size="sm" asChild>
+                  <Link href={`/${page.slug}`} target="_blank">দেখুন</Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link href={`/admin/pages/edit/${page.id}`}>সম্পাদনা</Link>
+              </Button>
+              <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(page)}>মুছুন</Button>
+            </CardFooter>
+          </Card>
+        )) : (
+          <div className="text-center text-muted-foreground py-8">
+            কোনো পেজ পাওয়া যায়নি।
+          </div>
+        )}
       </div>
       
       {totalPages > 1 && (

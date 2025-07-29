@@ -32,7 +32,7 @@ import { MoreHorizontal, Trash, Edit, Eye } from "lucide-react";
 import { StudentForAdmin, deleteStudent } from "@/lib/student-data";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import { CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { toDataURL } from "@/lib/utils";
 
@@ -110,7 +110,8 @@ export default function StudentTable({ students }: { students: StudentForAdmin[]
             className="max-w-sm"
         />
       </div>
-      <div className="border rounded-md">
+      {/* Desktop View */}
+      <div className="border rounded-md hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -180,6 +181,47 @@ export default function StudentTable({ students }: { students: StudentForAdmin[]
           </TableBody>
         </Table>
       </div>
+
+      {/* Mobile View */}
+      <div className="md:hidden space-y-4">
+        {paginatedStudents.length > 0 ? paginatedStudents.map((student) => (
+          <Card key={student.id}>
+             <CardHeader>
+              <div className="flex items-center gap-4">
+                <Image 
+                  src={student.image ? toDataURL(student.image as Buffer) : "https://placehold.co/40x40.png"}
+                  alt={student.name_bn}
+                  width={40}
+                  height={40}
+                  className="rounded-full object-cover"
+                />
+                <div>
+                  <CardTitle>{student.name_bn}</CardTitle>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p><strong>রোল:</strong> {student.roll}</p>
+              <p><strong>শ্রেণী:</strong> {student.class_name}</p>
+              <p><strong>বছর:</strong> {student.year}</p>
+            </CardContent>
+             <CardFooter className="flex justify-end gap-2">
+              <Button variant="ghost" size="sm" asChild>
+                  <Link href={`/students/${student.roll}`} target="_blank">দেখুন</Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link href={`/admin/students/edit/${student.id}`}>সম্পাদনা</Link>
+              </Button>
+              <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(student)}>মুছুন</Button>
+            </CardFooter>
+          </Card>
+        )) : (
+          <div className="text-center text-muted-foreground py-8">
+            কোনো শিক্ষার্থী পাওয়া যায়নি।
+          </div>
+        )}
+      </div>
+
       
       {totalPages > 1 && (
         <CardFooter className="flex items-center justify-between pt-4 px-0">

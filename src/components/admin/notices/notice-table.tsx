@@ -31,7 +31,7 @@ import { MoreHorizontal, Trash, Edit, Eye } from "lucide-react";
 import { Notice, deleteNotice } from "@/lib/notice-data";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import { CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
 const NOTICES_PER_PAGE = 10;
@@ -100,7 +100,8 @@ export default function NoticeTable({ notices }: { notices: Notice[] }) {
             className="max-w-sm"
         />
       </div>
-      <div className="border rounded-md">
+      {/* Desktop View */}
+      <div className="border rounded-md hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -155,6 +156,33 @@ export default function NoticeTable({ notices }: { notices: Notice[] }) {
             )}
           </TableBody>
         </Table>
+      </div>
+
+       {/* Mobile View */}
+       <div className="md:hidden space-y-4">
+        {paginatedNotices.length > 0 ? paginatedNotices.map((notice) => (
+          <Card key={notice.id}>
+            <CardHeader>
+                <CardTitle>{notice.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p><strong>তারিখ:</strong> {notice.date}</p>
+            </CardContent>
+            <CardFooter className="flex justify-end gap-2">
+              <Button variant="ghost" size="sm" asChild>
+                  <Link href={`/notice/${notice.id}`} target="_blank">দেখুন</Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link href={`/admin/notices/edit/${notice.id}`}>সম্পাদনা</Link>
+              </Button>
+              <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(notice)}>মুছুন</Button>
+            </CardFooter>
+          </Card>
+        )) : (
+          <div className="text-center text-muted-foreground py-8">
+            কোনো নোটিশ পাওয়া যায়নি।
+          </div>
+        )}
       </div>
       
       {totalPages > 1 && (

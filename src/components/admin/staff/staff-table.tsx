@@ -32,7 +32,7 @@ import { MoreHorizontal, Trash, Edit, Eye } from "lucide-react";
 import { Staff, deleteStaff } from "@/lib/staff-data";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import { CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { toDataURL } from "@/lib/utils";
 
@@ -109,7 +109,8 @@ export default function StaffTable({ staff }: { staff: Staff[] }) {
             className="max-w-sm"
         />
       </div>
-      <div className="border rounded-md">
+       {/* Desktop View */}
+      <div className="border rounded-md hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -177,6 +178,45 @@ export default function StaffTable({ staff }: { staff: Staff[] }) {
           </TableBody>
         </Table>
       </div>
+
+        {/* Mobile View */}
+        <div className="md:hidden space-y-4">
+            {paginatedStaff.length > 0 ? paginatedStaff.map((person) => (
+            <Card key={person.id}>
+                <CardHeader>
+                    <div className="flex items-center gap-4">
+                         <Image 
+                            src={person.image ? toDataURL(person.image as Buffer) : "https://placehold.co/40x40.png"}
+                            alt={person.name}
+                            width={40}
+                            height={40}
+                            className="rounded-full object-cover"
+                        />
+                        <div>
+                            <CardTitle>{person.name}</CardTitle>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <p><strong>পদবি:</strong> {person.role}</p>
+                    <p><strong>ইমেইল:</strong> {person.email}</p>
+                </CardContent>
+                <CardFooter className="flex justify-end gap-2">
+                    <Button variant="ghost" size="sm" asChild>
+                         <Link href={`/staff/${person.id}`} target="_blank">দেখুন</Link>
+                    </Button>
+                    <Button variant="outline" size="sm" asChild>
+                        <Link href={`/admin/staff/edit/${person.id}`}>সম্পাদনা</Link>
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(person)}>মুছুন</Button>
+                </CardFooter>
+            </Card>
+            )) : (
+            <div className="text-center text-muted-foreground py-8">
+                কোনো কর্মচারী পাওয়া যায়নি।
+            </div>
+            )}
+        </div>
       
       {totalPages > 1 && (
         <CardFooter className="flex items-center justify-between pt-4 px-0">
