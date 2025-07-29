@@ -38,7 +38,7 @@ import { MoreHorizontal, Trash, Edit } from "lucide-react";
 import { Routine, deleteRoutine } from "@/lib/routine-data";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import { CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 const ITEMS_PER_PAGE = 10;
 const classes = ["all", "৬ষ্ঠ শ্রেণী", "৭ম শ্রেণী", "৮ম শ্রেণী", "৯ম শ্রেণী", "১০ম শ্রেণী"];
@@ -124,7 +124,8 @@ export default function RoutineTable({ routines }: { routines: Routine[] }) {
                 </SelectContent>
             </Select>
       </div>
-      <div className="border rounded-md">
+      {/* Desktop View */}
+      <div className="border rounded-md hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -180,6 +181,31 @@ export default function RoutineTable({ routines }: { routines: Routine[] }) {
           </TableBody>
         </Table>
       </div>
+       {/* Mobile View */}
+      <div className="md:hidden space-y-4">
+        {paginatedRoutines.length > 0 ? paginatedRoutines.map((routine) => (
+            <Card key={routine.id}>
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-base">{routine.subject}</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm space-y-1">
+                    <p><strong>শিক্ষক:</strong> {routine.teacher_name}</p>
+                    <p><strong>শ্রেণী:</strong> {routine.class_name}</p>
+                    <p><strong>দিন:</strong> {routine.day_of_week} ({routine.period}তম পিরিয়ড)</p>
+                    <p><strong>সময়:</strong> {routine.start_time.substring(0,5)} - {routine.end_time.substring(0,5)}</p>
+                </CardContent>
+                <CardFooter className="flex justify-end gap-2">
+                    <Button variant="outline" size="sm" asChild>
+                        <Link href={`/admin/routine/edit/${routine.id}`}>সম্পাদনা</Link>
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(routine)}>মুছুন</Button>
+                </CardFooter>
+            </Card>
+        )) : (
+            <p className="text-center text-muted-foreground py-8">কোনো রুটিন পাওয়া যায়নি।</p>
+        )}
+      </div>
+
       
       {totalPages > 1 && (
         <CardFooter className="flex items-center justify-between pt-4 px-0">
