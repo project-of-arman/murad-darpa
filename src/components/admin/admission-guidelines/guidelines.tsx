@@ -25,6 +25,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import RichTextEditor from '@/components/admin/pages/rich-text-editor';
 import * as LucideIcons from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 
 const iconNames = Object.keys(LucideIcons).filter(k => typeof LucideIcons[k as keyof typeof LucideIcons] === 'object');
 
@@ -151,7 +152,9 @@ export default function Guidelines({ guidelines }: { guidelines: AdmissionGuidel
                     </DialogContent>
                 </Dialog>
             </div>
-            <div className="border rounded-md">
+            
+            {/* Desktop View */}
+            <div className="border rounded-md hidden md:block">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -195,6 +198,44 @@ export default function Guidelines({ guidelines }: { guidelines: AdmissionGuidel
                         ))}
                     </TableBody>
                 </Table>
+            </div>
+
+            {/* Mobile View */}
+            <div className="md:hidden space-y-4">
+                {guidelines.map((item) => (
+                    <Card key={item.id}>
+                        <CardHeader>
+                            <CardTitle className="text-base">{item.title}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-sm">
+                             <p><strong>আইকন:</strong> {item.icon}</p>
+                             <p><strong>অবস্থান:</strong> {item.sort_order}</p>
+                        </CardContent>
+                        <CardFooter className="flex justify-end gap-2">
+                             <Dialog open={editOpen === item.id} onOpenChange={(isOpen) => setEditOpen(isOpen ? item.id : null)}>
+                                <DialogTrigger asChild>
+                                    <Button variant="outline" size="sm">সম্পাদনা</Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-[625px]">
+                                    <DialogHeader><DialogTitle>নির্দেশনা সম্পাদনা করুন</DialogTitle></DialogHeader>
+                                    <GuidelineForm guideline={item} onFinished={onFormFinished} />
+                                </DialogContent>
+                            </Dialog>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                     <Button variant="destructive" size="sm">মুছুন</Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader><AlertDialogTitle>আপনি কি নিশ্চিত?</AlertDialogTitle><AlertDialogDescription>এই নির্দেশনাটি স্থায়ীভাবে মুছে ফেলা হবে।</AlertDialogDescription></AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>বাতিল</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleDelete(item.id)} className="bg-destructive hover:bg-destructive/90">মুছুন</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </CardFooter>
+                    </Card>
+                ))}
             </div>
         </div>
     );
