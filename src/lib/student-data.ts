@@ -134,7 +134,21 @@ export async function getStudentByRoll(roll: string): Promise<Student | null> {
         return mockStudents.find(s => s.roll === roll) || null;
     }
     try {
-        const [rows] = await pool.query('SELECT id, roll, name_bn as name, class_name, gender, year, IF(image IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image)), NULL) as image, data_ai_hint FROM students WHERE roll = ?', [roll]);
+        const [rows] = await pool.query(`
+            SELECT 
+                id, 
+                roll, 
+                name_bn as name, 
+                class_name, 
+                gender, 
+                year, 
+                IF(image IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image)), NULL) as image, 
+                data_ai_hint 
+            FROM students 
+            WHERE roll = ?
+            ORDER BY year DESC
+            LIMIT 1
+        `, [roll]);
         const students = rows as Student[];
         return students[0] || null;
     } catch (error) {
