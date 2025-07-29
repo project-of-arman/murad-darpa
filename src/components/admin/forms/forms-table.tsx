@@ -259,14 +259,14 @@ export default function FormsTable({ formType, submissions, config }: { formType
                 </CardHeader>
                 <CardContent className="p-4 pt-0 space-y-1 text-sm">
                     {config.columns.filter(c => !c.isPrimary).map(col => (
-                        <p key={col.key}>
+                        <div key={col.key}>
                             <strong>{col.label}: </strong>
                              {col.key === 'status' ? (
                                 <Badge variant={getStatusVariant(submission[col.key])} className="ml-1">{submission[col.key]}</Badge>
                             ) : (
                                 renderCellContent(submission[col.key])
                             )}
-                        </p>
+                        </div>
                     ))}
                 </CardContent>
                 <CardFooter className="p-4 pt-0 flex justify-end gap-2">
