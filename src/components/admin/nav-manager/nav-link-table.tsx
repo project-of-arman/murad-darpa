@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import * as React from "react";
 import {
   Table,
   TableBody,
@@ -22,7 +22,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Trash, Edit, PlusCircle, ArrowUp, ArrowDown } from "lucide-react";
+import { MoreHorizontal, Trash, Edit, PlusCircle } from "lucide-react";
 import { NavLink, deleteNavLink } from "@/lib/nav-data";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
@@ -116,10 +116,10 @@ export default function NavLinkTable({ navLinks }: { navLinks: NavLink[] }) {
         </TableHeader>
         <TableBody>
           {navLinks.length > 0 ? navLinks.map(link => (
-              <>
+              <React.Fragment key={link.id}>
                 {renderRow(link)}
                 {link.subLinks && link.subLinks.map(subLink => renderRow(subLink, true))}
-              </>
+              </React.Fragment>
           )) : (
             <TableRow>
               <TableCell colSpan={4} className="text-center h-24">
