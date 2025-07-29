@@ -1,6 +1,11 @@
 
-
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
 import { getSiteSettings } from "@/lib/settings-data";
 import SettingsForm from "@/components/admin/settings/settings-form";
 import SchoolInfoForm from "@/components/admin/settings/school-info-form";
@@ -30,42 +35,60 @@ export default async function AdminSettingsPage() {
   }
 
   return (
-    <div className="space-y-8">
-        <Card>
-            <CardHeader>
-                <CardTitle>সাইট সেটিংস</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <p className="text-muted-foreground mb-4">
-                এই তথ্যগুলো আপনার ওয়েবসাইটের SEO এবং ব্রাউজার ট্যাবে ব্যবহৃত হবে।
-                </p>
-                <SettingsForm settings={settings} />
-            </CardContent>
-        </Card>
-        
-        <Card>
-            <CardHeader>
-                <CardTitle>স্কুলের তথ্য</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <p className="text-muted-foreground mb-4">
-                ওয়েবসাইটের বিভিন্ন জায়গায় প্রদর্শিত স্কুলের নাম, ঠিকানা ও লোগো এখান থেকে পরিবর্তন করুন।
-                </p>
-                <SchoolInfoForm schoolInfo={schoolInfo} />
-            </CardContent>
-        </Card>
-        
-        <Card>
-            <CardHeader>
-                <CardTitle>অ্যাডমিন অ্যাকাউন্ট</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <p className="text-muted-foreground mb-4">
-                আপনার অ্যাডমিন ইউজারনেম এবং পাসওয়ার্ড পরিবর্তন করুন।
-                </p>
-                <AdminAccountForm account={adminAccount} />
-            </CardContent>
-        </Card>
+    <div className="space-y-6">
+        <div className="text-left mb-8">
+            <h1 className="text-3xl font-bold text-primary">সেটিংস</h1>
+            <p className="text-muted-foreground mt-1">
+                আপনার ওয়েবসাইটের সাধারণ সেটিংস, স্কুলের তথ্য এবং অ্যাডমিন অ্যাকাউন্ট পরিচালনা করুন।
+            </p>
+        </div>
+
+        <Tabs defaultValue="site_settings" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="site_settings">সাইট সেটিংস</TabsTrigger>
+                <TabsTrigger value="school_info">স্কুলের তথ্য</TabsTrigger>
+                <TabsTrigger value="admin_account">অ্যাডমিন অ্যাকাউন্ট</TabsTrigger>
+            </TabsList>
+            <TabsContent value="site_settings">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>সাইট সেটিংস</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                         <p className="text-muted-foreground -mt-4">
+                            এই তথ্যগুলো আপনার ওয়েবসাইটের SEO এবং ব্রাউজার ট্যাবে ব্যবহৃত হবে।
+                        </p>
+                        <SettingsForm settings={settings} />
+                    </CardContent>
+                </Card>
+            </TabsContent>
+            <TabsContent value="school_info">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>স্কুলের তথ্য</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <p className="text-muted-foreground -mt-4">
+                            ওয়েবসাইটের বিভিন্ন জায়গায় প্রদর্শিত স্কুলের নাম, ঠিকানা ও লোগো এখান থেকে পরিবর্তন করুন।
+                        </p>
+                        <SchoolInfoForm schoolInfo={schoolInfo} />
+                    </CardContent>
+                </Card>
+            </TabsContent>
+            <TabsContent value="admin_account">
+                 <Card>
+                    <CardHeader>
+                        <CardTitle>অ্যাডমিন অ্যাকাউন্ট</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <p className="text-muted-foreground -mt-4">
+                            আপনার অ্যাডমিন ইউজারনেম এবং পাসওয়ার্ড পরিবর্তন করুন।
+                        </p>
+                        <AdminAccountForm account={adminAccount} />
+                    </CardContent>
+                </Card>
+            </TabsContent>
+        </Tabs>
     </div>
   );
 }
