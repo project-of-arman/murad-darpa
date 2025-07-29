@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-quill/lib/component.js b/node_modules/react-quill/lib/component.js
+index 9e57723..5f01da7 100644
+--- a/node_modules/react-quill/lib/component.js
++++ b/node_modules/react-quill/lib/component.js
+@@ -345,7 +345,7 @@
+ 	},
+ 
+ 	getEditorNode: function() {
+-		return ReactDOM.findDOMNode(this.editingArea);
++		return this.editingArea.current;
+ 	},
+ 
+ 	/*
