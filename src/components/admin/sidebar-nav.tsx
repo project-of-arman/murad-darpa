@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import {
@@ -108,8 +107,13 @@ const navItems = [
 
 export default function AdminSidebarNav() {
   const pathname = usePathname();
-  const { state, setOpen } = useSidebar();
+  const { state, setOpen, setOpenMobile, isMobile } = useSidebar();
 
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   const isSubItemActive = (subItems: any[]) => {
     return subItems.some((item) => pathname.startsWith(item.href));
@@ -131,7 +135,7 @@ export default function AdminSidebarNav() {
     <>
       <SidebarHeader>
         <div className="flex items-center gap-2 p-2">
-            <Link href="/" className="flex items-center gap-2" target="_blank">
+            <Link href="/" className="flex items-center gap-2" target="_blank" onClick={handleLinkClick}>
                 <GraduationCap className="h-6 w-6 text-primary" />
                 <span className="text-lg font-semibold text-primary truncate group-data-[collapsible=icon]:hidden">হোম পেজ</span>
             </Link>
@@ -145,6 +149,7 @@ export default function AdminSidebarNav() {
                     asChild
                     isActive={pathname === item.href}
                     tooltip={item.label}
+                    onClick={handleLinkClick}
                     >
                     <Link href={item.href!}>
                         <item.icon />
@@ -178,6 +183,7 @@ export default function AdminSidebarNav() {
                                             tooltip={subItem.label}
                                             size="sm"
                                             className="h-auto py-1.5"
+                                            onClick={handleLinkClick}
                                         >
                                             <Link href={subItem.href!}>
                                             <subItem.icon />

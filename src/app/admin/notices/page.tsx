@@ -14,9 +14,9 @@ export default async function AdminNoticesPage() {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>নোটিশ ব্যবস্থাপনা</CardTitle>
         <Button asChild>
-          <Link href="/admin/notices/new">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            নতুন নোটিশ যোগ করুন
+          <Link title="নতুন নোটিশ যোগ করুন" href="/admin/notices/new">
+            <PlusCircle  className="mx-2 h-4 w-4" />
+            <span className="hidden sm:flex">নতুন নোটিশ যোগ করুন</span>
           </Link>
         </Button>
       </CardHeader>
