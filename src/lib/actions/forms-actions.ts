@@ -16,6 +16,27 @@ It provides functions to:
 - Delete a submission.
 */
 
+// ========= HELPERS =========
+
+async function queryWithRetry<T>(query: string, params: any[] = [], retries = 3, delay = 100): Promise<T> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      if (!pool) throw new Error("Database not connected.");
+      const [rows] = await pool.query(query, params);
+      return rows as T;
+    } catch (error: any) {
+      if ((error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') && i < retries - 1) {
+        console.warn(`Query failed with ${error.code}. Retrying in ${delay}ms...`);
+        await new Promise(res => setTimeout(res, delay));
+        continue;
+      }
+      throw error;
+    }
+  }
+  throw new Error("Database query failed after multiple retries.");
+}
+
+
 // ========= DATA FETCHING =========
 
 export async function getFormSubmissions(formType: string): Promise<FormSubmission[]> {
@@ -25,7 +46,7 @@ export async function getFormSubmissions(formType: string): Promise<FormSubmissi
   try {
     const columnKeys = config.columns.map(c => c.key).join(', ');
     const query = `SELECT id, ${columnKeys} FROM ${config.tableName} ORDER BY created_at DESC`;
-    const [rows] = await pool.query<FormSubmission[]>(query);
+    const rows = await queryWithRetry<FormSubmission[]>(query);
     return rows;
   } catch (error) {
     console.error(`Failed to fetch submissions for ${formType}:`, (error as Error).message);
@@ -40,7 +61,7 @@ export async function getSubmissionDetails(formType: string, id: number): Promis
 
   try {
     const query = `SELECT * FROM ${config.tableName} WHERE id = ?`;
-    const [rows] = await pool.query<FormSubmission[]>(query, [id]);
+    const rows = await queryWithRetry<FormSubmission[]>(query, [id]);
     
     if (rows.length === 0) {
       return null;
@@ -73,7 +94,7 @@ export async function updateSubmissionStatus(formType: string, id: number, statu
 
   try {
     const query = `UPDATE ${config.tableName} SET status = ? WHERE id = ?`;
-    await pool.query(query, [status, id]);
+    await queryWithRetry(query, [status, id]);
     revalidatePath('/admin/forms');
     return { success: true };
   } catch (error) {
@@ -88,7 +109,7 @@ export async function deleteSubmission(formType: string, id: number): Promise<Mu
 
   try {
     const query = `DELETE FROM ${config.tableName} WHERE id = ?`;
-    await pool.query(query, [id]);
+    await queryWithRetry(query, [id]);
     revalidatePath('/admin/forms');
     return { success: true };
   } catch (error) {
