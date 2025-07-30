@@ -13,6 +13,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectGroup,
+  SelectLabel,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
@@ -20,6 +22,7 @@ import { NavLink, saveNavLink } from "@/lib/nav-data";
 import * as LucideIcons from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import React from "react";
+import type { Page } from "@/lib/page-data";
 
 const IconComponent = ({ name }: { name: string | null | undefined }) => {
     if (!name) return null;
@@ -43,12 +46,28 @@ const educationIcons = [
   'Library', 'Landmark', 'Building', 'PenSquare', 'Edit', 'Info', 'MessageSquare', 'GalleryVerticalEnd'
 ].sort();
 
+const stockPages = [
+    { title: 'School Details', href: '/school-details' },
+    { title: 'Committee', href: '/committee' },
+    { title: 'Admission Guidelines', href: '/admission-guidelines' },
+    { title: 'Results', href: '/results' },
+    { title: 'All Forms', href: '/forms' },
+    { title: 'Contact', href: '/contact' },
+    { title: 'Image Gallery', href: '/gallery' },
+    { title: 'Video Gallery', href: '/videos' },
+    { title: 'Students', href: '/students' },
+    { title: 'Routine', href: '/routine' },
+    { title: 'Syllabus', href: '/syllabus' },
+    { title: 'Blog', href: '/blog' },
+    { title: 'Notice', href: '/notice' },
+];
 
-export function NavLinkForm({ link, allLinks, parentId }: { link?: NavLink, allLinks: NavLink[], parentId?: number }) {
+
+export function NavLinkForm({ link, allLinks, pages, parentId }: { link?: NavLink, allLinks: NavLink[], pages: Page[], parentId?: number }) {
   const { toast } = useToast();
   const router = useRouter();
   
-  const { register, handleSubmit, control, formState: { errors, isSubmitting } } = useForm<FormValues>({
+  const { register, handleSubmit, control, setValue, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: link?.title || "",
@@ -75,6 +94,34 @@ export function NavLinkForm({ link, allLinks, parentId }: { link?: NavLink, allL
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2"><Label htmlFor="title">শিরোনাম</Label><Input id="title" {...register("title")} />{errors.title && <p className="text-sm font-medium text-destructive">{errors.title.message}</p>}</div>
         <div className="space-y-2"><Label htmlFor="href">লিংক (URL)</Label><Input id="href" {...register("href")} /><p className="text-xs text-muted-foreground">ড্রপডাউনের জন্য এটি খালি রাখুন।</p>{errors.href && <p className="text-sm font-medium text-destructive">{errors.href.message}</p>}</div>
+        <div className="space-y-2 md:col-span-2">
+            <Label>অথবা একটি পেজ নির্বাচন করে URL যুক্ত করুন</Label>
+             <Select onValueChange={(value) => setValue('href', value, { shouldValidate: true })}>
+                <SelectTrigger>
+                    <SelectValue placeholder="পেজ নির্বাচন করুন" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectGroup>
+                        <SelectLabel>সাধারণ পেজ</SelectLabel>
+                        {stockPages.map(page => (
+                            <SelectItem key={page.href} value={page.href}>
+                                {page.title} ({page.href})
+                            </SelectItem>
+                        ))}
+                    </SelectGroup>
+                    {pages.length > 0 && (
+                        <SelectGroup>
+                            <SelectLabel>আপনার তৈরি পেজ</SelectLabel>
+                             {pages.map(page => (
+                                <SelectItem key={page.id} value={`/${page.slug}`}>
+                                    {page.title} (/{page.slug})
+                                </SelectItem>
+                            ))}
+                        </SelectGroup>
+                    )}
+                </SelectContent>
+            </Select>
+        </div>
         <div className="space-y-2">
             <Label>Parent Link (For Submenu)</Label>
             <Controller
