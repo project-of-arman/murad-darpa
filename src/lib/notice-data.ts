@@ -136,12 +136,12 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
                 fieldsToUpdate.file_name = null;
             }
             // If no new file and remove_file is false, do nothing to the file fields
-
+            
             await pool.query('UPDATE notices SET ? WHERE id = ?', [fieldsToUpdate, id]);
         } else {
             // Insert logic
             let fileName = null;
-            if(data.file) {
+            if(data.file && fileBuffer) {
                  const extension = getFileExtension(data.file.name);
                  fileName = `${data.title}.${extension}`;
             }
@@ -177,4 +177,3 @@ export async function deleteNotice(id: number): Promise<SaveResult> {
     return { success: false, error: "একটি সার্ভার ত্রুটি হয়েছে।" };
   }
 }
-
