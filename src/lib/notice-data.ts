@@ -117,7 +117,7 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
         
         if (id) {
             // Update logic
-            const [existingNotices] = await pool.query<Notice[]>('SELECT file_name FROM notices WHERE id = ?', [id]);
+            const [existingNotices] = await queryWithRetry<Notice[]>('SELECT file_name FROM notices WHERE id = ?', [id]);
             const existingNotice = existingNotices[0];
 
             const fieldsToUpdate: any = {
@@ -135,8 +135,7 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
                 fieldsToUpdate.file_data = null;
                 fieldsToUpdate.file_name = null;
             } else {
-                 // If the title changed, but no new file was uploaded, update the filename to match the new title
-                 if (data.title !== existingNotice.title && existingNotice.file_name) {
+                 if (existingNotice && data.title !== existingNotice.title && existingNotice.file_name) {
                      const oldExtension = getFileExtension(existingNotice.file_name);
                      fieldsToUpdate.file_name = `${data.title}.${oldExtension}`;
                  }
