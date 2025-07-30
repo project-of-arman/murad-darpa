@@ -107,23 +107,34 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
             description: formData.get('description') as string,
             is_marquee: formData.get('is_marquee') === 'true',
             file: formData.get('file') as File | null,
+            remove_file: formData.get('remove_file') === 'true',
         };
 
-        const fileBuffer = data.file ? Buffer.from(await data.file.arrayBuffer()) : null;
+        const fileBuffer = data.file && data.file.size > 0 ? Buffer.from(await data.file.arrayBuffer()) : null;
         
         if (id) {
+            // Update logic
             const fieldsToUpdate: any = {
                 title: data.title,
                 date: data.date,
                 description: data.description,
                 is_marquee: data.is_marquee,
             };
+
             if (fileBuffer) {
+                // If a new file is uploaded, set file_data and file_name
                 fieldsToUpdate.file_data = fileBuffer;
                 fieldsToUpdate.file_name = data.file?.name;
+            } else if (data.remove_file) {
+                // If remove_file is checked and no new file, nullify them
+                fieldsToUpdate.file_data = null;
+                fieldsToUpdate.file_name = null;
             }
+            // If no new file and remove_file is false, do nothing to the file fields
+
             await pool.query('UPDATE notices SET ? WHERE id = ?', [fieldsToUpdate, id]);
         } else {
+            // Insert logic
             const query = 'INSERT INTO notices (title, date, description, is_marquee, file_data, file_name) VALUES (?, ?, ?, ?, ?, ?)';
             await pool.query(query, [data.title, data.date, data.description, data.is_marquee, fileBuffer, data.file?.name || null]);
         }
@@ -131,12 +142,17 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
         revalidatePath('/admin/notices');
         revalidatePath('/(site)/notice');
         revalidatePath('/(site)/');
+        if (id) {
+            revalidatePath(`/api/notice-file/${id}`);
+            revalidatePath(`/(site)/notice/${id}`);
+        }
         return { success: true };
     } catch (error: any) {
         console.error("Failed to save notice:", error);
         return { success: false, error: "একটি সার্ভার ত্রুটি হয়েছে।" };
     }
 }
+
 
 export async function deleteNotice(id: number): Promise<SaveResult> {
    if (!pool) return { success: false, error: "Database not connected." };
