@@ -45,14 +45,16 @@ export default async function NoticeDetailsPage({ params }: { params: { id: stri
                 <CardContent className="text-muted-foreground text-base leading-relaxed">
                    <p>{notice.description}</p>
                 </CardContent>
-                <CardFooter>
-                    <Button asChild>
-                        <a href={notice.fileUrl} download>
-                            <Download className="mr-2 h-4 w-4" />
-                            ডাউনলোড করুন
-                        </a>
-                    </Button>
-                </CardFooter>
+                {notice.file_name && (
+                  <CardFooter>
+                      <Button asChild>
+                          <a href={`/api/notice-file/${notice.id}`} download={notice.file_name}>
+                              <Download className="mr-2 h-4 w-4" />
+                              ডাউনলোড করুন ({notice.file_name})
+                          </a>
+                      </Button>
+                  </CardFooter>
+                )}
             </Card>
         </div>
     </div>

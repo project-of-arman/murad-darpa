@@ -27,7 +27,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Trash, Edit, Eye } from "lucide-react";
+import { MoreHorizontal, Trash, Edit, Eye, Download } from "lucide-react";
 import { Notice, deleteNotice } from "@/lib/notice-data";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
@@ -107,6 +107,7 @@ export default function NoticeTable({ notices }: { notices: Notice[] }) {
             <TableRow>
               <TableHead>শিরোনাম</TableHead>
               <TableHead>তারিখ</TableHead>
+              <TableHead>ফাইল</TableHead>
               <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>
             </TableRow>
           </TableHeader>
@@ -115,6 +116,17 @@ export default function NoticeTable({ notices }: { notices: Notice[] }) {
               <TableRow key={notice.id}>
                 <TableCell className="font-medium">{notice.title}</TableCell>
                 <TableCell>{notice.date}</TableCell>
+                <TableCell>
+                  {notice.file_name ? (
+                    <Button variant="outline" size="sm" asChild>
+                      <a href={`/api/notice-file/${notice.id}`} download={notice.file_name}>
+                        <Download className="mr-2 h-4 w-4" /> {notice.file_name}
+                      </a>
+                    </Button>
+                  ) : (
+                    <span className="text-muted-foreground text-xs">ফাইল নেই</span>
+                  )}
+                </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -149,7 +161,7 @@ export default function NoticeTable({ notices }: { notices: Notice[] }) {
               </TableRow>
             )) : (
               <TableRow>
-                <TableCell colSpan={3} className="text-center h-24">
+                <TableCell colSpan={4} className="text-center h-24">
                   কোনো নোটিশ পাওয়া যায়নি।
                 </TableCell>
               </TableRow>
@@ -167,6 +179,15 @@ export default function NoticeTable({ notices }: { notices: Notice[] }) {
             </CardHeader>
             <CardContent>
               <p><strong>তারিখ:</strong> {notice.date}</p>
+              {notice.file_name && (
+                <div className="mt-2">
+                   <Button variant="outline" size="sm" asChild>
+                      <a href={`/api/notice-file/${notice.id}`} download={notice.file_name}>
+                        <Download className="mr-2 h-4 w-4" /> {notice.file_name}
+                      </a>
+                    </Button>
+                </div>
+              )}
             </CardContent>
             <CardFooter className="flex justify-end gap-2">
               <Button variant="ghost" size="sm" asChild>

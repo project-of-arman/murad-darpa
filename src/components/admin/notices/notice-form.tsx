@@ -13,11 +13,22 @@ import { Notice, saveNotice } from "@/lib/notice-data";
 import { useRouter } from "next/navigation";
 import { Switch } from "@/components/ui/switch";
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ACCEPTED_FILE_TYPES = ["application/pdf"];
+
+const fileSchema = z.any()
+  .optional()
+  .refine((files) => !files || files.length === 0 || files?.[0]?.size <= MAX_FILE_SIZE, `ফাইলের সর্বোচ্চ আকার 10MB।`)
+  .refine(
+    (files) => !files || files.length === 0 || ACCEPTED_FILE_TYPES.includes(files?.[0]?.type),
+    "শুধুমাত্র .pdf ফরম্যাট সাপোর্ট করবে।"
+  );
+
 const formSchema = z.object({
   title: z.string().min(1, "শিরোনাম আবশ্যক"),
   date: z.string().min(1, "তারিখ আবশ্যক"),
   description: z.string().min(1, "বিবরণ আবশ্যক"),
-  fileUrl: z.string().url("অবৈধ URL").optional().or(z.literal('')),
+  file: fileSchema,
   is_marquee: z.boolean().default(false),
 });
 
@@ -38,13 +49,22 @@ export function NoticeForm({ notice }: { notice?: Notice }) {
       title: notice?.title || "",
       date: notice?.date || "",
       description: notice?.description || "",
-      fileUrl: notice?.fileUrl || "",
       is_marquee: notice?.is_marquee || false,
     },
   });
 
   async function onSubmit(values: FormValues) {
-    const result = await saveNotice(values, notice?.id);
+    const formData = new FormData();
+    formData.append('title', values.title);
+    formData.append('date', values.date);
+    formData.append('description', values.description);
+    formData.append('is_marquee', values.is_marquee.toString());
+    
+    if (values.file && values.file.length > 0) {
+        formData.append('file', values.file[0]);
+    }
+
+    const result = await saveNotice(formData, notice?.id);
 
     if (result.success) {
       toast({
@@ -83,9 +103,10 @@ export function NoticeForm({ notice }: { notice?: Notice }) {
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="fileUrl">ফাইলের URL (ঐচ্ছিক)</Label>
-        <Input id="fileUrl" placeholder="https://example.com/file.pdf" {...register("fileUrl")} />
-        {errors.fileUrl && <p className="text-sm font-medium text-destructive">{errors.fileUrl.message}</p>}
+        <Label htmlFor="file">ফাইল আপলোড (ঐচ্ছিক)</Label>
+        <Input id="file" type="file" accept="application/pdf" {...register("file")} />
+        {errors.file && <p className="text-sm font-medium text-destructive">{errors.file.message as string}</p>}
+        {notice?.file_name && <p className="text-xs text-muted-foreground mt-1">বর্তমান ফাইল: {notice.file_name} (নতুন ফাইল আপলোড করলে এটি প্রতিস্থাপিত হবে)।</p>}
       </div>
 
       <div className="flex items-center space-x-2">
