@@ -14,6 +14,7 @@ export default function TopBar({ schoolInfo }: { schoolInfo: SchoolInfo }) {
             month: 'long',
             day: 'numeric'
         };
+        // This will only run on the client, preventing hydration mismatches.
         setCurrentDate(new Date().toLocaleDateString('bn-BD', dateOptions));
     }, []);
 
