@@ -126,16 +126,16 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
             };
 
             if (fileBuffer && data.file) {
-                // If a new file is uploaded, set file_data and file_name
+                // If a new file is uploaded, update file_data and file_name
                 const extension = getFileExtension(data.file.name);
                 fieldsToUpdate.file_data = fileBuffer;
                 fieldsToUpdate.file_name = `${data.title}.${extension}`;
             } else if (data.remove_file) {
-                // If remove_file is checked and no new file, nullify them
+                // If remove_file is checked (and no new file), nullify file fields
                 fieldsToUpdate.file_data = null;
                 fieldsToUpdate.file_name = null;
             }
-            // If no new file and remove_file is false, do nothing to the file fields
+            // If no new file is uploaded and remove_file is false, do nothing to file fields. They will be preserved.
             
             await pool.query('UPDATE notices SET ? WHERE id = ?', [fieldsToUpdate, id]);
         } else {
