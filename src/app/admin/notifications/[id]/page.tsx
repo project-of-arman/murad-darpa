@@ -34,10 +34,10 @@ export default async function AdminNoticeDetailsPage({ params }: { params: { id:
           <CardContent className="text-muted-foreground text-base leading-relaxed">
               <p>{notice.description}</p>
           </CardContent>
-          {notice.fileUrl && (
+          {notice.file_name && (
             <CardFooter>
                 <Button asChild>
-                    <a href={notice.fileUrl} download>
+                    <a href={`/api/notice-file/${notice.id}`} download={notice.file_name}>
                         <Download className="mr-2 h-4 w-4" />
                         ডাউনলোড করুন
                     </a>

@@ -33,6 +33,7 @@ import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
 
 const NOTICES_PER_PAGE = 10;
 
@@ -42,6 +43,7 @@ export default function NoticeTable({ notices }: { notices: Notice[] }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
+  const router = useRouter();
 
   const filteredNotices = useMemo(() => {
     return notices.filter(notice =>
@@ -78,6 +80,7 @@ export default function NoticeTable({ notices }: { notices: Notice[] }) {
           title: "নোটিশ মোছা হয়েছে",
           description: `"${selectedNotice.title}" সফলভাবে মুছে ফেলা হয়েছে।`,
         });
+        router.refresh();
       } else {
         toast({
           title: "ত্রুটি",
