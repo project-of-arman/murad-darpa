@@ -47,7 +47,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-          <NextNProgress color="#2d8a5b" startPosition={0.3} stopDelayMs={200} height={3} showOnShallow={true} />
+          <NextNProgress color="hsl(var(--primary))" startPosition={0.3} stopDelayMs={200} height={3} showOnShallow={true} />
           {children}
           <Toaster />
       </body>
