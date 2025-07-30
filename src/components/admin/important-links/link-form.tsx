@@ -14,6 +14,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectGroup,
+  SelectLabel,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
@@ -28,10 +30,22 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+const stockPages = [
+    { title: 'School Details', href: '/school-details' },
+    { title: 'Committee', href: '/committee' },
+    { title: 'Admission Guidelines', href: '/admission-guidelines' },
+    { title: 'Results', href: '/results' },
+    { title: 'All Forms', href: '/forms' },
+    { title: 'Contact', href: '/contact' },
+    { title: 'Image Gallery', href: '/gallery' },
+    { title: 'Video Gallery', href: '/videos' },
+    { title: 'Students', href: '/students' },
+];
+
+
 export function LinkForm({ link, groupId, pages }: { link?: LinkType, groupId: number, pages: Page[] }) {
   const { toast } = useToast();
   const router = useRouter();
-  const [selectedSlug, setSelectedSlug] = useState("");
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -40,12 +54,6 @@ export function LinkForm({ link, groupId, pages }: { link?: LinkType, groupId: n
       sort_order: link?.sort_order || 0,
     },
   });
-
-  const handleInsertSlug = () => {
-    if (selectedSlug) {
-      setValue('href', `/${selectedSlug}`, { shouldValidate: true });
-    }
-  }
 
   async function onSubmit(values: FormValues) {
     const formData = new FormData();
@@ -74,28 +82,36 @@ export function LinkForm({ link, groupId, pages }: { link?: LinkType, groupId: n
         <FormItem> <Label htmlFor="text">লিংকের টেক্সট</Label> <Input id="text" {...register("text")} /> <FormMessage name="text" /> </FormItem>
         <FormItem> <Label htmlFor="href">লিংকের URL</Label> <Input id="href" {...register("href")} /> <FormMessage name="href" /> </FormItem>
         
-        {pages.length > 0 && (
-            <FormItem>
-                <Label>অথবা একটি পেজ নির্বাচন করুন</Label>
-                <div className="flex gap-2">
-                    <Select onValueChange={setSelectedSlug} value={selectedSlug}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="পেজ নির্বাচন করুন" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {pages.map(page => (
-                                <SelectItem key={page.id} value={page.slug}>
-                                    {page.title} (/{page.slug})
+        <FormItem>
+            <Label>অথবা একটি পেজ নির্বাচন করুন</Label>
+            <div className="flex gap-2">
+                <Select onValueChange={(value) => setValue('href', value, { shouldValidate: true })}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="পেজ নির্বাচন করে URL যুক্ত করুন" />
+                    </SelectTrigger>
+                    <SelectContent>
+                         <SelectGroup>
+                            <SelectLabel>সাধারণ পেজ</SelectLabel>
+                            {stockPages.map(page => (
+                                <SelectItem key={page.href} value={page.href}>
+                                    {page.title} ({page.href})
                                 </SelectItem>
                             ))}
-                        </SelectContent>
-                    </Select>
-                    <Button type="button" onClick={handleInsertSlug} disabled={!selectedSlug}>
-                        URL যুক্ত করুন
-                    </Button>
-                </div>
-            </FormItem>
-        )}
+                        </SelectGroup>
+                        {pages.length > 0 && (
+                            <SelectGroup>
+                                <SelectLabel>আপনার তৈরি পেজ</SelectLabel>
+                                {pages.map(page => (
+                                    <SelectItem key={page.id} value={`/${page.slug}`}>
+                                        {page.title} (/{page.slug})
+                                    </SelectItem>
+                                ))}
+                            </SelectGroup>
+                        )}
+                    </SelectContent>
+                </Select>
+            </div>
+        </FormItem>
 
         <FormItem> <Label htmlFor="sort_order">অবস্থান (Sort Order)</Label> <Input id="sort_order" type="number" {...register("sort_order")} /> <FormMessage name="sort_order" /> </FormItem>
         
