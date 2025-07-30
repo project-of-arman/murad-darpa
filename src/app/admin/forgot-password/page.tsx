@@ -7,7 +7,7 @@ import { Phone, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 // In a real app, this phone number would come from a secure source or config
-const SUPPORT_PHONE_NUMBER = "+8801234567890"; 
+const SUPPORT_PHONE_NUMBER = "01701034883"; 
 
 export default function ForgotPasswordPage() {
   return (
