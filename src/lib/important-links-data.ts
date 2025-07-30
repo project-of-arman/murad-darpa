@@ -56,11 +56,24 @@ export async function getImportantLinkGroups(): Promise<ImportantLinkGroup[]> {
         return mockLinkCards;
     }
     try {
-        const groups = await queryWithRetry<ImportantLinkGroup[]>('SELECT id, title, data_ai_hint, sort_order, IF(image IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image)), NULL) as image FROM important_link_groups ORDER BY sort_order ASC');
-        
+        const groupQuery = 'SELECT id, title, data_ai_hint, sort_order, IF(image IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image)), NULL) as image FROM important_link_groups ORDER BY sort_order ASC';
+        const linksQuery = 'SELECT * FROM important_links ORDER BY group_id, sort_order ASC';
+
+        const [groups, allLinks] = await Promise.all([
+            queryWithRetry<ImportantLinkGroup[]>(groupQuery),
+            queryWithRetry<Link[]>(linksQuery)
+        ]);
+
+        const linksByGroupId = new Map<number, Link[]>();
+        for (const link of allLinks) {
+            if (!linksByGroupId.has(link.group_id)) {
+                linksByGroupId.set(link.group_id, []);
+            }
+            linksByGroupId.get(link.group_id)!.push(link);
+        }
+
         for (const group of groups) {
-            const links = await queryWithRetry<Link[]>('SELECT * FROM important_links WHERE group_id = ? ORDER BY sort_order ASC', [group.id]);
-            group.links = links;
+            group.links = linksByGroupId.get(group.id) || [];
         }
 
         return groups;
