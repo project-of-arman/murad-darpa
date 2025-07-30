@@ -5,8 +5,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { getSiteSettings } from '@/lib/settings-data';
-import { RouteProgressBar } from '@/components/ui/route-progress-bar';
 import { Suspense, useEffect, useState } from 'react';
+import NextNProgress from 'nextjs-progressbar';
 
 // We can't use generateMetadata in a client component, so we'll set the title dynamically.
 // Note: For full metadata support, this would require a more complex setup, but for the title and favicon, this is a good approach.
@@ -53,9 +53,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-          <Suspense>
-            {isMounted && <RouteProgressBar />}
-          </Suspense>
+          <NextNProgress color="#2d8a5b" startPosition={0.3} stopDelayMs={200} height={3} showOnShallow={true} />
           {children}
           <Toaster />
       </body>
