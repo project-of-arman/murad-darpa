@@ -15,10 +15,23 @@ import {
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { getTeachers, Teacher } from "@/lib/teacher-data";
+import { Skeleton } from "../ui/skeleton";
+
+const TeacherCardSkeleton = () => (
+    <div className="p-1">
+        <Card className="overflow-hidden shadow-md">
+            <CardContent className="relative flex aspect-[3/4] items-center justify-center p-0">
+                <Skeleton className="h-full w-full" />
+            </CardContent>
+        </Card>
+    </div>
+);
+
 
 export default function TeachersCarousel() {
   const [api, setApi] = React.useState<any>();
   const [teachers, setTeachers] = React.useState<Teacher[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     if (!api) return;
@@ -35,8 +48,10 @@ export default function TeachersCarousel() {
   
   React.useEffect(() => {
     async function fetchTeachersData() {
+      setLoading(true);
       const fetchedTeachers = await getTeachers();
       setTeachers(fetchedTeachers);
+      setLoading(false);
     }
     fetchTeachersData();
   }, []);
@@ -49,6 +64,14 @@ export default function TeachersCarousel() {
           <Link href="/staff">সকলকে দেখুন</Link>
         </Button>
       </div>
+       {loading ? (
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0.5">
+               <TeacherCardSkeleton />
+               <TeacherCardSkeleton />
+               <TeacherCardSkeleton />
+               <TeacherCardSkeleton />
+           </div>
+      ) : (
       <Carousel
         setApi={setApi}
         opts={{
@@ -85,6 +108,7 @@ export default function TeachersCarousel() {
         <CarouselPrevious className="hidden md:flex" />
         <CarouselNext className="hidden md:flex" />
       </Carousel>
+      )}
     </div>
   );
 }
