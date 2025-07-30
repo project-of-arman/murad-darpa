@@ -127,14 +127,14 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
                 is_marquee: data.is_marquee,
             };
 
-            if (fileBuffer && data.file) {
+            if (fileBuffer && data.file) { // Case 1: New file uploaded
                 const extension = getFileExtension(data.file.name);
                 fieldsToUpdate.file_data = fileBuffer;
                 fieldsToUpdate.file_name = `${data.title}.${extension}`;
-            } else if (data.remove_file) {
+            } else if (data.remove_file) { // Case 2: Remove existing file checked
                 fieldsToUpdate.file_data = null;
                 fieldsToUpdate.file_name = null;
-            } else {
+            } else { // Case 3: No file change, but maybe title changed
                  if (existingNotice && data.title !== existingNotice.title && existingNotice.file_name) {
                      const oldExtension = getFileExtension(existingNotice.file_name);
                      fieldsToUpdate.file_name = `${data.title}.${oldExtension}`;
