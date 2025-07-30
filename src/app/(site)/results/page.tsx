@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,8 @@ import { Search, Printer, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { getResultByRollAndClass, StudentResult } from '@/lib/results-data';
+import { getSchoolInfo, SchoolInfo } from '@/lib/school-data';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 export default function ResultsPage() {
@@ -19,7 +21,16 @@ export default function ResultsPage() {
     const [selectedClass, setSelectedClass] = useState('');
     const [studentResult, setStudentResult] = useState<StudentResult | null>(null);
     const [loading, setLoading] = useState(false);
+    const [schoolInfo, setSchoolInfo] = useState<SchoolInfo | null>(null);
     const { toast } = useToast();
+
+    useEffect(() => {
+        async function fetchSchoolInfo() {
+            const info = await getSchoolInfo();
+            setSchoolInfo(info);
+        }
+        fetchSchoolInfo();
+    }, []);
 
     const handlePrint = () => {
         window.print();
@@ -80,11 +91,21 @@ export default function ResultsPage() {
                     <div id="printable-area">
                         <Card className="shadow-lg border-primary/20 print:shadow-none print:border-none">
                             <CardHeader className="text-center space-y-2 border-b pb-4">
-                                <div className="flex justify-center">
-                                    <Image src="https://placehold.co/80x80.png" alt="School Logo" width={80} height={80} data-ai-hint="school logo" />
-                                </div>
-                                <h1 className="text-3xl font-bold text-primary font-headline">মুরাদদর্প নারায়নপুর নিম্ন মাধ্যমিক বিদ্যালয়</h1>
-                                <p className="text-muted-foreground">House #1, Road #1, Block #A, Mirpur, Dhaka-1216</p>
+                                 {schoolInfo ? (
+                                    <>
+                                        <div className="flex justify-center">
+                                            <Image src={schoolInfo.logo_url} alt="School Logo" width={80} height={80} data-ai-hint="school logo" />
+                                        </div>
+                                        <h1 className="text-3xl font-bold text-primary font-headline">{schoolInfo.name}</h1>
+                                        <p className="text-muted-foreground">{schoolInfo.address}</p>
+                                    </>
+                                 ) : (
+                                    <>
+                                        <Skeleton className="h-20 w-20 rounded-full mx-auto" />
+                                        <Skeleton className="h-8 w-3/4 mx-auto" />
+                                        <Skeleton className="h-5 w-1/2 mx-auto" />
+                                    </>
+                                 )}
                                 <CardTitle className="text-xl pt-2 bg-primary/10 text-primary font-headline rounded-md p-2">একাডেমিক ট্রান্সক্রিপ্ট</CardTitle>
                             </CardHeader>
                             <CardContent className="p-6">
