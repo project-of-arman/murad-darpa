@@ -11,60 +11,38 @@ export function RouteProgressBar() {
   const searchParams = useSearchParams();
   const [progress, setProgress] = React.useState(0);
   const [isVisible, setIsVisible] = React.useState(false);
-  const [isMounted, setIsMounted] = React.useState(false);
 
   React.useEffect(() => {
-    setIsMounted(true);
-  }, []);
+    // When the route changes, we want to start the progress bar.
+    // We use a timeout to give the browser a moment to start rendering.
+    setIsVisible(true);
+    setProgress(10); // Start with a small amount of progress
 
-  React.useEffect(() => {
-    if (!isMounted) return;
-    
-    // Reset progress on route change
-    setIsVisible(false);
-    setProgress(0);
-    
-    // Use a timeout to allow the old page to unmount and the new one to start mounting.
-    const startTimer = setTimeout(() => {
-        setIsVisible(true);
-        setProgress(10); // Initial progress
-    }, 100);
-
-    return () => clearTimeout(startTimer);
-  }, [pathname, searchParams, isMounted]);
-
-  React.useEffect(() => {
-    if (!isVisible) return;
-
-    // Simulate loading progress
     const progressTimer = setInterval(() => {
       setProgress(prev => {
         if (prev >= 95) {
           clearInterval(progressTimer);
           return 95;
         }
+        // Simulate loading progress with varying increments
         const increment = prev > 80 ? 1 : (prev > 50 ? 5 : 10);
         return Math.min(prev + increment, 95);
       });
     }, 200);
 
-    return () => clearInterval(progressTimer);
-  }, [isVisible]);
-
-  // When the component unmounts (new page is fully loaded), we want to quickly finish the progress bar.
-   React.useEffect(() => {
+    // This is the cleanup function that runs when the component unmounts
+    // (i.e., the new page has finished loading and this component instance is destroyed).
     return () => {
+      clearInterval(progressTimer);
+      // Quickly complete the progress bar
       setProgress(100);
+      // And then hide it after a short delay
       setTimeout(() => {
           setIsVisible(false);
-          // We don't reset to 0 here because the new instance will handle it.
       }, 500);
     };
   }, [pathname, searchParams]);
 
-  if (!isMounted) {
-    return null;
-  }
 
   return (
     <Progress
