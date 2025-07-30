@@ -40,6 +40,7 @@ const stockPages = [
     { title: 'Image Gallery', href: '/gallery' },
     { title: 'Video Gallery', href: '/videos' },
     { title: 'Students', href: '/students' },
+    { title: 'Syllabus', href: '/syllabus' },
 ];
 
 
