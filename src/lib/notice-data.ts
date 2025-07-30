@@ -112,6 +112,10 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
 
         const fileBuffer = data.file && data.file.size > 0 ? Buffer.from(await data.file.arrayBuffer()) : null;
         
+        const getFileExtension = (filename: string) => {
+            return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
+        }
+        
         if (id) {
             // Update logic
             const fieldsToUpdate: any = {
@@ -121,10 +125,11 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
                 is_marquee: data.is_marquee,
             };
 
-            if (fileBuffer) {
+            if (fileBuffer && data.file) {
                 // If a new file is uploaded, set file_data and file_name
+                const extension = getFileExtension(data.file.name);
                 fieldsToUpdate.file_data = fileBuffer;
-                fieldsToUpdate.file_name = data.file?.name;
+                fieldsToUpdate.file_name = `${data.title}.${extension}`;
             } else if (data.remove_file) {
                 // If remove_file is checked and no new file, nullify them
                 fieldsToUpdate.file_data = null;
@@ -135,8 +140,13 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
             await pool.query('UPDATE notices SET ? WHERE id = ?', [fieldsToUpdate, id]);
         } else {
             // Insert logic
+            let fileName = null;
+            if(data.file) {
+                 const extension = getFileExtension(data.file.name);
+                 fileName = `${data.title}.${extension}`;
+            }
             const query = 'INSERT INTO notices (title, date, description, is_marquee, file_data, file_name) VALUES (?, ?, ?, ?, ?, ?)';
-            await pool.query(query, [data.title, data.date, data.description, data.is_marquee, fileBuffer, data.file?.name || null]);
+            await pool.query(query, [data.title, data.date, data.description, data.is_marquee, fileBuffer, fileName]);
         }
         
         revalidatePath('/admin/notices');
@@ -167,3 +177,4 @@ export async function deleteNotice(id: number): Promise<SaveResult> {
     return { success: false, error: "একটি সার্ভার ত্রুটি হয়েছে।" };
   }
 }
+
