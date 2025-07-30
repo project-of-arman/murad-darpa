@@ -16,6 +16,8 @@ export interface SiteSettings extends RowDataPacket {
   school_name: string;
   school_address: string;
   school_logo_url: string | Buffer;
+  mpo_code: string | null;
+  eiin_number: string | null;
 }
 
 // ========= MOCK DATA (for fallback) =========
@@ -29,6 +31,8 @@ const mockSiteSettings: SiteSettings = {
   school_name: 'মুরাদদর্প নারায়নপুর নিম্ন মাধ্যমিক বিদ্যালয়',
   school_address: 'কাফ্রিখাল, মিঠাপুকুর, রংপুর।',
   school_logo_url: 'https://placehold.co/80x80.png',
+  mpo_code: '12345',
+  eiin_number: '67890',
 };
 
 // ========= DATABASE ACTIONS =========
@@ -48,7 +52,9 @@ export async function getSiteSettings(): Promise<SiteSettings> {
             si.id as school_id,
             si.name as school_name,
             si.address as school_address,
-            si.logo_url as school_logo_url
+            si.logo_url as school_logo_url,
+            si.mpo_code,
+            si.eiin_number
         FROM site_settings ss, school_info si 
         WHERE ss.id = 1 AND si.id = 1;
     `;

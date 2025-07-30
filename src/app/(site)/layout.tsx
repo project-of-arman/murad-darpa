@@ -3,6 +3,7 @@ import Footer from '@/components/footer';
 import HeroCarousel from '@/components/homepage/hero-carousel';
 import SecondaryNav from '@/components/homepage/secondary-nav';
 import DynamicSidebar from '@/components/homepage/dynamic-sidebar';
+import TopBar from '@/components/homepage/top-bar';
 import { Megaphone } from 'lucide-react';
 import { getNotices } from '@/lib/notice-data';
 import Link from 'next/link';
@@ -45,6 +46,7 @@ export default async function SiteLayout({
   
   return (
     <div className="relative flex min-h-screen flex-col">
+        <TopBar schoolInfo={schoolInfo} />
         <HeroCarousel />
         <SecondaryNav schoolName={schoolInfo.name} />
         <div className="container mx-auto px-4">

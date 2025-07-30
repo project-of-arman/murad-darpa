@@ -47,12 +47,16 @@ export async function saveSchoolInfo(formData: FormData): Promise<SaveResult> {
         const data = {
             name: formData.get('name') as string,
             address: formData.get('address') as string,
+            mpo_code: formData.get('mpo_code') as string | null,
+            eiin_number: formData.get('eiin_number') as string | null,
             logo_url: formData.get('logo_url') as Blob | null,
         };
 
         const fieldsToUpdate: {[key: string]: any} = {
             name: data.name,
             address: data.address,
+            mpo_code: data.mpo_code,
+            eiin_number: data.eiin_number,
         };
 
         if (data.logo_url && data.logo_url.size > 0) {

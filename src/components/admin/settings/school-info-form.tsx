@@ -28,6 +28,8 @@ const fileSchema = z.any()
 const formSchema = z.object({
   name: z.string().min(1, "স্কুলের নাম আবশ্যক"),
   address: z.string().min(1, "ঠিকানা আবশ্যক"),
+  mpo_code: z.string().optional(),
+  eiin_number: z.string().optional(),
   logo: fileSchema,
 });
 
@@ -41,6 +43,8 @@ export default function SchoolInfoForm({ schoolInfo }: { schoolInfo: SchoolInfo 
     defaultValues: {
         name: schoolInfo.name,
         address: schoolInfo.address,
+        mpo_code: schoolInfo.mpo_code || '',
+        eiin_number: schoolInfo.eiin_number || '',
     },
   });
 
@@ -48,6 +52,8 @@ export default function SchoolInfoForm({ schoolInfo }: { schoolInfo: SchoolInfo 
     const formData = new FormData();
     formData.append('name', values.name);
     formData.append('address', values.address);
+    formData.append('mpo_code', values.mpo_code || '');
+    formData.append('eiin_number', values.eiin_number || '');
 
     if (values.logo && values.logo.length > 0) {
         try {
@@ -73,16 +79,28 @@ export default function SchoolInfoForm({ schoolInfo }: { schoolInfo: SchoolInfo 
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-2xl">
-        <FormItem>
-          <Label htmlFor="name">স্কুলের নাম</Label>
-          <Input id="name" {...register("name")} />
-          <FormMessage name="name" />
-        </FormItem>
-        <FormItem>
-          <Label htmlFor="address">ঠিকানা</Label>
-          <Textarea id="address" {...register("address")} />
-          <FormMessage name="address" />
-        </FormItem>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormItem>
+              <Label htmlFor="name">স্কুলের নাম</Label>
+              <Input id="name" {...register("name")} />
+              <FormMessage name="name" />
+            </FormItem>
+             <FormItem>
+              <Label htmlFor="address">ঠিকানা</Label>
+              <Input id="address" {...register("address")} />
+              <FormMessage name="address" />
+            </FormItem>
+             <FormItem>
+              <Label htmlFor="mpo_code">MPO Code</Label>
+              <Input id="mpo_code" {...register("mpo_code")} />
+              <FormMessage name="mpo_code" />
+            </FormItem>
+             <FormItem>
+              <Label htmlFor="eiin_number">EIIN Number</Label>
+              <Input id="eiin_number" {...register("eiin_number")} />
+              <FormMessage name="eiin_number" />
+            </FormItem>
+        </div>
         <FormItem>
             <Label htmlFor="logo">স্কুলের লোগো</Label>
             <Input id="logo" type="file" accept="image/*" {...register("logo")} />

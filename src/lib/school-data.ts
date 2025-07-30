@@ -6,6 +6,14 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { toDataURL } from './utils';
 
+/*
+SQL for table `school_info`:
+
+ALTER TABLE school_info
+ADD COLUMN mpo_code VARCHAR(255) DEFAULT NULL,
+ADD COLUMN eiin_number VARCHAR(255) DEFAULT NULL;
+*/
+
 export interface CarouselItem {
   id: number;
   src: string;
@@ -35,6 +43,8 @@ export interface SchoolInfo {
     name: string;
     address: string;
     logo_url: string;
+    mpo_code: string | null;
+    eiin_number: string | null;
 }
 
 const mockCarouselItems: CarouselItem[] = [
@@ -100,7 +110,9 @@ const mockSchoolInfo: SchoolInfo = {
     id: 1,
     name: "মুরাদদর্প নারায়নপুর নিম্ন মাধ্যমিক বিদ্যালয়",
     address: "কাফ্রিখাল, মিঠাপুকুর, রংপুর।",
-    logo_url: "https://placehold.co/80x80.png"
+    logo_url: "https://placehold.co/80x80.png",
+    mpo_code: "12345",
+    eiin_number: "67890"
 };
 
 type SaveResult = { success: boolean; error?: string };
@@ -182,7 +194,7 @@ export async function deleteCarouselItem(id: number): Promise<SaveResult> {
 export async function getSchoolInfo(): Promise<SchoolInfo> {
     if (!pool) return mockSchoolInfo;
     try {
-        const [rows] = await pool.query('SELECT id, name, address, IF(logo_url IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(logo_url)), NULL) as logo_url FROM school_info LIMIT 1');
+        const [rows] = await pool.query('SELECT id, name, address, mpo_code, eiin_number, IF(logo_url IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(logo_url)), NULL) as logo_url FROM school_info LIMIT 1');
         return (rows as SchoolInfo[])[0] || mockSchoolInfo;
     } catch (error) {
         return mockSchoolInfo;

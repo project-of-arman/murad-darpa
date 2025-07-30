@@ -31,7 +31,9 @@ export default async function AdminSettingsPage() {
       id: settings.school_id,
       name: settings.school_name,
       address: settings.school_address,
-      logo_url: settings.school_logo_url
+      logo_url: settings.school_logo_url,
+      mpo_code: settings.mpo_code,
+      eiin_number: settings.eiin_number,
   }
 
   return (
