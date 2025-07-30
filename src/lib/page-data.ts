@@ -1,7 +1,7 @@
 
 'use server';
 
-import pool from './db';
+import pool, { queryWithRetry } from './db';
 import { revalidatePath } from 'next/cache';
 
 export interface Page {
@@ -20,8 +20,8 @@ export async function getPages(): Promise<Page[]> {
         return [];
     }
     try {
-        const [rows] = await pool.query('SELECT id, title, slug, description, IF(thumbnail IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(thumbnail)), NULL) as thumbnail, created_at, updated_at FROM pages ORDER BY created_at DESC');
-        return rows as Page[];
+        const rows = await queryWithRetry<Page[]>('SELECT id, title, slug, description, IF(thumbnail IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(thumbnail)), NULL) as thumbnail, created_at, updated_at FROM pages ORDER BY created_at DESC');
+        return rows;
     } catch (error) {
         console.error('Failed to fetch pages:', error);
         return [];
@@ -33,7 +33,7 @@ export async function getPageById(id: string | number): Promise<Page | null> {
         return null;
     }
     try {
-        const [rows] = await pool.query<Page[]>('SELECT id, title, slug, description, IF(thumbnail IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(thumbnail)), NULL) as thumbnail, created_at, updated_at FROM pages WHERE id = ?', [id]);
+        const rows = await queryWithRetry<Page[]>('SELECT id, title, slug, description, IF(thumbnail IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(thumbnail)), NULL) as thumbnail, created_at, updated_at FROM pages WHERE id = ?', [id]);
         return rows[0] || null;
     } catch (error) {
         console.error(`Failed to fetch page by id ${id}:`, error);
@@ -46,7 +46,7 @@ export async function getPageBySlug(slug: string): Promise<Page | null> {
         return null;
     }
     try {
-        const [rows] = await pool.query<Page[]>('SELECT id, title, slug, description, IF(thumbnail IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(thumbnail)), NULL) as thumbnail, created_at, updated_at FROM pages WHERE slug = ?', [slug]);
+        const rows = await queryWithRetry<Page[]>('SELECT id, title, slug, description, IF(thumbnail IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(thumbnail)), NULL) as thumbnail, created_at, updated_at FROM pages WHERE slug = ?', [slug]);
         return rows[0] || null;
     } catch (error) {
         console.error(`Failed to fetch page by slug ${slug}:`, error);
@@ -84,11 +84,11 @@ export async function savePage(formData: FormData, id?: number): Promise<SaveRes
             }
 
             const query = 'UPDATE pages SET ? WHERE id = ?';
-            await pool.query(query, [fieldsToUpdate, id]);
+            await queryWithRetry(query, [fieldsToUpdate, id]);
         } else {
             // Insert
             const query = 'INSERT INTO pages (title, slug, description, thumbnail) VALUES (?, ?, ?, ?)';
-            await pool.query(query, [title, slug, description, thumbnailBuffer]);
+            await queryWithRetry(query, [title, slug, description, thumbnailBuffer]);
         }
 
         revalidatePath('/admin/pages');
@@ -109,7 +109,7 @@ export async function deletePage(id: number): Promise<SaveResult> {
         // First get the slug to revalidate the path
         const page = await getPageById(id);
 
-        await pool.query('DELETE FROM pages WHERE id = ?', [id]);
+        await queryWithRetry('DELETE FROM pages WHERE id = ?', [id]);
         
         revalidatePath('/admin/pages');
         if (page) {

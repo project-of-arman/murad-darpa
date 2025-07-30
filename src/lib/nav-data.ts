@@ -1,7 +1,7 @@
 
 'use server';
 
-import pool from './db';
+import pool, { queryWithRetry } from './db';
 import { revalidatePath } from 'next/cache';
 
 /*
@@ -58,8 +58,8 @@ export async function getNavLinks(): Promise<NavLink[]> {
         return mockNavLinks.sort((a, b) => a.sort_order - b.sort_order);
     }
     try {
-        const [rows] = await pool.query('SELECT * FROM nav_links ORDER BY parent_id ASC, sort_order ASC');
-        const links = rows as NavLink[];
+        const rows = await queryWithRetry<NavLink[]>('SELECT * FROM nav_links ORDER BY parent_id ASC, sort_order ASC');
+        const links = rows;
         
         const linkMap: { [key: number]: NavLink } = {};
         const topLevelLinks: NavLink[] = [];
@@ -90,7 +90,7 @@ export async function getNavLinks(): Promise<NavLink[]> {
 export async function getNavLinkById(id: string | number): Promise<NavLink | null> {
     if (!pool) return null;
     try {
-        const [rows] = await pool.query<NavLink[]>('SELECT * FROM nav_links WHERE id = ?', [id]);
+        const rows = await queryWithRetry<NavLink[]>('SELECT * FROM nav_links WHERE id = ?', [id]);
         return (rows as any)[0] || null;
     } catch (error) {
         console.error(`Failed to fetch nav link by id ${id}:`, error);
@@ -110,9 +110,9 @@ export async function saveNavLink(data: Omit<NavLink, 'id' | 'subLinks'>, id?: n
 
   try {
     if (id) {
-      await pool.query('UPDATE nav_links SET ? WHERE id = ?', [dbData, id]);
+      await queryWithRetry('UPDATE nav_links SET ? WHERE id = ?', [dbData, id]);
     } else {
-      await pool.query('INSERT INTO nav_links SET ?', [dbData]);
+      await queryWithRetry('INSERT INTO nav_links SET ?', [dbData]);
     }
     revalidatePath('/admin/nav-manager');
     revalidatePath('/(site)/layout', 'layout');
@@ -128,7 +128,7 @@ export async function deleteNavLink(id: number): Promise<SaveResult> {
     return { success: false, error: "Database not connected." };
   }
   try {
-    await pool.query('DELETE FROM nav_links WHERE id = ?', [id]);
+    await queryWithRetry('DELETE FROM nav_links WHERE id = ?', [id]);
     revalidatePath('/admin/nav-manager');
     revalidatePath('/(site)/layout', 'layout');
     return { success: true };

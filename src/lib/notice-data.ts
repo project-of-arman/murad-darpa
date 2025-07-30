@@ -1,7 +1,7 @@
 
 'use server';
 
-import pool from './db';
+import pool, { queryWithRetry } from './db';
 import { revalidatePath } from 'next/cache';
 
 /*
@@ -71,8 +71,8 @@ export async function getNotices(options: { is_marquee?: boolean } = {}): Promis
             params.push(true);
         }
 
-        const [rows] = await pool.query(query, params);
-        return rows as Notice[];
+        const rows = await queryWithRetry<Notice[]>(query, params);
+        return rows;
     } catch (error) {
         console.error('Failed to fetch notices, returning mock data:', error);
         return is_marquee ? mockNotices.filter(n => n.is_marquee) : mockNotices;
@@ -85,9 +85,8 @@ export async function getNoticeById(id: string): Promise<Notice | null> {
         return mockNotices.find(n => n.id.toString() === id) || null;
     }
     try {
-        const [rows] = await pool.query('SELECT id, title, date, description, is_marquee, file_name FROM notices WHERE id = ?', [id]);
-        const notices = rows as Notice[];
-        return notices[0] || null;
+        const rows = await queryWithRetry<Notice[]>('SELECT id, title, date, description, is_marquee, file_name FROM notices WHERE id = ?', [id]);
+        return rows[0] || null;
     } catch (error) {
         console.error(`Failed to fetch notice by id ${id}, returning mock data:`, error);
         return mockNotices.find(n => n.id.toString() === id) || null;
@@ -118,6 +117,9 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
         
         if (id) {
             // Update logic
+            const [existingNotices] = await pool.query<Notice[]>('SELECT file_name FROM notices WHERE id = ?', [id]);
+            const existingNotice = existingNotices[0];
+
             const fieldsToUpdate: any = {
                 title: data.title,
                 date: data.date,
@@ -126,16 +128,19 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
             };
 
             if (fileBuffer && data.file) {
-                // If a new file is uploaded, update file_data and file_name
                 const extension = getFileExtension(data.file.name);
                 fieldsToUpdate.file_data = fileBuffer;
                 fieldsToUpdate.file_name = `${data.title}.${extension}`;
             } else if (data.remove_file) {
-                // If remove_file is checked (and no new file), nullify file fields
                 fieldsToUpdate.file_data = null;
                 fieldsToUpdate.file_name = null;
+            } else {
+                 // If the title changed, but no new file was uploaded, update the filename to match the new title
+                 if (data.title !== existingNotice.title && existingNotice.file_name) {
+                     const oldExtension = getFileExtension(existingNotice.file_name);
+                     fieldsToUpdate.file_name = `${data.title}.${oldExtension}`;
+                 }
             }
-            // If no new file is uploaded and remove_file is false, do nothing to file fields. They will be preserved.
             
             await pool.query('UPDATE notices SET ? WHERE id = ?', [fieldsToUpdate, id]);
         } else {
