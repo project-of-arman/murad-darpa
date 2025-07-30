@@ -36,19 +36,6 @@ const Marquee = async () => {
   );
 };
 
-// This new component will contain the client components
-function SiteLayoutClient({ schoolName }: { schoolName: string }) {
-    return (
-        <>
-            <HeroCarousel />
-            <SecondaryNav schoolName={schoolName} />
-            <div className="container mx-auto px-4">
-                <Marquee />
-            </div>
-        </>
-    )
-}
-
 export default async function SiteLayout({
   children,
 }: {
@@ -58,7 +45,11 @@ export default async function SiteLayout({
   
   return (
     <div className="relative flex min-h-screen flex-col">
-        <SiteLayoutClient schoolName={schoolInfo.name} />
+        <HeroCarousel />
+        <SecondaryNav schoolName={schoolInfo.name} />
+        <div className="container mx-auto px-4">
+            <Marquee />
+        </div>
         <main className="flex-1">
             <div className="container mx-auto py-12 sm:py-16 lg:py-20 ">
                 <div className="grid grid-cols-10 gap-8"> 
