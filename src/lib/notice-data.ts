@@ -125,13 +125,6 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
             const extension = getFileExtension(data.file.name);
             fieldsToUpdate.file_data = fileBuffer;
             fieldsToUpdate.file_name = `${data.title}.${extension}`;
-        } else if (id) {
-            const [existingNotices] = await queryWithRetry<Notice[]>('SELECT file_name FROM notices WHERE id = ?', [id]);
-            const existingNotice = existingNotices[0];
-            if (existingNotice && data.title !== existingNotice.title && existingNotice.file_name) {
-                const oldExtension = getFileExtension(existingNotice.file_name);
-                fieldsToUpdate.file_name = `${data.title}.${oldExtension}`;
-            }
         }
         
         if (id) {
