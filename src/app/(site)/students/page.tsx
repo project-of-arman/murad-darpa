@@ -22,6 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { getStudents, Student } from '@/lib/student-data';
+import { User, Users } from 'lucide-react';
 
 const STUDENTS_PER_PAGE = 5;
 
@@ -77,6 +78,10 @@ export default function StudentsPage() {
     setCurrentPage(prev => Math.min(prev + 1, totalPages));
   };
 
+  const totalStudents = allStudents.length;
+  const maleStudents = allStudents.filter(s => s.gender === 'ছেলে').length;
+  const femaleStudents = allStudents.filter(s => s.gender === 'মেয়ে').length;
+
   return (
     <div className="bg-white">
       <div className="container mx-auto px-4 py-16">
@@ -84,6 +89,37 @@ export default function StudentsPage() {
           <h1 className="text-4xl font-bold text-primary font-headline">আমাদের শিক্ষার্থী</h1>
           <p className="text-muted-foreground mt-2">প্রতিষ্ঠানের সকল শিক্ষার্থীদের তালিকা</p>
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">মোট শিক্ষার্থী</CardTitle>
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{loading ? '...' : totalStudents}</div>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">ছাত্র</CardTitle>
+                    <User className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{loading ? '...' : maleStudents}</div>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">ছাত্রী</CardTitle>
+                    <User className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{loading ? '...' : femaleStudents}</div>
+                </CardContent>
+            </Card>
+        </div>
+
         <Card>
           <CardHeader>
             <CardTitle>ফিল্টার</CardTitle>
