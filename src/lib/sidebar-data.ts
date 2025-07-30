@@ -1,7 +1,7 @@
 
 'use server';
 
-import pool from './db';
+import pool, { queryWithRetry } from './db';
 import { revalidatePath } from 'next/cache';
 
 export interface SidebarWidget {
@@ -121,7 +121,7 @@ export async function getSidebarWidgets(): Promise<SidebarWidget[]> {
     }
     try {
         const query = 'SELECT id, widget_type, title, subtitle, link_url, link_text, content, sort_order, IF(image_url IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image_url)), NULL) as image_url FROM sidebar_widgets ORDER BY sort_order ASC';
-        const [rows] = await pool.query(query);
+        const rows = await queryWithRetry<SidebarWidget[]>(query);
         return rows as SidebarWidget[];
     } catch (error) {
         console.error('Failed to fetch sidebar widgets, returning mock data:', error);
