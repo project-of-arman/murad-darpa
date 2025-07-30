@@ -12,7 +12,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Notice, saveNotice } from "@/lib/notice-data";
 import { useRouter } from "next/navigation";
 import { Switch } from "@/components/ui/switch";
-import { Checkbox } from "@/components/ui/checkbox";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_FILE_TYPES = ["application/pdf"];
@@ -31,7 +30,6 @@ const formSchema = z.object({
   description: z.string().min(1, "বিবরণ আবশ্যক"),
   file: fileSchema,
   is_marquee: z.boolean().default(false),
-  remove_file: z.boolean().default(false),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -52,7 +50,6 @@ export function NoticeForm({ notice }: { notice?: Notice }) {
       date: notice?.date || "",
       description: notice?.description || "",
       is_marquee: notice?.is_marquee || false,
-      remove_file: false,
     },
   });
 
@@ -62,7 +59,6 @@ export function NoticeForm({ notice }: { notice?: Notice }) {
     formData.append('date', values.date);
     formData.append('description', values.description);
     formData.append('is_marquee', values.is_marquee.toString());
-    formData.append('remove_file', values.remove_file.toString());
     
     if (values.file && values.file.length > 0) {
         formData.append('file', values.file[0]);
@@ -113,22 +109,6 @@ export function NoticeForm({ notice }: { notice?: Notice }) {
         {notice?.file_name && (
           <div className="mt-2 space-y-2">
             <p className="text-xs text-muted-foreground">বর্তমান ফাইল: {notice.file_name}</p>
-            <div className="flex items-center space-x-2">
-                <Controller
-                    control={control}
-                    name="remove_file"
-                    render={({ field }) => (
-                        <Checkbox
-                            id="remove_file"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                        />
-                    )}
-                />
-                <Label htmlFor="remove_file" className="text-sm font-normal text-destructive">
-                    বর্তমান ফাইলটি মুছুন
-                </Label>
-            </div>
           </div>
         )}
       </div>

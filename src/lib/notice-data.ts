@@ -106,7 +106,6 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
             description: formData.get('description') as string,
             is_marquee: formData.get('is_marquee') === 'true',
             file: formData.get('file') as File | null,
-            remove_file: formData.get('remove_file') === 'true',
         };
 
         const fileBuffer = data.file && data.file.size > 0 ? Buffer.from(await data.file.arrayBuffer()) : null;
@@ -115,41 +114,30 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
             return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
         }
         
-        if (id) {
-            // Update logic
+        const fieldsToUpdate: { [key: string]: any } = {
+            title: data.title,
+            date: data.date,
+            description: data.description,
+            is_marquee: data.is_marquee,
+        };
+
+        if (fileBuffer && data.file) {
+            const extension = getFileExtension(data.file.name);
+            fieldsToUpdate.file_data = fileBuffer;
+            fieldsToUpdate.file_name = `${data.title}.${extension}`;
+        } else if (id) {
             const [existingNotices] = await queryWithRetry<Notice[]>('SELECT file_name FROM notices WHERE id = ?', [id]);
             const existingNotice = existingNotices[0];
-
-            let query = 'UPDATE notices SET title = ?, date = ?, description = ?, is_marquee = ?';
-            const params: any[] = [data.title, data.date, data.description, data.is_marquee];
-
-            if (fileBuffer && data.file) { // Case 1: New file uploaded
-                const extension = getFileExtension(data.file.name);
-                query += ', file_data = ?, file_name = ?';
-                params.push(fileBuffer, `${data.title}.${extension}`);
-            } else if (data.remove_file) { // Case 2: Remove existing file checked
-                query += ', file_data = NULL, file_name = NULL';
-            } else { // Case 3: No file change, but maybe title changed
-                 if (existingNotice && data.title !== existingNotice.title && existingNotice.file_name) {
-                     const oldExtension = getFileExtension(existingNotice.file_name);
-                     query += ', file_name = ?';
-                     params.push(`${data.title}.${oldExtension}`);
-                 }
+            if (existingNotice && data.title !== existingNotice.title && existingNotice.file_name) {
+                const oldExtension = getFileExtension(existingNotice.file_name);
+                fieldsToUpdate.file_name = `${data.title}.${oldExtension}`;
             }
-
-            query += ' WHERE id = ?';
-            params.push(id);
-            
-            await pool.query(query, params);
+        }
+        
+        if (id) {
+            await pool.query('UPDATE notices SET ? WHERE id = ?', [fieldsToUpdate, id]);
         } else {
-            // Insert logic
-            let fileName = null;
-            if(data.file && fileBuffer) {
-                 const extension = getFileExtension(data.file.name);
-                 fileName = `${data.title}.${extension}`;
-            }
-            const query = 'INSERT INTO notices (title, date, description, is_marquee, file_data, file_name) VALUES (?, ?, ?, ?, ?, ?)';
-            await pool.query(query, [data.title, data.date, data.description, data.is_marquee, fileBuffer, fileName]);
+            await pool.query('INSERT INTO notices SET ?', [fieldsToUpdate]);
         }
         
         revalidatePath('/admin/notices');
