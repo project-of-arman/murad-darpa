@@ -124,7 +124,7 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
         if (fileBuffer && data.file) {
             const extension = getFileExtension(data.file.name);
             fieldsToUpdate.file_data = fileBuffer;
-            fieldsToUpdate.file_name = `${data.title}.${extension}`;
+            fieldsToUpdate.file_name = `${data.title.replace(/\s/g, '_')}.${extension}`;
         }
         
         if (id) {
