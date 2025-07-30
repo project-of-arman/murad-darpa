@@ -39,7 +39,7 @@ const mockNotices: Notice[] = [
     {
     id: 1,
     title: "ভর্তি পরীক্ষার ফলাফল প্রকাশ",
-    date: "২০ জুলাই, ২০২৪",
+    date: "۲۰ জুলাই, ২০২৪",
     description: "২০২৪-২৫ শিক্ষাবর্ষের ভর্তি পরীক্ষার ফলাফল প্রকাশিত হয়েছে। উত্তীর্ণ শিক্ষার্থীদের তালিকা এবং ভর্তির পরবর্তী নির্দেশনা জানতে পারবেন συνημμένο ফাইল থেকে।",
     is_marquee: true,
     file_name: "result.pdf"
@@ -120,28 +120,27 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
             const [existingNotices] = await queryWithRetry<Notice[]>('SELECT file_name FROM notices WHERE id = ?', [id]);
             const existingNotice = existingNotices[0];
 
-            const fieldsToUpdate: any = {
-                title: data.title,
-                date: data.date,
-                description: data.description,
-                is_marquee: data.is_marquee,
-            };
+            let query = 'UPDATE notices SET title = ?, date = ?, description = ?, is_marquee = ?';
+            const params: any[] = [data.title, data.date, data.description, data.is_marquee];
 
             if (fileBuffer && data.file) { // Case 1: New file uploaded
                 const extension = getFileExtension(data.file.name);
-                fieldsToUpdate.file_data = fileBuffer;
-                fieldsToUpdate.file_name = `${data.title}.${extension}`;
+                query += ', file_data = ?, file_name = ?';
+                params.push(fileBuffer, `${data.title}.${extension}`);
             } else if (data.remove_file) { // Case 2: Remove existing file checked
-                fieldsToUpdate.file_data = null;
-                fieldsToUpdate.file_name = null;
+                query += ', file_data = NULL, file_name = NULL';
             } else { // Case 3: No file change, but maybe title changed
                  if (existingNotice && data.title !== existingNotice.title && existingNotice.file_name) {
                      const oldExtension = getFileExtension(existingNotice.file_name);
-                     fieldsToUpdate.file_name = `${data.title}.${oldExtension}`;
+                     query += ', file_name = ?';
+                     params.push(`${data.title}.${oldExtension}`);
                  }
             }
+
+            query += ' WHERE id = ?';
+            params.push(id);
             
-            await pool.query('UPDATE notices SET ? WHERE id = ?', [fieldsToUpdate, id]);
+            await pool.query(query, params);
         } else {
             // Insert logic
             let fileName = null;
@@ -171,7 +170,7 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
 export async function deleteNotice(id: number): Promise<SaveResult> {
    if (!pool) return { success: false, error: "Database not connected." };
   try {
-    await pool.query('DELETE FROM notices WHERE id = ?', [id]);
+    await queryWithRetry('DELETE FROM notices WHERE id = ?', [id]);
     revalidatePath('/admin/notices');
     revalidatePath('/(site)/notice');
     revalidatePath('/(site)/');
