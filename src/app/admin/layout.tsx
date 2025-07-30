@@ -9,7 +9,7 @@ import AdminHeader from '@/components/admin/header';
 import { hasAdminAccount, login } from '@/lib/actions/auth-actions';
 import { useRouter } from 'next/navigation';
 import AdminSetupPage from './setup/page';
-import MatrixLoader from '@/components/admin/matrix-loader';
+import LogoLoader from '@/components/admin/logo-loader';
 
 function AdminLayoutContainer({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -42,7 +42,7 @@ function AdminLayoutContainer({ children }: { children: ReactNode }) {
   }
 
   if (adminExists === null) {
-      return <MatrixLoader />;
+      return <LogoLoader />;
   }
 
   if (!adminExists) {
@@ -71,7 +71,7 @@ function AdminLayoutContainer({ children }: { children: ReactNode }) {
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
     return (
-        <React.Suspense fallback={<MatrixLoader />}>
+        <React.Suspense fallback={<LogoLoader />}>
             <AdminLayoutContainer>{children}</AdminLayoutContainer>
         </React.Suspense>
     )
