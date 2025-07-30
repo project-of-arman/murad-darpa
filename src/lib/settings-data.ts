@@ -11,11 +11,11 @@ export interface SiteSettings extends RowDataPacket {
   site_title: string;
   meta_description: string;
   meta_keywords: string | null;
-  favicon_url: string | null;
+  favicon_url: string | null | Buffer;
   school_id: number;
   school_name: string;
   school_address: string;
-  school_logo_url: string;
+  school_logo_url: string | Buffer;
 }
 
 // ========= MOCK DATA (for fallback) =========

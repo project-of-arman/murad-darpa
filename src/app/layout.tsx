@@ -1,53 +1,47 @@
 
 "use client";
 
-import type { Metadata } from 'next';
+import type { Metadata, IconDescriptor } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { getSiteSettings } from '@/lib/settings-data';
-import { Suspense, useEffect, useState } from 'react';
 import NextNProgress from 'nextjs-progressbar';
+import { useEffect, useState } from 'react';
 
-// We can't use generateMetadata in a client component, so we'll set the title dynamically.
-// Note: For full metadata support, this would require a more complex setup, but for the title and favicon, this is a good approach.
+// We can't use generateMetadata in a client component, so we manage the title dynamically.
+// SEO-critical metadata should be handled in a parent Server Component layout if possible,
+// but for this case, we'll set the title with useEffect.
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-    const [isMounted, setIsMounted] = useState(false);
+  const [siteTitle, setSiteTitle] = useState('মুরাদদর্প নারায়নপুর নিম্ন মাধ্যমিক বিদ্যালয়');
+  const [favicon, setFavicon] = useState('/favicon.ico');
 
-    useEffect(() => {
-        setIsMounted(true);
-        
-        async function setMetadata() {
-            try {
-                const settings = await getSiteSettings();
-                document.title = settings.site_title || 'মুরাদদর্প নারায়নপুর নিম্ন মাধ্যমিক বিদ্যালয়';
-                
-                let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
-                if (!link) {
-                    link = document.createElement('link');
-                    link.rel = 'icon';
-                    document.getElementsByTagName('head')[0].appendChild(link);
-                }
-                 const faviconUrl = settings.favicon_url 
-                    ? `${settings.favicon_url}?v=${new Date().getTime()}`
-                    : '/favicon.ico';
-                link.href = faviconUrl;
-
-            } catch (error) {
-                console.error("Failed to set metadata:", error);
-            }
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const settings = await getSiteSettings();
+        if (settings.site_title) {
+          setSiteTitle(settings.site_title);
+          document.title = settings.site_title;
         }
-        setMetadata();
-    }, []);
-
+        if (settings.favicon_url && typeof settings.favicon_url === 'string') {
+          setFavicon(settings.favicon_url);
+        }
+      } catch (error) {
+        console.error("Failed to fetch site settings, using defaults.", error);
+      }
+    }
+    fetchSettings();
+  }, []);
 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="icon" href={favicon} type="image/x-icon" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet" />
