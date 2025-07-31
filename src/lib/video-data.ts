@@ -1,7 +1,7 @@
 
 'use server';
 
-import pool from './db';
+import pool, { queryWithRetry } from './db';
 import { revalidatePath } from 'next/cache';
 import { toDataURL } from './utils';
 
@@ -48,7 +48,8 @@ export async function getVideos(): Promise<Video[]> {
         return mockVideos;
     }
     try {
-        const [rows] = await pool.query('SELECT id, title, description, videoUrl, dataAiHint, IF(thumbnail IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(thumbnail)), NULL) as thumbnail FROM videos ORDER BY id ASC');
+        const query = 'SELECT id, title, description, videoUrl, dataAiHint, IF(thumbnail IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(thumbnail)), NULL) as thumbnail FROM videos ORDER BY id ASC';
+        const rows = await queryWithRetry<Video[]>(query);
         return rows as Video[];
     } catch (error) {
         console.error('Failed to fetch videos, returning mock data:', error);
@@ -63,7 +64,7 @@ export async function getVideoById(id: string): Promise<Video | null> {
         return video;
     }
     try {
-        const [rows] = await pool.query('SELECT * FROM videos WHERE id = ?', [id]);
+        const rows = await queryWithRetry<Video[]>('SELECT * FROM videos WHERE id = ?', [id]);
         const videos = rows as Video[];
         
         if (!videos[0]) {
@@ -124,9 +125,9 @@ export async function saveVideo(formData: FormData, id?: string): Promise<SaveRe
 
     try {
         if (id) {
-            await pool.query('UPDATE videos SET ? WHERE id = ?', [videoToSave, id]);
+            await queryWithRetry('UPDATE videos SET ? WHERE id = ?', [videoToSave, id]);
         } else {
-            await pool.query('INSERT INTO videos SET ?', [videoToSave]);
+            await queryWithRetry('INSERT INTO videos SET ?', [videoToSave]);
         }
         revalidatePath('/admin/gallery/videos');
         revalidatePath('/(site)/videos');
@@ -141,7 +142,7 @@ export async function saveVideo(formData: FormData, id?: string): Promise<SaveRe
 export async function deleteVideo(id: string): Promise<SaveResult> {
     if (!pool) return { success: false, error: "Database not connected" };
     try {
-        await pool.query('DELETE FROM videos WHERE id = ?', [id]);
+        await queryWithRetry('DELETE FROM videos WHERE id = ?', [id]);
         revalidatePath('/admin/gallery/videos');
         revalidatePath('/(site)/videos');
         revalidatePath('/(site)/');
