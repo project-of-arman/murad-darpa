@@ -1,7 +1,7 @@
 
 'use server';
 
-import pool from './db';
+import pool, { queryWithRetry } from './db';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { toDataURL } from './utils';
@@ -194,8 +194,9 @@ export async function deleteCarouselItem(id: number): Promise<SaveResult> {
 export async function getSchoolInfo(): Promise<SchoolInfo> {
     if (!pool) return mockSchoolInfo;
     try {
-        const [rows] = await pool.query('SELECT id, name, address, mpo_code, eiin_number, IF(logo_url IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(logo_url)), NULL) as logo_url FROM school_info LIMIT 1');
-        return (rows as SchoolInfo[])[0] || mockSchoolInfo;
+        const query = 'SELECT id, name, address, mpo_code, eiin_number, IF(logo_url IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(logo_url)), NULL) as logo_url FROM school_info LIMIT 1';
+        const rows = await queryWithRetry<SchoolInfo[]>(query);
+        return rows[0] || mockSchoolInfo;
     } catch (error) {
         return mockSchoolInfo;
     }
