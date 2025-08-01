@@ -53,7 +53,7 @@ ADD COLUMN `role` ENUM('admin', 'moderator', 'visitor') NOT NULL DEFAULT 'visito
 export async function hasAdminAccount(): Promise<boolean> {
     if (!pool) return false;
     try {
-        const [rows] = await pool.query<{ count: number }[]>('SELECT COUNT(*) as count FROM admin_users');
+        const [rows] = await pool.query<{ count: number }[]>(`SELECT COUNT(*) as count FROM admin_users`);
         return rows[0].count > 0;
     } catch (error: any) {
         if (error.code === 'ER_NO_SUCH_TABLE') {
@@ -67,7 +67,7 @@ export async function hasAdminAccount(): Promise<boolean> {
 export async function getAdminAccount(): Promise<AdminAccount | null> {
     if (!pool) return null;
     try {
-        const [rows] = await pool.query<AdminAccount[]>('SELECT id, username, email, phone, role FROM admin_users LIMIT 1');
+        const [rows] = await pool.query<AdminAccount[]>(`SELECT id, username, email, phone, role FROM admin_users WHERE role = 'admin' LIMIT 1`);
         return rows[0] || null;
     } catch (error) {
         console.error("Failed to get admin account:", error);
@@ -78,7 +78,7 @@ export async function getAdminAccount(): Promise<AdminAccount | null> {
 export async function getAllUsers(): Promise<AdminAccount[]> {
     if (!pool) return [];
     try {
-        const [rows] = await pool.query<AdminAccount[]>('SELECT id, username, email, phone, role FROM admin_users ORDER BY username ASC');
+        const [rows] = await pool.query<AdminAccount[]>(`SELECT id, username, email, phone, role FROM admin_users ORDER BY username ASC`);
         return rows;
     } catch (error) {
         console.error("Failed to get all users:", error);
@@ -89,7 +89,7 @@ export async function getAllUsers(): Promise<AdminAccount[]> {
 export async function getUserById(id: number | string): Promise<AdminAccount | null> {
     if (!pool) return null;
     try {
-        const [rows] = await pool.query<AdminAccount[]>('SELECT id, username, email, phone, role FROM admin_users WHERE id = ?', [id]);
+        const [rows] = await pool.query<AdminAccount[]>(`SELECT id, username, email, phone, role FROM admin_users WHERE id = ?`, [id]);
         return rows[0] || null;
     } catch (error) {
         console.error(`Failed to get user by id ${id}:`, error);
@@ -141,7 +141,7 @@ export async function deleteUser(id: number): Promise<AuthResult> {
     if (!pool) return { success: false, error: 'Database not connected' };
     
     // Prevent deleting the last admin account
-    const [allUsers] = await pool.query<AdminAccount[]>('SELECT id, role FROM admin_users');
+    const [allUsers] = await pool.query<AdminAccount[]>(`SELECT id, role FROM admin_users`);
     const userToDelete = allUsers.find(u => u.id === id);
     const adminCount = allUsers.filter(u => u.role === 'admin').length;
 
@@ -201,7 +201,7 @@ export async function login(formData: FormData): Promise<AuthResult> {
     }
 
     try {
-        const [rows] = await pool.query<any[]>('SELECT * FROM admin_users WHERE username = ? OR email = ? OR phone = ?', [identifier, identifier, identifier]);
+        const [rows] = await pool.query<any[]>(`SELECT * FROM admin_users WHERE username = ? OR email = ? OR phone = ?`, [identifier, identifier, identifier]);
         const user = rows[0];
 
         if (!user) {
@@ -217,6 +217,45 @@ export async function login(formData: FormData): Promise<AuthResult> {
         return { success: true };
     } catch (error) {
         console.error('Login error:', error);
+        return { success: false, error: 'An unexpected error occurred.' };
+    }
+}
+
+
+export async function updateAdminCredentials(formData: FormData): Promise<AuthResult> {
+    if (!pool) return { success: false, error: 'Database not connected' };
+
+    try {
+        const adminAccount = await getAdminAccount();
+        if (!adminAccount) {
+            return { success: false, error: 'No admin account found to update.' };
+        }
+
+        const data = {
+            username: formData.get('username') as string,
+            email: formData.get('email') as string,
+            phone: formData.get('phone') as string,
+            newPassword: formData.get('newPassword') as string | null,
+        };
+
+        const fieldsToUpdate: { [key: string]: any } = {
+            username: data.username,
+            email: data.email,
+            phone: data.phone,
+        };
+        
+        if (data.newPassword) {
+            fieldsToUpdate.password = await bcrypt.hash(data.newPassword, 10);
+        }
+
+        await pool.query('UPDATE admin_users SET ? WHERE id = ?', [fieldsToUpdate, adminAccount.id]);
+        revalidatePath('/admin/settings');
+        return { success: true };
+    } catch (e: any) {
+        console.error("Failed to update admin credentials:", e);
+        if (e.code === 'ER_DUP_ENTRY') {
+            return { success: false, error: 'Username, email, or phone already taken.' };
+        }
         return { success: false, error: 'An unexpected error occurred.' };
     }
 }
