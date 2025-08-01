@@ -1,7 +1,9 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,12 +17,24 @@ interface LoginPageProps {
   onLoginSuccess: () => void;
 }
 
+const loginSchema = z.object({
+    identifier: z.string().min(1, "Identifier is required"),
+    password: z.string().min(1, "Password is required"),
+});
+
+type LoginValues = z.infer<typeof loginSchema>;
+
 export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
   const { toast } = useToast();
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginValues>({
+      resolver: zodResolver(loginSchema)
+  });
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
+  const handleLogin = async (values: LoginValues) => {
+    const formData = new FormData();
+    formData.append('identifier', values.identifier);
+    formData.append('password', values.password);
+    
     const result = await login(formData);
 
     if (result.success) {
@@ -47,16 +61,16 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
             Admin Login
           </CardTitle>
         </CardHeader>
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleSubmit(handleLogin)}>
           <CardContent className="space-y-4">
              <div className="space-y-2">
               <Label htmlFor="identifier">Username, Email, or Phone</Label>
               <Input
                 id="identifier"
-                name="identifier"
+                {...register("identifier")}
                 placeholder="Enter your username, email, or phone"
-                required
               />
+              {errors.identifier && <p className="text-sm text-destructive mt-1">{errors.identifier.message}</p>}
             </div>
             <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -69,16 +83,16 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
                 </div>
               <Input
                 id="password"
-                name="password"
                 type="password"
+                {...register("password")}
                 placeholder="Enter your password"
-                required
               />
+               {errors.password && <p className="text-sm text-destructive mt-1">{errors.password.message}</p>}
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full">
-              Login
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? 'Logging in...' : 'Login'}
             </Button>
           </CardFooter>
         </form>
