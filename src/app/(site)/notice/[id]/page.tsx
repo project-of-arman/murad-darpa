@@ -4,6 +4,14 @@ import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 import { ArrowLeft, Download, Calendar } from "lucide-react";
 import { getNoticeById } from "@/lib/notice-data";
+import type { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const notice = await getNoticeById(params.id);
+  return {
+    title: notice?.title || 'Notice',
+  };
+}
 
 
 export default async function NoticeDetailsPage({ params }: { params: { id: string } }) {

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 import Image from "next/image";
 import { ArrowLeft, Calendar, User } from "lucide-react";
+import type { Metadata } from 'next';
 
 const allPosts = [
   {
@@ -61,6 +62,13 @@ const allPosts = [
     dataAiHint: "school library books"
   },
 ];
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const post = allPosts.find(p => p.id.toString() === params.id);
+  return {
+    title: post?.title || 'Blog Post',
+  };
+}
 
 
 export default function BlogPostPage({ params }: { params: { id: string } }) {
@@ -122,4 +130,3 @@ export default function BlogPostPage({ params }: { params: { id: string } }) {
     </div>
   );
 }
-

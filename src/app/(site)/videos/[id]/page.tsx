@@ -4,6 +4,14 @@ import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 import { ArrowLeft } from "lucide-react";
 import { getVideoById } from "@/lib/video-data";
+import type { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const video = await getVideoById(params.id);
+  return {
+    title: video?.title || 'Video',
+  };
+}
 
 export default async function VideoDetailsPage({ params }: { params: { id: string } }) {
   const video = await getVideoById(params.id);

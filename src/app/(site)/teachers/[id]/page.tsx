@@ -5,6 +5,14 @@ import Link from 'next/link';
 import { ArrowLeft, Mail, MapPin, Phone } from "lucide-react";
 import Image from "next/image";
 import { getTeacherById } from "@/lib/teacher-data";
+import type { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const teacher = await getTeacherById(params.id);
+  return {
+    title: teacher?.name || 'Teacher Profile',
+  };
+}
 
 
 export default async function TeacherDetailsPage({ params }: { params: { id: string } }) {
@@ -39,7 +47,7 @@ export default async function TeacherDetailsPage({ params }: { params: { id: str
               <div className="flex flex-col md:flex-row gap-0">
                   <div className="w-full md:w-1/3 relative aspect-[3/4] md:aspect-auto">
                       <Image 
-                        src={teacher.image} 
+                        src={teacher.image as string} 
                         alt={teacher.name} 
                         fill 
                         className="object-cover rounded-t-lg md:rounded-l-lg md:rounded-t-none" 

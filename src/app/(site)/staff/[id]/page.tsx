@@ -5,10 +5,20 @@ import Link from 'next/link';
 import { ArrowLeft, Mail, MapPin, Phone } from "lucide-react";
 import Image from "next/image";
 import { getStaffById } from "@/lib/staff-data";
+import type { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+    const id = parseInt(params.id, 10);
+    if(isNaN(id)) return { title: 'Staff' };
+    const staff = await getStaffById(id);
+    return {
+        title: staff?.name || 'Staff',
+    };
+}
 
 
 export default async function StaffDetailsPage({ params }: { params: { id: string } }) {
-  const staff = await getStaffById(params.id);
+  const staff = await getStaffById(parseInt(params.id));
 
   if (!staff) {
     return (
@@ -39,7 +49,7 @@ export default async function StaffDetailsPage({ params }: { params: { id: strin
               <div className="flex flex-col md:flex-row gap-0">
                   <div className="w-full md:w-1/3 relative aspect-[3/4] md:aspect-auto">
                       <Image 
-                        src={staff.image} 
+                        src={staff.image as string} 
                         alt={staff.name} 
                         fill 
                         className="object-cover rounded-t-lg md:rounded-l-lg md:rounded-t-none" 

@@ -6,6 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import type { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const page = await getPageBySlug(params.slug);
+  return {
+    title: page?.title || 'Page',
+  };
+}
+
 
 export default async function DynamicPage({ params }: { params: { slug: string } }) {
     const page = await getPageBySlug(params.slug);

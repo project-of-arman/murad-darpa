@@ -5,6 +5,14 @@ import Link from 'next/link';
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import { getStudentByRoll } from "@/lib/student-data";
+import type { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: { roll: string } }): Promise<Metadata> {
+  const student = await getStudentByRoll(params.roll);
+  return {
+    title: student?.name || 'Student Profile',
+  };
+}
 
 
 export default async function StudentDetailsPage({ params }: { params: { roll: string } }) {
@@ -38,7 +46,7 @@ export default async function StudentDetailsPage({ params }: { params: { roll: s
             <div className="flex flex-col md:flex-row gap-8">
                 <div className="w-full md:w-1/3">
                     <Card className="overflow-hidden shadow-lg">
-                        <Image src={student.image || "https://placehold.co/300x400.png"} alt={student.name} width={300} height={400} className="w-full object-cover aspect-[3/4]" data-ai-hint={student.data_ai_hint || 'student portrait'} />
+                        <Image src={student.image as string || "https://placehold.co/300x400.png"} alt={student.name} width={300} height={400} className="w-full object-cover aspect-[3/4]" data-ai-hint={student.data_ai_hint || 'student portrait'} />
                     </Card>
                 </div>
                 <div className="w-full md:w-2/3">
