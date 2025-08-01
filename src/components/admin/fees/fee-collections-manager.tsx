@@ -4,6 +4,7 @@
 import { useState, useMemo } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -30,12 +31,12 @@ export default function FeeCollectionsManager({ initialCollections, students, fe
     const classOptions = ['all', '৬ষ্ঠ', '৭ম', '৮ম', '৯ম', '১০ম'];
 
     const filteredCollections = useMemo(() => {
-        return collections.filter(c =>
+        return initialCollections.filter(c =>
             c.student_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             c.roll.includes(searchTerm) ||
             c.fee_type_name.toLowerCase().includes(searchTerm.toLowerCase())
         );
-    }, [collections, searchTerm]);
+    }, [initialCollections, searchTerm]);
 
     const paginatedCollections = useMemo(() => {
         const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -86,7 +87,8 @@ export default function FeeCollectionsManager({ initialCollections, students, fe
                 <AddFeeCollectionDialog students={students} feeTypes={feeTypes} />
             </div>
             
-             <div className="border rounded-md">
+            {/* Desktop View */}
+            <div className="border rounded-md hidden md:block">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -129,6 +131,40 @@ export default function FeeCollectionsManager({ initialCollections, students, fe
                     </TableBody>
                 </Table>
             </div>
+            
+            {/* Mobile View */}
+            <div className="md:hidden space-y-4">
+                {paginatedCollections.map((item) => (
+                    <Card key={item.id}>
+                        <CardHeader className="p-4">
+                            <CardTitle className="text-base">{item.student_name}</CardTitle>
+                        </CardHeader>
+                         <CardContent className="p-4 pt-0 text-sm space-y-1">
+                            <p><strong>রোল:</strong> {item.roll} - {item.class_name}</p>
+                            <p><strong>ফির প্রকার:</strong> {item.fee_type_name}</p>
+                            <p><strong>পরিমাণ:</strong> {item.amount_paid} টাকা</p>
+                            <p><strong>মাস/বছর:</strong> {item.month ? `${item.month}, ${item.year}`: 'প্রযোজ্য নয়'}</p>
+                            <p><strong>পেমেন্টের তারিখ:</strong> {new Date(item.payment_date).toLocaleDateString('bn-BD')}</p>
+                        </CardContent>
+                        <CardFooter className="p-4 pt-0">
+                             <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="destructive" size="sm"><Trash className="mr-2 h-4 w-4" />মুছুন</Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader><AlertDialogTitle>আপনি কি নিশ্চিত?</AlertDialogTitle><AlertDialogDescription>এই পেমেন্টটি স্থায়ীভাবে মুছে ফেলা হবে।</AlertDialogDescription></AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>বাতিল</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleDelete(item.id)} className="bg-destructive hover:bg-destructive/90">মুছে ফেলুন</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </CardFooter>
+                    </Card>
+                ))}
+            </div>
+
+
              {totalPages > 1 && (
                 <div className="flex items-center justify-end space-x-2 py-4">
                     <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
@@ -143,4 +179,3 @@ export default function FeeCollectionsManager({ initialCollections, students, fe
         </div>
     );
 }
-
