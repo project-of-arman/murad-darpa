@@ -15,7 +15,7 @@ import type { AdminAccount } from "@/lib/actions/auth-actions";
 import { toDataURL } from "@/lib/utils";
 
 type AdminSettingsPageProps = {
-    user: AdminAccount;
+    user?: AdminAccount;
     userRole: 'admin' | 'moderator' | 'visitor';
 }
 
@@ -62,7 +62,7 @@ export default async function AdminSettingsPage({ user }: AdminSettingsPageProps
                         <p className="text-muted-foreground -mt-4">
                             আপনার অ্যাকাউন্টের তথ্য এবং পাসওয়ার্ড পরিবর্তন করুন।
                         </p>
-                        <AdminAccountForm account={user} />
+                        {user && <AdminAccountForm account={user} />}
                     </CardContent>
                 </Card>
             </TabsContent>
