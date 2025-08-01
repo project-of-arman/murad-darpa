@@ -37,7 +37,8 @@ import {
   Sidebar as SidebarIcon,
   Palette,
   Navigation,
-  Banknote
+  Banknote,
+  CheckCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -68,6 +69,7 @@ const navItems = [
       icon: Users,
       subItems: [
           { href: "/admin/students", icon: User, label: "শিক্ষার্থী" },
+          { href: "/admin/attendance", icon: CheckCircle, label: "শিক্ষার্থী হাজিরা" },
           { href: "/admin/teachers", icon: Users, label: "শিক্ষক" },
           { href: "/admin/staff", icon: Users, label: "কর্মচারী" },
           { href: "/admin/committee", icon: Users, label: "কমিটি" },
