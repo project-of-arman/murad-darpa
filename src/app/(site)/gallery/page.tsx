@@ -1,12 +1,6 @@
 
 "use client";
 
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'ছবি গ্যালারি',
-};
-
 import { useState, useEffect } from 'react';
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";

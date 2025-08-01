@@ -1,12 +1,6 @@
 
 "use client";
 
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'ব্লগ ও ঘটনাবলী',
-};
-
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';

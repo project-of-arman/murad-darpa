@@ -1,3 +1,4 @@
+
 import mysql from 'mysql2/promise';
 
 // Extend the NodeJS global type to include our MySQL pool

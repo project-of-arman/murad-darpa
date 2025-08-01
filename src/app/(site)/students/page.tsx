@@ -1,12 +1,6 @@
 
 "use client";
 
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'আমাদের শিক্ষার্থী',
-};
-
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import {

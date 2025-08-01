@@ -1,10 +1,4 @@
 
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'উপবৃত্তির জন্য আবেদন',
-};
-
 "use client";
 
 import { useForm } from "react-hook-form";
