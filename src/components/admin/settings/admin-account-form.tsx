@@ -28,15 +28,15 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function AdminAccountForm({ account }: { account: AdminAccount | null }) {
+export default function AdminAccountForm({ account }: { account: AdminAccount }) {
   const { toast } = useToast();
   const router = useRouter();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-        username: account?.username || '',
-        email: account?.email || '',
-        phone: account?.phone || '',
+        username: account.username,
+        email: account.email,
+        phone: account.phone,
         currentPassword: '',
         newPassword: '',
         confirmPassword: '',
@@ -61,11 +61,6 @@ export default function AdminAccountForm({ account }: { account: AdminAccount | 
     if (values.newPassword && values.currentPassword) {
       formData.append('newPassword', values.newPassword);
       formData.append('currentPassword', values.currentPassword);
-    }
-    
-    if (!account) {
-        toast({ title: "ত্রুটি", description: "User not found.", variant: "destructive"});
-        return;
     }
 
     const result = await updateAdminCredentials(account.id, formData);
