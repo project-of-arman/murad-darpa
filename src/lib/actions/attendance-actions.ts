@@ -27,8 +27,19 @@ export interface StudentAttendanceRecord extends RowDataPacket {
   id: number;
   name_bn: string;
   roll: string;
+  class_name: string;
   status: 'Present' | 'Absent' | null;
   reason: string | null;
+}
+
+export interface AttendanceReportRecord extends RowDataPacket {
+    id: number;
+    student_id: number;
+    student_name: string;
+    class_name: string;
+    roll: string;
+    status: 'Present' | 'Absent';
+    reason: string | null;
 }
 
 export async function getStudentsWithAttendance(
@@ -60,6 +71,30 @@ export async function getStudentsWithAttendance(
     return [];
   }
 }
+
+export async function getAttendanceByDate(date: string): Promise<AttendanceReportRecord[]> {
+    if (!pool) {
+        console.error("Database not connected.");
+        return [];
+    }
+    try {
+        const query = `
+            SELECT 
+                sa.id, sa.student_id, sa.status, sa.reason,
+                s.name_bn as student_name, s.class_name, s.roll
+            FROM student_attendance sa
+            JOIN students s ON sa.student_id = s.id
+            WHERE sa.attendance_date = ?
+            ORDER BY s.class_name, CAST(s.roll as UNSIGNED) ASC
+        `;
+        const [rows] = await pool.query(query, [date]);
+        return rows as AttendanceReportRecord[];
+    } catch (error) {
+        console.error('Failed to fetch attendance report:', error);
+        return [];
+    }
+}
+
 
 type SaveResult = { success: boolean; error?: string };
 type AttendanceData = {
