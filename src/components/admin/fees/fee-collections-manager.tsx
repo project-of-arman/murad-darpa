@@ -19,7 +19,7 @@ import AddFeeCollectionDialog from './add-fee-collection-dialog';
 
 const ITEMS_PER_PAGE = 10;
 
-export default function FeeCollectionsManager({ initialCollections, students, feeTypes, selectedClass }: { initialCollections: FeeCollection[], students: Student[], feeTypes: FeeType[], selectedClass: string }) {
+export default function FeeCollectionsManager({ initialCollections, students, feeTypes, selectedClass, userRole }: { initialCollections: FeeCollection[], students: Student[], feeTypes: FeeType[], selectedClass: string, userRole: 'admin' | 'moderator' | 'visitor' }) {
     const [collections, setCollections] = useState(initialCollections);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
@@ -84,7 +84,7 @@ export default function FeeCollectionsManager({ initialCollections, students, fe
                         </SelectContent>
                     </Select>
                 </div>
-                <AddFeeCollectionDialog students={students} feeTypes={feeTypes} />
+                {userRole !== 'visitor' && <AddFeeCollectionDialog students={students} feeTypes={feeTypes} />}
             </div>
             
             {/* Desktop View */}
@@ -99,7 +99,7 @@ export default function FeeCollectionsManager({ initialCollections, students, fe
                             <TableHead>পরিমাণ</TableHead>
                             <TableHead>মাস/বছর</TableHead>
                             <TableHead>পেমেন্টের তারিখ</TableHead>
-                            <TableHead className="text-right">অ্যাকশন</TableHead>
+                            {userRole !== 'visitor' && <TableHead className="text-right">অ্যাকশন</TableHead>}
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -112,6 +112,7 @@ export default function FeeCollectionsManager({ initialCollections, students, fe
                                 <TableCell>{item.amount_paid}</TableCell>
                                 <TableCell>{item.month ? `${item.month}, ${item.year}`: 'N/A'}</TableCell>
                                 <TableCell>{new Date(item.payment_date).toLocaleDateString('bn-BD')}</TableCell>
+                                {userRole !== 'visitor' && (
                                 <TableCell className="text-right">
                                     <AlertDialog>
                                         <AlertDialogTrigger asChild>
@@ -126,6 +127,7 @@ export default function FeeCollectionsManager({ initialCollections, students, fe
                                         </AlertDialogContent>
                                     </AlertDialog>
                                 </TableCell>
+                                )}
                             </TableRow>
                         ))}
                     </TableBody>
@@ -146,6 +148,7 @@ export default function FeeCollectionsManager({ initialCollections, students, fe
                             <p><strong>মাস/বছর:</strong> {item.month ? `${item.month}, ${item.year}`: 'প্রযোজ্য নয়'}</p>
                             <p><strong>পেমেন্টের তারিখ:</strong> {new Date(item.payment_date).toLocaleDateString('bn-BD')}</p>
                         </CardContent>
+                        {userRole !== 'visitor' && (
                         <CardFooter className="p-4 pt-0">
                              <AlertDialog>
                                 <AlertDialogTrigger asChild>
@@ -160,6 +163,7 @@ export default function FeeCollectionsManager({ initialCollections, students, fe
                                 </AlertDialogContent>
                             </AlertDialog>
                         </CardFooter>
+                        )}
                     </Card>
                 ))}
             </div>

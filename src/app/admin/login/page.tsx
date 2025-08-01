@@ -14,7 +14,7 @@ import { login } from '@/lib/actions/auth-actions';
 import Link from 'next/link';
 
 interface LoginPageProps {
-  onLoginSuccess: () => void;
+  onLoginSuccess: (identifier: string) => void;
 }
 
 const loginSchema = z.object({
@@ -38,7 +38,7 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
     const result = await login(formData);
 
     if (result.success) {
-      onLoginSuccess();
+      onLoginSuccess(values.identifier);
       toast({
         title: 'Login Successful',
         description: 'Welcome to the admin dashboard.',

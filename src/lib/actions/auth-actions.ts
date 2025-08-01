@@ -75,6 +75,23 @@ export async function getAdminAccount(): Promise<AdminAccount | null> {
     }
 }
 
+export async function getLoggedInUser(): Promise<AdminAccount | null> {
+    const identifier = sessionStorage.getItem('adminIdentifier');
+    if (!identifier || !pool) return null;
+
+    try {
+        const [rows] = await pool.query<AdminAccount[]>(
+            `SELECT id, username, email, phone, role FROM admin_users WHERE username = ? OR email = ? OR phone = ?`, 
+            [identifier, identifier, identifier]
+        );
+        return rows[0] || null;
+    } catch(e) {
+        console.error("Failed to get logged in user", e);
+        return null;
+    }
+}
+
+
 export async function getAllUsers(): Promise<AdminAccount[]> {
     if (!pool) return [];
     try {

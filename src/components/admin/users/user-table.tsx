@@ -39,7 +39,7 @@ import { Badge } from "@/components/ui/badge";
 
 const ITEMS_PER_PAGE = 10;
 
-export default function UserTable({ users }: { users: AdminAccount[] }) {
+export default function UserTable({ users, userRole }: { users: AdminAccount[], userRole: 'admin' | 'moderator' | 'visitor' }) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AdminAccount | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -109,7 +109,7 @@ export default function UserTable({ users }: { users: AdminAccount[] }) {
               <TableHead>ইমেইল</TableHead>
               <TableHead>ফোন</TableHead>
               <TableHead>ভূমিকা</TableHead>
-              <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>
+              {userRole === 'admin' && <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -119,6 +119,7 @@ export default function UserTable({ users }: { users: AdminAccount[] }) {
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.phone}</TableCell>
                 <TableCell><Badge variant="secondary">{user.role}</Badge></TableCell>
+                {userRole === 'admin' && (
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -144,6 +145,7 @@ export default function UserTable({ users }: { users: AdminAccount[] }) {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
+                )}
               </TableRow>
             )) : (
               <TableRow>
@@ -168,12 +170,14 @@ export default function UserTable({ users }: { users: AdminAccount[] }) {
                     <p><strong>ফোন:</strong> {user.phone}</p>
                     <div><strong>ভূমিকা:</strong> <Badge variant="secondary">{user.role}</Badge></div>
                 </CardContent>
+                {userRole === 'admin' && (
                 <CardFooter className="flex justify-end gap-2 p-2 pt-0 border-t">
                     <Button variant="outline" size="sm" asChild>
                         <Link href={`/admin/users/edit/${user.id}`}>Edit</Link>
                     </Button>
                     <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(user)}>Delete</Button>
                 </CardFooter>
+                )}
             </Card>
         )) : (
             <div className="text-center text-muted-foreground py-8">

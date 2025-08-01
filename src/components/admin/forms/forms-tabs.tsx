@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,9 +11,10 @@ interface FormsTabsProps {
     formConfigs: Record<string, FormConfig>;
     submissionsByType: Record<string, FormSubmission[]>;
     pendingCounts: Record<string, number>;
+    userRole: 'admin' | 'moderator' | 'visitor';
 }
 
-export default function FormsTabs({ formTypes, formConfigs, submissionsByType, pendingCounts }: FormsTabsProps) {
+export default function FormsTabs({ formTypes, formConfigs, submissionsByType, pendingCounts, userRole }: FormsTabsProps) {
     const initialFormType = formTypes[0] || '';
 
     return (
@@ -25,7 +25,7 @@ export default function FormsTabs({ formTypes, formConfigs, submissionsByType, p
                     return (
                         <TabsTrigger key={formType} value={formType} className="relative">
                             {formConfigs[formType].displayName}
-                            {hasPending && (
+                            {hasPending && userRole !== 'visitor' && (
                                 <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
@@ -43,6 +43,7 @@ export default function FormsTabs({ formTypes, formConfigs, submissionsByType, p
                             formType={formType}
                             submissions={submissionsByType[formType] || []}
                             config={formConfigs[formType]}
+                            userRole={userRole}
                         />
                     </div>
                 </TabsContent>

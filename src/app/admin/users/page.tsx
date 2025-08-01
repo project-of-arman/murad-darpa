@@ -6,22 +6,28 @@ import Link from "next/link";
 import { PlusCircle } from "lucide-react";
 import UserTable from "@/components/admin/users/user-table";
 
-export default async function AdminUsersPage() {
+type AdminUsersPageProps = {
+  userRole: 'admin' | 'moderator' | 'visitor';
+}
+
+export default async function AdminUsersPage({ userRole }: AdminUsersPageProps) {
   const users = await getAllUsers();
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>ব্যবহারকারী ব্যবস্থাপনা</CardTitle>
-        <Button asChild>
-          <Link href="/admin/users/new">
-            <PlusCircle className="mx-2 h-4 w-4" />
-            <span className="hidden sm:flex">নতুন ব্যবহারকারী যোগ করুন</span>
-          </Link>
-        </Button>
+        {userRole === 'admin' && (
+          <Button asChild>
+            <Link href="/admin/users/new">
+              <PlusCircle className="mx-2 h-4 w-4" />
+              <span className="hidden sm:flex">নতুন ব্যবহারকারী যোগ করুন</span>
+            </Link>
+          </Button>
+        )}
       </CardHeader>
       <CardContent>
-        <UserTable users={users} />
+        <UserTable users={users} userRole={userRole} />
       </CardContent>
     </Card>
   );

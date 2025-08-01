@@ -1,12 +1,15 @@
 
-
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { getFormSubmissions, getPendingSubmissionCounts } from "@/lib/actions/forms-actions";
 import { formConfigs } from "@/lib/config/forms-config";
 import FormsTabs from "@/components/admin/forms/forms-tabs";
 import type { FormSubmission } from "@/lib/config/forms-config";
 
-export default async function AdminFormsPage() {
+type AdminFormsPageProps = {
+  userRole: 'admin' | 'moderator' | 'visitor';
+}
+
+export default async function AdminFormsPage({ userRole }: AdminFormsPageProps) {
   const formTypes = Object.keys(formConfigs);
 
   // Fetch all data concurrently
@@ -31,6 +34,7 @@ export default async function AdminFormsPage() {
           formConfigs={formConfigs}
           submissionsByType={submissionsByType}
           pendingCounts={pendingCounts}
+          userRole={userRole}
         />
       </CardContent>
     </Card>

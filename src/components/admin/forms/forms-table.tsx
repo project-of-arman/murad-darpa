@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState, useMemo } from "react";
@@ -97,7 +96,7 @@ function ViewSubmissionDialog({ formType, submissionId, isMobile }: { formType: 
 }
 
 
-export default function FormsTable({ formType, submissions, config }: { formType: string; submissions: FormSubmission[]; config: FormConfig }) {
+export default function FormsTable({ formType, submissions, config, userRole }: { formType: string; submissions: FormSubmission[]; config: FormConfig; userRole: 'admin' | 'moderator' | 'visitor' }) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedSubmission, setSelectedSubmission] = useState<FormSubmission | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -211,31 +210,33 @@ export default function FormsTable({ formType, submissions, config }: { formType
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-1">
                       <ViewSubmissionDialog formType={formType} submissionId={submission.id} />
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-7 w-7 p-0">
-                            <span className="sr-only">মেনু খুলুন</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                           <DropdownMenuItem onSelect={() => handleStatusUpdate(submission.id, 'approved')}>
-                              <CheckCircle className="mr-2 h-4 w-4" />
-                              অনুমোদন করুন
-                           </DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => handleStatusUpdate(submission.id, 'rejected')}>
-                              <XCircle className="mr-2 h-4 w-4" />
-                              প্রত্যাখ্যান করুন
-                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onSelect={() => handleDeleteClick(submission)}
-                            className="text-destructive"
-                          >
-                            <Trash className="mr-2 h-4 w-4" />
-                            মুছুন
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      {userRole !== 'visitor' && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-7 w-7 p-0">
+                              <span className="sr-only">মেনু খুলুন</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onSelect={() => handleStatusUpdate(submission.id, 'approved')}>
+                                <CheckCircle className="mr-2 h-4 w-4" />
+                                অনুমোদন করুন
+                            </DropdownMenuItem>
+                              <DropdownMenuItem onSelect={() => handleStatusUpdate(submission.id, 'rejected')}>
+                                <XCircle className="mr-2 h-4 w-4" />
+                                প্রত্যাখ্যান করুন
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onSelect={() => handleDeleteClick(submission)}
+                              className="text-destructive"
+                            >
+                              <Trash className="mr-2 h-4 w-4" />
+                              মুছুন
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
                   </div>
                 </TableCell>
               </TableRow>
@@ -270,28 +271,30 @@ export default function FormsTable({ formType, submissions, config }: { formType
                     ))}
                 </CardContent>
                 <CardFooter className="p-4 pt-0 flex justify-end gap-2">
-                   <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm">পদক্ষেপ</Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                           <DropdownMenuItem onSelect={() => handleStatusUpdate(submission.id, 'approved')}>
-                              <CheckCircle className="mr-2 h-4 w-4" />
-                              অনুমোদন করুন
-                           </DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => handleStatusUpdate(submission.id, 'rejected')}>
-                              <XCircle className="mr-2 h-4 w-4" />
-                              প্রত্যাখ্যান করুন
-                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onSelect={() => handleDeleteClick(submission)}
-                            className="text-destructive"
-                          >
-                            <Trash className="mr-2 h-4 w-4" />
-                            মুছুন
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                   {userRole !== 'visitor' && (
+                     <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                              <Button variant="outline" size="sm">পদক্ষেপ</Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onSelect={() => handleStatusUpdate(submission.id, 'approved')}>
+                                <CheckCircle className="mr-2 h-4 w-4" />
+                                অনুমোদন করুন
+                            </DropdownMenuItem>
+                              <DropdownMenuItem onSelect={() => handleStatusUpdate(submission.id, 'rejected')}>
+                                <XCircle className="mr-2 h-4 w-4" />
+                                প্রত্যাখ্যান করুন
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onSelect={() => handleDeleteClick(submission)}
+                              className="text-destructive"
+                            >
+                              <Trash className="mr-2 h-4 w-4" />
+                              মুছুন
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                      </DropdownMenu>
+                   )}
                     <ViewSubmissionDialog formType={formType} submissionId={submission.id} isMobile={true} />
                 </CardFooter>
             </Card>

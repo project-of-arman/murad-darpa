@@ -52,66 +52,71 @@ import {
 import { cn } from "@/lib/utils";
 import React from "react";
 
-const navItems = [
-  { href: "/admin", icon: Home, label: "Dashboard" },
+const allNavItems = [
+  { href: "/admin", icon: Home, label: "Dashboard", roles: ['admin', 'moderator', 'visitor'] },
   {
     label: "স্কুল সম্পর্কিত",
     icon: BookOpen,
+    roles: ['admin', 'moderator', 'visitor'],
     subItems: [
-      { href: "/admin/notices", icon: Bell, label: "নোটিশ" },
-      { href: "/admin/routine", icon: Calendar, label: "রুটিন" },
-      { href: "/admin/exam-routine", icon: ClipboardList, label: "পরীক্ষার রুটিন" },
-      { href: "/admin/syllabus", icon: Book, label: "সিলেবাস" },
-      { href: "/admin/results", icon: Trophy, label: "ফলাফল" },
+      { href: "/admin/notices", icon: Bell, label: "নোটিশ", roles: ['admin', 'moderator', 'visitor'] },
+      { href: "/admin/routine", icon: Calendar, label: "রুটিন", roles: ['admin', 'moderator', 'visitor'] },
+      { href: "/admin/exam-routine", icon: ClipboardList, label: "পরীক্ষার রুটিন", roles: ['admin', 'moderator', 'visitor'] },
+      { href: "/admin/syllabus", icon: Book, label: "সিলেবাস", roles: ['admin', 'moderator', 'visitor'] },
+      { href: "/admin/results", icon: Trophy, label: "ফলাফল", roles: ['admin', 'moderator', 'visitor'] },
     ],
   },
   {
       label: "শিক্ষার্থী ও স্টাফ",
       icon: Users,
+      roles: ['admin', 'moderator', 'visitor'],
       subItems: [
-          { href: "/admin/students", icon: User, label: "শিক্ষার্থী" },
-          { href: "/admin/attendance", icon: CheckCircle, label: "শিক্ষার্থী হাজিরা" },
-          { href: "/admin/teachers", icon: Users, label: "শিক্ষক" },
-          { href: "/admin/staff", icon: Users, label: "কর্মচারী" },
-          { href: "/admin/committee", icon: Users, label: "কমিটি" },
+          { href: "/admin/students", icon: User, label: "শিক্ষার্থী", roles: ['admin', 'moderator', 'visitor'] },
+          { href: "/admin/attendance", icon: CheckCircle, label: "শিক্ষার্থী হাজিরা", roles: ['admin', 'moderator', 'visitor'] },
+          { href: "/admin/teachers", icon: Users, label: "শিক্ষক", roles: ['admin', 'moderator', 'visitor'] },
+          { href: "/admin/staff", icon: Users, label: "কর্মচারী", roles: ['admin', 'moderator', 'visitor'] },
+          { href: "/admin/committee", icon: Users, label: "কমিটি", roles: ['admin', 'moderator', 'visitor'] },
       ]
   },
   {
       label: "কনটেন্ট",
       icon: FileText,
+      roles: ['admin', 'moderator'],
       subItems: [
-          { href: "/admin/pages", icon: StickyNote, label: "পেজ" },
-          { href: "/admin/admission-guidelines", icon: FileText, label: "ভর্তি নির্দেশিকা" },
-          { href: "/admin/important-links", icon: Link2, label: "গুরুত্বপূর্ণ লিংক" },
-          { href: "/admin/forms", icon: File, label: "সকল ফরমস" },
+          { href: "/admin/pages", icon: StickyNote, label: "পেজ", roles: ['admin', 'moderator'] },
+          { href: "/admin/admission-guidelines", icon: FileText, label: "ভর্তি নির্দেশিকা", roles: ['admin', 'moderator'] },
+          { href: "/admin/important-links", icon: Link2, label: "গুরুত্বপূর্ণ লিংক", roles: ['admin', 'moderator'] },
       ]
   },
-  { href: "/admin/fees", icon: Banknote, label: "ফি এবং পেমেন্ট" },
-  { href: "/admin/notifications", icon: Bell, label: "ঘোষণা" },
+  { href: "/admin/forms", icon: File, label: "সকল ফরমস", roles: ['admin', 'moderator', 'visitor'] },
+  { href: "/admin/fees", icon: Banknote, label: "ফি এবং পেমেন্ট", roles: ['admin', 'moderator', 'visitor'] },
+  { href: "/admin/notifications", icon: Bell, label: "ঘোষণা", roles: ['admin', 'moderator'] },
   {
     label: "গ্যালারি",
     icon: ImageIcon,
+    roles: ['admin', 'moderator'],
     subItems: [
-        { href: "/admin/gallery/carousel", icon: GalleryHorizontal, label: "ক্যারোসেল" },
-        { href: "/admin/gallery/photos", icon: ImageIcon, label: "ছবি গ্যালারি" },
-        { href: "/admin/gallery/videos", icon: Video, label: "ভিডিও গ্যালারি" }
+        { href: "/admin/gallery/carousel", icon: GalleryHorizontal, label: "ক্যারোসেল", roles: ['admin', 'moderator'] },
+        { href: "/admin/gallery/photos", icon: ImageIcon, label: "ছবি গ্যালারি", roles: ['admin', 'moderator'] },
+        { href: "/admin/gallery/videos", icon: Video, label: "ভিডিও গ্যালারি", roles: ['admin', 'moderator'] }
     ]
   },
   {
       label: "ওয়েবসাইট সেটিংস",
       icon: Palette,
+      roles: ['admin'],
       subItems: [
-        { href: "/admin/school-details", icon: Building2, label: "স্কুল বিস্তারিত" },
-        { href: "/admin/nav-manager", icon: Navigation, label: "নেভিগেশন মেনু" },
-        { href: "/admin/sidebar", icon: SidebarIcon, label: "সাইডবার" },
-        { href: "/admin/contact", icon: MessageSquare, label: "যোগাযোগ পেজ" },
-        { href: "/admin/settings", icon: Settings, label: "সাধারণ সেটিংস" },
+        { href: "/admin/school-details", icon: Building2, label: "স্কুল বিস্তারিত", roles: ['admin'] },
+        { href: "/admin/nav-manager", icon: Navigation, label: "নেভিগেশন মেনু", roles: ['admin'] },
+        { href: "/admin/sidebar", icon: SidebarIcon, label: "সাইডবার", roles: ['admin'] },
+        { href: "/admin/contact", icon: MessageSquare, label: "যোগাযোগ পেজ", roles: ['admin'] },
+        { href: "/admin/settings", icon: Settings, label: "সাধারণ সেটিংস", roles: ['admin'] },
       ]
   },
-  { href: "/admin/users", icon: Users2, label: "ব্যবহারকারী"},
+  { href: "/admin/users", icon: Users2, label: "ব্যবহারকারী", roles: ['admin']},
 ];
 
-export default function AdminSidebarNav() {
+export default function AdminSidebarNav({ userRole }: { userRole: 'admin' | 'moderator' | 'visitor' }) {
   const pathname = usePathname();
   const { state, setOpen, setOpenMobile, isMobile } = useSidebar();
 
@@ -124,6 +129,23 @@ export default function AdminSidebarNav() {
   const isSubItemActive = (subItems: any[]) => {
     return subItems.some((item) => pathname.startsWith(item.href));
   }
+
+  const getFilteredNavItems = (items: typeof allNavItems, role: typeof userRole) => {
+    return items
+      .filter(item => item.roles.includes(role))
+      .map(item => {
+        if (item.subItems) {
+          return {
+            ...item,
+            subItems: item.subItems.filter(sub => sub.roles.includes(role)),
+          };
+        }
+        return item;
+      })
+      .filter(item => !item.subItems || item.subItems.length > 0);
+  };
+  
+  const navItems = getFilteredNavItems(allNavItems, userRole);
 
   const getAccordionDefaultValue = () => {
     const activeItem = navItems.find(item => item.subItems && isSubItemActive(item.subItems));
