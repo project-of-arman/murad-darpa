@@ -25,10 +25,12 @@ export default async function FeesPage({ searchParams, userRole }: FeesPageProps
       <h1 className="text-2xl font-bold">ফি ও পেমেন্ট ব্যবস্থাপনা</h1>
 
       <Tabs defaultValue="collections" className="w-full">
-        <TabsList className={userRole === 'visitor' ? 'hidden' : "grid w-full grid-cols-2"}>
-          <TabsTrigger value="collections">ফি কালেকশন</TabsTrigger>
-          <TabsTrigger value="types">ফির প্রকারভেদ</TabsTrigger>
-        </TabsList>
+        {userRole !== 'visitor' && (
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="collections">ফি কালেকশন</TabsTrigger>
+              <TabsTrigger value="types">ফির প্রকারভেদ</TabsTrigger>
+            </TabsList>
+        )}
         <TabsContent value="collections">
           <Card>
             <CardHeader>

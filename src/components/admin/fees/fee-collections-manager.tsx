@@ -149,7 +149,7 @@ export default function FeeCollectionsManager({ initialCollections, students, fe
                             <p><strong>পেমেন্টের তারিখ:</strong> {new Date(item.payment_date).toLocaleDateString('bn-BD')}</p>
                         </CardContent>
                         {userRole !== 'visitor' && (
-                        <CardFooter className="p-4 pt-0">
+                        <CardFooter className="p-4 pt-0 flex justify-end">
                              <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                     <Button variant="destructive" size="sm"><Trash className="mr-2 h-4 w-4" />মুছুন</Button>
