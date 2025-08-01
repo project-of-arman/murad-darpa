@@ -3,6 +3,11 @@ import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCommitteeMembers } from "@/lib/committee-data";
 import { toDataURL } from "@/lib/utils";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'পরিচালনা পর্ষদ',
+};
 
 export default async function CommitteePage() {
   const committeeMembers = await getCommitteeMembers();

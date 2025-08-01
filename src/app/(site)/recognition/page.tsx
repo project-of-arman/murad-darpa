@@ -1,5 +1,11 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BadgeCheck } from "lucide-react";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'পাঠদান ও স্বীকৃতি',
+};
 
 export default function RecognitionPage() {
   return (

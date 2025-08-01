@@ -4,6 +4,11 @@ import { getTeachers } from "@/lib/teacher-data";
 import StaffList from "./staff-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'শিক্ষক ও কর্মচারী',
+};
 
 export default async function StaffPage() {
   const teachers = await getTeachers();

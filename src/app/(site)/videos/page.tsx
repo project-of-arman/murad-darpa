@@ -4,6 +4,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { getVideos } from "@/lib/video-data";
 import { PlayCircle } from "lucide-react";
 import Link from "next/link";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'ভিডিও গ্যালারি',
+};
+
 
 export default async function VideosPage() {
   const videos = await getVideos();

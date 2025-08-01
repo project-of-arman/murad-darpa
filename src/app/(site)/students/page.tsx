@@ -1,4 +1,10 @@
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'আমাদের শিক্ষার্থী',
+};
+
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
@@ -171,7 +177,7 @@ export default function StudentsPage() {
                 <TableRow>
                   <TableHead>রোল নং</TableHead>
                   <TableHead>নাম</TableHead>
-                  <TableHead>শ্রেণী</TableHead>
+                  <TableHead> শ্রেণী</TableHead>
                   <TableHead>লিঙ্গ</TableHead>
                   <TableHead>বছর</TableHead>
                   <TableHead>অ্যাকশন</TableHead>

@@ -11,6 +11,15 @@ import { Download, Phone, Calendar, BookOpen, FilePenLine } from 'lucide-react';
 import { getAdmissionGuidelines, getAdmissionImportantDates, getAdmissionPageContent } from "@/lib/admission-data";
 import * as LucideIcons from "lucide-react";
 import Link from "next/link";
+import type { Metadata } from 'next';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const pageContent = await getAdmissionPageContent();
+  return {
+    title: pageContent.title || 'Admission Guidelines',
+  };
+}
+
 
 type IconName = keyof typeof LucideIcons;
 

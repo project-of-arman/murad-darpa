@@ -1,4 +1,10 @@
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'বিষয় পরিবর্তনের জন্য আবেদন',
+};
+
 "use client";
 
 import { useForm } from "react-hook-form";

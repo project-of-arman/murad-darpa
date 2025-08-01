@@ -1,4 +1,5 @@
 
+import type { Metadata } from 'next';
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Target, Users, History, Award, Building } from "lucide-react";
@@ -8,6 +9,10 @@ import VideoGallery from "@/components/homepage/video-gallery";
 import { getTeachers } from "@/lib/teacher-data";
 import { getAboutSchool, getSchoolFeatures, SchoolFeature } from "@/lib/school-data";
 import * as LucideIcons from "lucide-react";
+
+export const metadata: Metadata = {
+  title: 'স্কুল বিস্তারিত',
+};
 
 type IconName = keyof typeof LucideIcons;
 

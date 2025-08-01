@@ -1,4 +1,10 @@
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'ফলাফল',
+};
+
 "use client";
 
 import { useState, useEffect } from 'react';

@@ -1,4 +1,10 @@
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'অভিভাবকের সম্মতিপত্র',
+};
+
 "use client";
 
 import { useForm } from "react-hook-form";
