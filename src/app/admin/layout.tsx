@@ -22,9 +22,10 @@ function AdminLayoutContainer({ children }: { children: ReactNode }) {
       const exists = await hasAdminAccount();
       setAdminExists(exists);
       const session = sessionStorage.getItem('isAdminAuthenticated');
-      if (session === 'true') {
+      const identifier = sessionStorage.getItem('adminIdentifier');
+      if (session === 'true' && identifier) {
           setIsAuthenticated(true);
-          const loggedInUser = await getLoggedInUser();
+          const loggedInUser = await getLoggedInUser(identifier);
           setUser(loggedInUser);
       }
     }
@@ -35,7 +36,7 @@ function AdminLayoutContainer({ children }: { children: ReactNode }) {
     sessionStorage.setItem('isAdminAuthenticated', 'true');
     sessionStorage.setItem('adminIdentifier', identifier);
     setIsAuthenticated(true);
-    const loggedInUser = await getLoggedInUser();
+    const loggedInUser = await getLoggedInUser(identifier);
     setUser(loggedInUser);
   };
   

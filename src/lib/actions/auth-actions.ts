@@ -75,8 +75,7 @@ export async function getAdminAccount(): Promise<AdminAccount | null> {
     }
 }
 
-export async function getLoggedInUser(): Promise<AdminAccount | null> {
-    const identifier = sessionStorage.getItem('adminIdentifier');
+export async function getLoggedInUser(identifier: string): Promise<AdminAccount | null> {
     if (!identifier || !pool) return null;
 
     try {
