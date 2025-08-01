@@ -36,7 +36,8 @@ import {
   ClipboardList,
   Sidebar as SidebarIcon,
   Palette,
-  Navigation
+  Navigation,
+  Banknote
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -82,6 +83,7 @@ const navItems = [
           { href: "/admin/forms", icon: File, label: "সকল ফরমস" },
       ]
   },
+  { href: "/admin/fees", icon: Banknote, label: "ফি এবং পেমেন্ট" },
   { href: "/admin/notifications", icon: Bell, label: "ঘোষণা" },
   {
     label: "গ্যালারি",
