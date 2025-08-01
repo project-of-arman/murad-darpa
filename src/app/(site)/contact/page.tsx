@@ -1,11 +1,11 @@
 
+"use client";
+
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'যোগাযোগ ও ফিডব্যাক',
 };
-
-"use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

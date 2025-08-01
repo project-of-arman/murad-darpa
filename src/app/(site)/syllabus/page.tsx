@@ -1,11 +1,11 @@
 
+"use client";
+
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'সিলেবাস',
 };
-
-"use client";
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

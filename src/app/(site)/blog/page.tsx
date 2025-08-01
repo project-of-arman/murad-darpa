@@ -1,11 +1,11 @@
 
+"use client";
+
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'ব্লগ ও ঘটনাবলী',
 };
-
-"use client";
 
 import { useState } from 'react';
 import Link from 'next/link';

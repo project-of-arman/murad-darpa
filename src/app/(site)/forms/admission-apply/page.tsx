@@ -1,11 +1,11 @@
 
+"use client";
+
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'ভর্তি আবেদন',
 };
-
-"use client";
 
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
