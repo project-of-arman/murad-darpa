@@ -166,7 +166,7 @@ export default function UserTable({ users }: { users: AdminAccount[] }) {
                 <CardContent className="p-4 pt-0 text-sm space-y-1">
                     <p><strong>ইমেইল:</strong> {user.email}</p>
                     <p><strong>ফোন:</strong> {user.phone}</p>
-                    <p><strong>ভূমিকা:</strong> <Badge variant="secondary">{user.role}</Badge></p>
+                    <div><strong>ভূমিকা:</strong> <Badge variant="secondary">{user.role}</Badge></div>
                 </CardContent>
                 <CardFooter className="flex justify-end gap-2 p-2 pt-0 border-t">
                     <Button variant="outline" size="sm" asChild>
