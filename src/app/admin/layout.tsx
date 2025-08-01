@@ -77,8 +77,7 @@ function AdminLayoutContainer({ children }: { children: ReactNode }) {
             <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-muted/40">
                 {React.Children.map(children, child => {
                     if (React.isValidElement(child)) {
-                        // @ts-ignore
-                        return React.cloneElement(child, { user: user, userRole: user.role });
+                        return React.cloneElement(child as React.ReactElement<any>, { user: user, userRole: user.role });
                     }
                     return child;
                 })}

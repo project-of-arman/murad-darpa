@@ -38,7 +38,7 @@ import { toDataURL } from "@/lib/utils";
 
 const STUDENTS_PER_PAGE = 10;
 
-export default function StudentTable({ students }: { students: StudentForAdmin[] }) {
+export default function StudentTable({ students, userRole }: { students: StudentForAdmin[], userRole: 'admin' | 'moderator' | 'visitor' }) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<StudentForAdmin | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -120,7 +120,7 @@ export default function StudentTable({ students }: { students: StudentForAdmin[]
               <TableHead>রোল</TableHead>
               <TableHead>শ্রেণী</TableHead>
               <TableHead>বছর</TableHead>
-              <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>
+              {userRole !== 'visitor' && <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -139,41 +139,43 @@ export default function StudentTable({ students }: { students: StudentForAdmin[]
                 <TableCell>{student.roll}</TableCell>
                 <TableCell>{student.class_name}</TableCell>
                 <TableCell>{student.year}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">মেনু খুলুন</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/students/${student.roll}`} target="_blank">
-                          <Eye className="mr-2 h-4 w-4" />
-                          দেখুন
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/admin/students/edit/${student.id}`}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          সম্পাদনা
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onSelect={() => handleDeleteClick(student)}
-                        className="text-destructive"
-                      >
-                        <Trash className="mr-2 h-4 w-4" />
-                        মুছুন
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+                {userRole !== 'visitor' && (
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">মেনু খুলুন</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                          <Link href={`/students/${student.roll}`} target="_blank">
+                            <Eye className="mr-2 h-4 w-4" />
+                            দেখুন
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/admin/students/edit/${student.id}`}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            সম্পাদনা
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onSelect={() => handleDeleteClick(student)}
+                          className="text-destructive"
+                        >
+                          <Trash className="mr-2 h-4 w-4" />
+                          মুছুন
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                )}
               </TableRow>
             )) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center h-24">
+                <TableCell colSpan={userRole !== 'visitor' ? 6 : 5} className="text-center h-24">
                   কোনো শিক্ষার্থী পাওয়া যায়নি।
                 </TableCell>
               </TableRow>
@@ -209,10 +211,14 @@ export default function StudentTable({ students }: { students: StudentForAdmin[]
               <Button variant="ghost" size="sm" asChild>
                   <Link href={`/students/${student.roll}`} target="_blank">দেখুন</Link>
               </Button>
-              <Button variant="outline" size="sm" asChild>
-                <Link href={`/admin/students/edit/${student.id}`}>সম্পাদনা</Link>
-              </Button>
-              <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(student)}>মুছুন</Button>
+              {userRole !== 'visitor' && (
+                <>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/admin/students/edit/${student.id}`}>সম্পাদনা</Link>
+                  </Button>
+                  <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(student)}>মুছুন</Button>
+                </>
+              )}
             </CardFooter>
           </Card>
         )) : (

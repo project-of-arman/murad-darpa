@@ -33,7 +33,7 @@ export default async function AdminStudentsPage({ userRole }: AdminStudentsPageP
         )}
       </CardHeader>
       <CardContent>
-        <StudentTable students={students} />
+        <StudentTable students={students} userRole={userRole} />
       </CardContent>
     </Card>
   );
