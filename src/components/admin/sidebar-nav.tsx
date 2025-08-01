@@ -39,6 +39,7 @@ import {
   Navigation,
   Banknote,
   CheckCircle,
+  Users2,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -65,7 +66,7 @@ const navItems = [
     ],
   },
   {
-      label: "ব্যবহারকারী",
+      label: "শিক্ষার্থী ও স্টাফ",
       icon: Users,
       subItems: [
           { href: "/admin/students", icon: User, label: "শিক্ষার্থী" },
@@ -106,7 +107,8 @@ const navItems = [
         { href: "/admin/contact", icon: MessageSquare, label: "যোগাযোগ পেজ" },
         { href: "/admin/settings", icon: Settings, label: "সাধারণ সেটিংস" },
       ]
-  }
+  },
+  { href: "/admin/users", icon: Users2, label: "ব্যবহারকারী"},
 ];
 
 export default function AdminSidebarNav() {
