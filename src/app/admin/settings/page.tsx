@@ -11,14 +11,16 @@ import SettingsForm from "@/components/admin/settings/settings-form";
 import SchoolInfoForm from "@/components/admin/settings/school-info-form";
 import AdminAccountForm from "@/components/admin/settings/admin-account-form";
 import type { SchoolInfo } from "@/lib/school-data";
-import { getAdminAccount } from "@/lib/actions/auth-actions";
+import type { AdminAccount } from "@/lib/actions/auth-actions";
 import { toDataURL } from "@/lib/utils";
 
-export default async function AdminSettingsPage() {
-  const [settingsData, adminAccount] = await Promise.all([
-    getSiteSettings(),
-    getAdminAccount()
-  ]);
+type AdminSettingsPageProps = {
+    user: AdminAccount;
+    userRole: 'admin' | 'moderator' | 'visitor';
+}
+
+export default async function AdminSettingsPage({ user }: AdminSettingsPageProps) {
+  const settingsData = await getSiteSettings();
   
   // Convert any buffer data to base64 strings before passing to client components
   const settings = {
@@ -45,12 +47,25 @@ export default async function AdminSettingsPage() {
             </p>
         </div>
 
-        <Tabs defaultValue="school_info" className="w-full">
+        <Tabs defaultValue="account" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="school_info">স্কুলের তথ্য</TabsTrigger>
+                <TabsTrigger value="account">অ্যাকাউন্ট</TabsTrigger>
                 <TabsTrigger value="site_settings">সাইট সেটিংস</TabsTrigger>
-                <TabsTrigger value="admin_account">অ্যাডমিন অ্যাকাউন্ট</TabsTrigger>
+                <TabsTrigger value="school_info">স্কুলের তথ্য</TabsTrigger>
             </TabsList>
+            <TabsContent value="account">
+                 <Card>
+                    <CardHeader>
+                        <CardTitle>আমার অ্যাকাউন্ট</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <p className="text-muted-foreground -mt-4">
+                            আপনার অ্যাকাউন্টের তথ্য এবং পাসওয়ার্ড পরিবর্তন করুন।
+                        </p>
+                        <AdminAccountForm account={user} />
+                    </CardContent>
+                </Card>
+            </TabsContent>
             <TabsContent value="site_settings">
                 <Card>
                     <CardHeader>
@@ -74,19 +89,6 @@ export default async function AdminSettingsPage() {
                             ওয়েবসাইটের বিভিন্ন জায়গায় প্রদর্শিত স্কুলের নাম, ঠিকানা ও লোগো এখান থেকে পরিবর্তন করুন।
                         </p>
                         <SchoolInfoForm schoolInfo={schoolInfo} />
-                    </CardContent>
-                </Card>
-            </TabsContent>
-            <TabsContent value="admin_account">
-                 <Card>
-                    <CardHeader>
-                        <CardTitle>অ্যাডমিন অ্যাকাউন্ট</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                        <p className="text-muted-foreground -mt-4">
-                            আপনার অ্যাডমিন ইউজারনেম এবং পাসওয়ার্ড পরিবর্তন করুন।
-                        </p>
-                        <AdminAccountForm account={adminAccount} />
                     </CardContent>
                 </Card>
             </TabsContent>

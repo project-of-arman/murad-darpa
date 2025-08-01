@@ -105,7 +105,7 @@ export async function getAllUsers(): Promise<AdminAccount[]> {
 export async function getUserById(id: number | string): Promise<AdminAccount | null> {
     if (!pool) return null;
     try {
-        const [rows] = await pool.query<AdminAccount[]>(`SELECT id, username, email, phone, role FROM admin_users WHERE id = ?`, [id]);
+        const [rows] = await pool.query<AdminAccount[]>(`SELECT * FROM admin_users WHERE id = ?`, [id]);
         return rows[0] || null;
     } catch (error) {
         console.error(`Failed to get user by id ${id}:`, error);
@@ -238,19 +238,20 @@ export async function login(formData: FormData): Promise<AuthResult> {
 }
 
 
-export async function updateAdminCredentials(formData: FormData): Promise<AuthResult> {
+export async function updateAdminCredentials(id: number, formData: FormData): Promise<AuthResult> {
     if (!pool) return { success: false, error: 'Database not connected' };
 
     try {
-        const adminAccount = await getAdminAccount();
-        if (!adminAccount) {
-            return { success: false, error: 'No admin account found to update.' };
+        const user = await getUserById(id);
+        if (!user) {
+            return { success: false, error: 'User not found.' };
         }
 
         const data = {
             username: formData.get('username') as string,
             email: formData.get('email') as string,
             phone: formData.get('phone') as string,
+            currentPassword: formData.get('currentPassword') as string | null,
             newPassword: formData.get('newPassword') as string | null,
         };
 
@@ -260,11 +261,22 @@ export async function updateAdminCredentials(formData: FormData): Promise<AuthRe
             phone: data.phone,
         };
         
-        if (data.newPassword) {
+        if (data.newPassword && data.currentPassword) {
+            const [userWithPassword] = await pool.query<any[]>('SELECT password FROM admin_users WHERE id = ?', [id]);
+            const isPasswordValid = await bcrypt.compare(data.currentPassword, userWithPassword[0].password);
+
+            if (!isPasswordValid) {
+                return { success: false, error: 'Incorrect current password.' };
+            }
+
             fieldsToUpdate.password = await bcrypt.hash(data.newPassword, 10);
+        } else if (data.newPassword) {
+            // This case should be caught by the form validation, but as a fallback:
+            return { success: false, error: 'Current password is required to set a new one.'};
         }
 
-        await pool.query('UPDATE admin_users SET ? WHERE id = ?', [fieldsToUpdate, adminAccount.id]);
+
+        await pool.query('UPDATE admin_users SET ? WHERE id = ?', [fieldsToUpdate, id]);
         revalidatePath('/admin/settings');
         return { success: true };
     } catch (e: any) {

@@ -15,11 +15,15 @@ const formSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters."),
   email: z.string().email("Invalid email address."),
   phone: z.string().min(1, "Phone number is required."),
+  currentPassword: z.string().optional(),
   newPassword: z.string().min(6, "New password must be at least 6 characters.").optional().or(z.literal('')),
   confirmPassword: z.string().optional(),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
+}).refine((data) => !data.newPassword || (data.newPassword && data.currentPassword), {
+    message: "Current password is required to set a new password.",
+    path: ["currentPassword"],
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -33,6 +37,7 @@ export default function AdminAccountForm({ account }: { account: AdminAccount | 
         username: account?.username || '',
         email: account?.email || '',
         phone: account?.phone || '',
+        currentPassword: '',
         newPassword: '',
         confirmPassword: '',
     },
@@ -52,11 +57,18 @@ export default function AdminAccountForm({ account }: { account: AdminAccount | 
     formData.append('username', values.username);
     formData.append('email', values.email);
     formData.append('phone', values.phone);
-    if (values.newPassword) {
+    
+    if (values.newPassword && values.currentPassword) {
       formData.append('newPassword', values.newPassword);
+      formData.append('currentPassword', values.currentPassword);
     }
     
-    const result = await updateAdminCredentials(formData);
+    if (!account) {
+        toast({ title: "ত্রুটি", description: "User not found.", variant: "destructive"});
+        return;
+    }
+
+    const result = await updateAdminCredentials(account.id, formData);
     
     if (result.success) {
       toast({ title: "সফল!", description: "অ্যাডমিন তথ্য সফলভাবে আপডেট করা হয়েছে।" });
@@ -84,6 +96,11 @@ export default function AdminAccountForm({ account }: { account: AdminAccount | 
           <Label htmlFor="phone">ফোন নম্বর</Label>
           <Input id="phone" type="tel" {...register("phone")} />
           {errors.phone && <p className="text-sm font-medium text-destructive">{errors.phone.message}</p>}
+        </FormItem>
+        <FormItem>
+          <Label htmlFor="currentPassword">বর্তমান পাসওয়ার্ড</Label>
+          <Input id="currentPassword" type="password" {...register("currentPassword")} />
+          {errors.currentPassword && <p className="text-sm font-medium text-destructive">{errors.currentPassword.message}</p>}
         </FormItem>
         <FormItem>
           <Label htmlFor="newPassword">নতুন পাসওয়ার্ড (খালি রাখলে পরিবর্তন হবে না)</Label>
