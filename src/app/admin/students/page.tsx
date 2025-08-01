@@ -7,7 +7,11 @@ import { PlusCircle } from "lucide-react";
 import StudentTable from "@/components/admin/students/student-table";
 import { toDataURL } from "@/lib/utils";
 
-export default async function AdminStudentsPage() {
+type AdminStudentsPageProps = {
+  userRole: 'admin' | 'moderator' | 'visitor';
+}
+
+export default async function AdminStudentsPage({ userRole }: AdminStudentsPageProps) {
   const studentsRaw = await getAllStudentsForAdmin();
 
   const students = studentsRaw.map(student => ({
@@ -19,12 +23,14 @@ export default async function AdminStudentsPage() {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>শিক্ষার্থী ব্যবস্থাপনা</CardTitle>
-        <Button asChild>
-          <Link href="/admin/students/new">
-            <PlusCircle className="mx-2 h-4 w-4" />
-            <span className="hidden sm:flex">নতুন শিক্ষার্থী যোগ করুন</span>
-          </Link>
-        </Button>
+        {userRole !== 'visitor' && (
+          <Button asChild>
+            <Link href="/admin/students/new">
+              <PlusCircle className="mx-2 h-4 w-4" />
+              <span className="hidden sm:flex">নতুন শিক্ষার্থী যোগ করুন</span>
+            </Link>
+          </Button>
+        )}
       </CardHeader>
       <CardContent>
         <StudentTable students={students} />
