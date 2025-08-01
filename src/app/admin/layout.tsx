@@ -73,7 +73,7 @@ function AdminLayoutContainer({ children }: { children: ReactNode }) {
           <AdminSidebarNav userRole={user.role} />
         </Sidebar>
         <div className="flex flex-col flex-1">
-            <AdminHeader onLogout={handleLogout} />
+            <AdminHeader onLogout={handleLogout} user={user} />
             <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-muted/40">
                 {React.Children.map(children, child => {
                     if (React.isValidElement(child)) {

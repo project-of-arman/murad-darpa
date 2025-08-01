@@ -8,6 +8,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuShortcut,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -17,9 +18,11 @@ import { useEffect, useState } from "react";
 import { getNotices, Notice } from "@/lib/notice-data";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import type { AdminAccount } from "@/lib/actions/auth-actions";
 
 interface AdminHeaderProps {
     onLogout: () => void;
+    user: AdminAccount;
 }
 
 const NoticeItem = ({ notice }: { notice: Notice }) => (
@@ -82,7 +85,7 @@ function Notifications() {
 }
 
 
-export default function AdminHeader({ onLogout }: AdminHeaderProps) {
+export default function AdminHeader({ onLogout, user }: AdminHeaderProps) {
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
         <div className="flex items-center gap-2">
@@ -105,7 +108,9 @@ export default function AdminHeader({ onLogout }: AdminHeaderProps) {
                 </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuLabel>My Account
+                     <DropdownMenuShortcut className="capitalize ml-2">{user.role}</DropdownMenuShortcut>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                     <Link href="/admin/settings">
