@@ -19,8 +19,8 @@ export default async function SiteLayout({
   
   return (
     <div className="relative flex min-h-screen flex-col">
-        {schoolInfo && <SiteHeaderClientWrapper schoolInfo={schoolInfo} marqueeNotices={marqueeNotices} />}
         <HeroCarousel />
+        {schoolInfo && <SiteHeaderClientWrapper schoolInfo={schoolInfo} marqueeNotices={marqueeNotices} />}
         <SecondaryNav schoolName={schoolInfo.name} />
         <main className="flex-1">
             <div className="container mx-auto py-12 sm:py-16 lg:py-20 ">
