@@ -11,7 +11,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Phone, Calendar, BookOpen, FilePenLine } from 'lucide-react';
-import { getAdmissionGuidelines, getAdmissionImportantDates, getAdmissionPageContent, AdmissionGuideline, ImportantDate, AdmissionPageContent } from "@/lib/admission-data";
+import { AdmissionGuideline, ImportantDate, AdmissionPageContent } from "@/lib/admission-data";
+import { getAdmissionData } from './actions';
 import * as LucideIcons from "lucide-react";
 import Link from "next/link";
 import { Skeleton } from '@/components/ui/skeleton';
@@ -64,11 +65,7 @@ export default function AdmissionGuidelinesPage() {
   useEffect(() => {
     async function fetchData() {
         try {
-            const [content, dates, guides] = await Promise.all([
-                getAdmissionPageContent(),
-                getAdmissionImportantDates(),
-                getAdmissionGuidelines(),
-            ]);
+            const { content, dates, guides } = await getAdmissionData();
             setPageContent(content);
             setImportantDates(dates);
             setGuidelines(guides);
