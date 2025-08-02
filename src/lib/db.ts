@@ -19,6 +19,13 @@ function getPool() {
     return pool;
   }
 
+  // If this is a build process, don't attempt to connect to the database.
+  if (process.env.IS_BUILD_PROCESS === 'true') {
+    console.warn("Build process detected. Skipping database connection and using mock data.");
+    return null as any as mysql.Pool;
+  }
+
+
   // If there are no credentials, return null. This supports DB-less development.
   if (
     !process.env.DB_HOST ||
@@ -40,6 +47,7 @@ function getPool() {
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
+    connectTimeout: 10000, // 10 seconds
     // Add a timeout to automatically close idle connections,
     // which helps prevent them from becoming stale.
     idleTimeout: 60000, // 60 seconds
