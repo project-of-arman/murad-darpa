@@ -12,6 +12,7 @@ import AdminSetupPage from './setup/page';
 import LogoLoader from '@/components/admin/logo-loader';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { setUser, selectUser, selectRole, clearUser } from '@/lib/redux/slices/user-slice';
+import NextNProgress from 'nextjs-progressbar';
 
 function AdminLayoutContainer({ children }: { children: ReactNode }) {
   const dispatch = useAppDispatch();
@@ -80,17 +81,20 @@ function AdminLayoutContainer({ children }: { children: ReactNode }) {
   }
 
   return (
-    <SidebarProvider defaultOpen={true}>
-        <Sidebar collapsible="icon">
-          <AdminSidebarNav userRole={userRole} />
-        </Sidebar>
-        <div className="flex flex-col flex-1">
-            <AdminHeader onLogout={handleLogout} />
-            <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-muted/40">
-                {children}
-            </main>
-        </div>
-    </SidebarProvider>
+    <>
+      <NextNProgress color="hsl(var(--primary))" startPosition={0.3} stopDelayMs={200} height={3} showOnShallow={true} />
+      <SidebarProvider defaultOpen={true}>
+          <Sidebar collapsible="icon">
+            <AdminSidebarNav userRole={userRole} />
+          </Sidebar>
+          <div className="flex flex-col flex-1">
+              <AdminHeader onLogout={handleLogout} />
+              <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-muted/40">
+                  {children}
+              </main>
+          </div>
+      </SidebarProvider>
+    </>
   );
 }
 
