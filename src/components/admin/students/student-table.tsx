@@ -28,22 +28,41 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Trash, Edit, Eye } from "lucide-react";
+import { MoreHorizontal, Trash, Edit, Eye, PlusCircle } from "lucide-react";
 import { StudentForAdmin, deleteStudent } from "@/lib/student-data";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { toDataURL } from "@/lib/utils";
+import { useAppSelector } from "@/lib/redux/hooks";
+import { selectRole } from "@/lib/redux/slices/user-slice";
 
 const STUDENTS_PER_PAGE = 10;
 
-export default function StudentTable({ students, userRole }: { students: StudentForAdmin[], userRole: 'admin' | 'moderator' | 'visitor' }) {
+const HeaderActions = () => {
+    const userRole = useAppSelector(selectRole);
+    if (userRole === 'visitor') return null;
+    
+    return (
+         <Button asChild>
+            <Link href="/admin/students/new">
+              <PlusCircle className="mx-2 h-4 w-4" />
+              <span className="hidden sm:flex">নতুন শিক্ষার্থী যোগ করুন</span>
+            </Link>
+          </Button>
+    )
+}
+
+
+function StudentTable({ students }: { students: StudentForAdmin[]}) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<StudentForAdmin | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
+  const userRole = useAppSelector(selectRole);
+
 
   const filteredStudents = useMemo(() => {
     return students.filter(student =>
@@ -279,3 +298,7 @@ export default function StudentTable({ students, userRole }: { students: Student
     </>
   );
 }
+
+StudentTable.HeaderActions = HeaderActions;
+
+export default StudentTable;

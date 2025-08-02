@@ -8,7 +8,7 @@ import StudentTable from "@/components/admin/students/student-table";
 import { toDataURL } from "@/lib/utils";
 
 type AdminStudentsPageProps = {
-  userRole: 'admin' | 'moderator' | 'visitor';
+  userRole?: 'admin' | 'moderator' | 'visitor';
 }
 
 export default async function AdminStudentsPage({ userRole }: AdminStudentsPageProps) {
@@ -18,23 +18,15 @@ export default async function AdminStudentsPage({ userRole }: AdminStudentsPageP
       ...student,
       image: student.image ? toDataURL(student.image as Buffer) : null,
   }));
-  console.log(userRole,'use role')
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>শিক্ষার্থী ব্যবস্থাপনা</CardTitle>
-        {userRole !== 'visitor' && (
-          <Button asChild>
-            <Link href="/admin/students/new">
-              <PlusCircle className="mx-2 h-4 w-4" />
-              <span className="hidden sm:flex">নতুন শিক্ষার্থী যোগ করুন</span>
-            </Link>
-          </Button>
-        )}
+        <StudentTable.HeaderActions />
       </CardHeader>
       <CardContent>
-        <StudentTable students={students} userRole={userRole} />
+        <StudentTable students={students} />
       </CardContent>
     </Card>
   );
