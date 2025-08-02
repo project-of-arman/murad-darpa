@@ -1,13 +1,10 @@
 
-"use client";
-
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { getNotices, Notice } from '@/lib/notice-data';
-import { Skeleton } from '@/components/ui/skeleton';
+import PaginationControls from '@/components/pagination-controls';
 
 const NOTICES_PER_PAGE = 5;
 
@@ -26,35 +23,17 @@ const NoticeDate = ({ date }: { date: string }) => {
     )
 }
 
-export default function NoticeListPage() {
-  const [allNotices, setAllNotices] = useState<Notice[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(true);
+export default async function NoticeListPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
+  const allNotices = await getNotices();
+  
+  const currentPage = Number(searchParams?.page || '1');
   const totalPages = Math.ceil(allNotices.length / NOTICES_PER_PAGE);
-
-  useEffect(() => {
-    async function fetchNotices() {
-      setLoading(true);
-      const notices = await getNotices();
-      setAllNotices(notices);
-      setLoading(false);
-    }
-    fetchNotices();
-  }, []);
 
   const paginatedNotices = allNotices.slice(
     (currentPage - 1) * NOTICES_PER_PAGE,
     currentPage * NOTICES_PER_PAGE
   );
-
-  const handlePreviousPage = () => {
-    setCurrentPage(prev => Math.max(prev - 1, 1));
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage(prev => Math.min(prev + 1, totalPages));
-  };
-
+  
   return (
     <div className="bg-white py-16">
         <div className="container mx-auto px-4">
@@ -64,11 +43,6 @@ export default function NoticeListPage() {
             </div>
             <Card className="shadow-lg border-primary/20">
               <CardContent className="p-0">
-                {loading ? (
-                    <div className="space-y-4 p-4">
-                      {Array.from({length: 5}).map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}
-                    </div>
-                ) : (
                   <ul className="divide-y divide-border">
                     {paginatedNotices.map((notice) => (
                       <li key={notice.id} className="p-4 flex items-center gap-4 hover:bg-muted/50 transition-colors">
@@ -85,31 +59,14 @@ export default function NoticeListPage() {
                       </li>
                     ))}
                   </ul>
-                )}
               </CardContent>
-               {totalPages > 1 && (
-                <CardFooter className="flex items-center justify-between pt-4 border-t">
-                  <span className="text-sm text-muted-foreground">
-                    পৃষ্ঠা {currentPage} এর {totalPages}
-                  </span>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline"
-                      onClick={handlePreviousPage}
-                      disabled={currentPage === 1}
-                    >
-                      পূর্ববর্তী
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      onClick={handleNextPage}
-                      disabled={currentPage === totalPages}
-                    >
-                      পরবর্তী
-                    </Button>
-                  </div>
-                </CardFooter>
-              )}
+              <CardFooter className="flex items-center justify-center pt-4 border-t">
+                  <PaginationControls
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    basePath="/notice"
+                  />
+              </CardFooter>
             </Card>
         </div>
     </div>

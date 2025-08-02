@@ -1,39 +1,27 @@
-"use client";
 
 import Footer from '@/components/footer';
 import HeroCarousel from '@/components/homepage/hero-carousel';
 import SecondaryNav from '@/components/homepage/secondary-nav';
 import DynamicSidebar from '@/components/homepage/dynamic-sidebar';
 import SiteHeaderClientWrapper from '@/components/homepage/site-header-client-wrapper';
-import { getNotices, Notice } from '@/lib/notice-data';
-import { getSchoolInfo, SchoolInfo } from '@/lib/school-data';
-import { useEffect, useState } from 'react';
+import { getNotices } from '@/lib/notice-data';
+import { getSchoolInfo } from '@/lib/school-data';
 
-export default function SiteLayout({
+export default async function SiteLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [schoolInfo, setSchoolInfo] = useState<SchoolInfo | null>(null);
-  const [marqueeNotices, setMarqueeNotices] = useState<Notice[]>([]);
-
-  useEffect(() => {
-    async function fetchData() {
-      const [info, notices] = await Promise.all([
-        getSchoolInfo(),
-        getNotices({ is_marquee: true })
-      ]);
-      setSchoolInfo(info);
-      setMarqueeNotices(notices);
-    }
-    fetchData();
-  }, []);
+  const [schoolInfo, marqueeNotices] = await Promise.all([
+    getSchoolInfo(),
+    getNotices({ is_marquee: true })
+  ]);
   
   return (
     <div className="relative flex min-h-screen flex-col">
         {schoolInfo && <SiteHeaderClientWrapper schoolInfo={schoolInfo} marqueeNotices={marqueeNotices} />}
         <HeroCarousel />
-        {schoolInfo && <SecondaryNav schoolName={schoolInfo.name} />}
+        <SecondaryNav schoolName={schoolInfo.name} />
         <main className="flex-1">
             <div className="container mx-auto py-12 sm:py-16 lg:py-20 ">
                 <div className="grid grid-cols-10 gap-8"> 

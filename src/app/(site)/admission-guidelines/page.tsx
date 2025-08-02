@@ -1,7 +1,4 @@
 
-"use client";
-
-import { useState, useEffect } from 'react';
 import {
   Accordion,
   AccordionContent,
@@ -11,11 +8,15 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Phone, Calendar, BookOpen, FilePenLine } from 'lucide-react';
-import { AdmissionGuideline, ImportantDate, AdmissionPageContent } from "@/lib/admission-data";
-import { getAdmissionData } from './actions';
+import { getAdmissionGuidelines, getAdmissionImportantDates, getAdmissionPageContent } from "@/lib/admission-data";
 import * as LucideIcons from "lucide-react";
 import Link from "next/link";
-import { Skeleton } from '@/components/ui/skeleton';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'ভর্তি নির্দেশিকা',
+};
+
 
 type IconName = keyof typeof LucideIcons;
 
@@ -28,64 +29,13 @@ const IconComponent = ({ name }: { name: string | null | undefined }) => {
     return <Icon className="h-6 w-6 text-primary" />;
 };
 
-const PageSkeleton = () => (
-    <div className="container mx-auto px-4 max-w-4xl">
-        <div className="text-center mb-12">
-            <Skeleton className="h-10 w-3/4 mx-auto" />
-            <Skeleton className="h-4 w-1/2 mx-auto mt-4" />
-        </div>
-        <Card className="shadow-lg border-primary/20 mb-12">
-            <CardHeader>
-                 <div className="flex items-center gap-4">
-                    <Skeleton className="h-12 w-12 rounded-full" />
-                    <Skeleton className="h-8 w-1/2" />
-                </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <Skeleton className="h-6 w-full" />
-                <Skeleton className="h-6 w-full" />
-                <Skeleton className="h-6 w-full" />
-            </CardContent>
-        </Card>
-        <div className="space-y-4">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-        </div>
-    </div>
-);
+export default async function AdmissionGuidelinesPage() {
+  const [pageContent, importantDates, guidelines] = await Promise.all([
+    getAdmissionPageContent(),
+    getAdmissionImportantDates(),
+    getAdmissionGuidelines()
+  ]);
 
-
-export default function AdmissionGuidelinesPage() {
-  const [pageContent, setPageContent] = useState<AdmissionPageContent | null>(null);
-  const [importantDates, setImportantDates] = useState<ImportantDate[]>([]);
-  const [guidelines, setGuidelines] = useState<AdmissionGuideline[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchData() {
-        try {
-            const { content, dates, guides } = await getAdmissionData();
-            setPageContent(content);
-            setImportantDates(dates);
-            setGuidelines(guides);
-        } catch (error) {
-            console.error("Failed to fetch admission data:", error);
-        } finally {
-            setLoading(false);
-        }
-    }
-    fetchData();
-  }, []);
-  
-  if (loading) {
-      return (
-          <div className="bg-white py-16 sm:py-20">
-              <PageSkeleton />
-          </div>
-      );
-  }
-  
   if (!pageContent) {
       return (
           <div className="bg-white py-16 sm:py-20 text-center">

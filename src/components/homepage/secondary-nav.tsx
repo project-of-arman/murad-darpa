@@ -1,8 +1,8 @@
 
-"use client";
+'use client';
 
 import Link from 'next/link';
-import { ChevronDown, Home, Menu, GraduationCap } from 'lucide-react';
+import { ChevronDown, Menu, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -88,7 +88,6 @@ const NavDropdown = ({ title, subLinks, className, isActive }: { title: string; 
 
 export default function SecondaryNav({ schoolName }: { schoolName: string }) {
   const [isMounted, setIsMounted] = React.useState(false);
-  const [isSticky, setIsSticky] = React.useState(false);
   const [isMenuOpen, setMenuOpen] = React.useState(false);
   const [navLinks, setNavLinks] = React.useState<NavLinkType[]>([]);
   const pathname = usePathname();
@@ -101,28 +100,11 @@ export default function SecondaryNav({ schoolName }: { schoolName: string }) {
         setNavLinks(links);
     }
     fetchNavLinks();
-
-    const handleScroll = () => {
-      const heroCarouselHeight = 600; 
-      if (window.scrollY > heroCarouselHeight) {
-        setIsSticky(true);
-      } else {
-        setIsSticky(false);
-      }
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    handleScroll();
-    
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
   }, []);
-
 
   const navClasses = cn(
     "h-16 flex items-center justify-start border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
-    isMounted && isSticky && "sticky top-0 z-40"
+    "sticky top-0 z-40"
   );
 
   return (

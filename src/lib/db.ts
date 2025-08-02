@@ -11,7 +11,7 @@ let pool: mysql.Pool | null;
 function getPool(): mysql.Pool | null {
   // If this is a build process, don't attempt to connect to the database.
   if (process.env.IS_BUILD_PROCESS === 'true') {
-    console.warn("Build process detected. Skipping database connection and using mock data.");
+    console.log("Build process detected. Skipping database connection and using mock data.");
     return null;
   }
 
