@@ -44,9 +44,14 @@ export default function ContactPage() {
   useEffect(() => {
     async function fetchContactInfo() {
       setLoading(true);
-      const info = await getContactInfo();
-      setContactInfo(info);
-      setLoading(false);
+      try {
+        const info = await getContactInfo();
+        setContactInfo(info);
+      } catch (error) {
+        console.error("Failed to fetch contact info:", error);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchContactInfo();
   }, []);
@@ -81,8 +86,17 @@ export default function ContactPage() {
           <div className="space-y-8">
             {loading ? (
                 <>
-                    <Skeleton className="h-48 w-full" />
-                    <Skeleton className="h-64 w-full" />
+                    <Card className="shadow-lg border-primary/20">
+                        <CardHeader>
+                            <Skeleton className="h-6 w-1/2" />
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <Skeleton className="h-5 w-full" />
+                            <Skeleton className="h-5 w-3/4" />
+                            <Skeleton className="h-5 w-full" />
+                        </CardContent>
+                    </Card>
+                    <Skeleton className="h-64 w-full rounded-lg" />
                 </>
             ) : (
                 <>
