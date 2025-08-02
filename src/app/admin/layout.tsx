@@ -6,45 +6,57 @@ import LoginPage from './login/page';
 import { SidebarProvider, Sidebar } from '@/components/ui/sidebar';
 import AdminSidebarNav from '@/components/admin/sidebar-nav';
 import AdminHeader from '@/components/admin/header';
-import { hasAdminAccount, login, getLoggedInUser } from '@/lib/actions/auth-actions';
+import { hasAdminAccount, login, getLoggedInUser, AdminAccount } from '@/lib/actions/auth-actions';
 import { useRouter } from 'next/navigation';
 import AdminSetupPage from './setup/page';
 import LogoLoader from '@/components/admin/logo-loader';
-import type { AdminAccount } from '@/lib/actions/auth-actions';
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+import { setUser, selectUser, selectRole, clearUser } from '@/lib/redux/slices/user-slice';
 
 function AdminLayoutContainer({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
+  const userRole = useAppSelector(selectRole);
+  
   const [adminExists, setAdminExists] = useState<boolean | null>(null);
-  const [user, setUser] = useState<AdminAccount | null>(null);
-
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
   useEffect(() => {
     async function checkAdmin() {
       const exists = await hasAdminAccount();
       setAdminExists(exists);
-      const session = sessionStorage.getItem('isAdminAuthenticated');
-      const identifier = sessionStorage.getItem('adminIdentifier');
-      if (session === 'true' && identifier) {
-          setIsAuthenticated(true);
-          const loggedInUser = await getLoggedInUser(identifier);
-          setUser(loggedInUser);
+      
+      const sessionIdentifier = sessionStorage.getItem('adminIdentifier');
+      if (sessionIdentifier) {
+        setIsAuthenticated(true);
+        if (!user) { // Fetch user if not already in store
+            const loggedInUser = await getLoggedInUser(sessionIdentifier);
+            if (loggedInUser) {
+                dispatch(setUser(loggedInUser));
+            } else {
+                 handleLogout(); // Could not find user, log out
+            }
+        }
+      } else {
+          setIsAuthenticated(false);
       }
     }
     checkAdmin();
-  }, []);
+  }, [dispatch, user]);
 
   const handleLoginSuccess = async (identifier: string) => {
-    sessionStorage.setItem('isAdminAuthenticated', 'true');
     sessionStorage.setItem('adminIdentifier', identifier);
     setIsAuthenticated(true);
     const loggedInUser = await getLoggedInUser(identifier);
-    setUser(loggedInUser);
+    if (loggedInUser) {
+        dispatch(setUser(loggedInUser));
+    }
   };
   
   const handleLogout = () => {
-    sessionStorage.removeItem('isAdminAuthenticated');
     sessionStorage.removeItem('adminIdentifier');
     setIsAuthenticated(false);
-    setUser(null);
+    dispatch(clearUser());
   };
   
   const handleSetupSuccess = () => {
@@ -63,21 +75,21 @@ function AdminLayoutContainer({ children }: { children: ReactNode }) {
     return <LoginPage onLoginSuccess={handleLoginSuccess} />;
   }
   
-  if (!user) {
+  if (!user || !userRole) {
       return <LogoLoader />;
   }
 
   return (
     <SidebarProvider defaultOpen={true}>
         <Sidebar collapsible="icon">
-          <AdminSidebarNav userRole={user.role} />
+          <AdminSidebarNav userRole={userRole} />
         </Sidebar>
         <div className="flex flex-col flex-1">
-            <AdminHeader onLogout={handleLogout} user={user} />
+            <AdminHeader onLogout={handleLogout} />
             <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-muted/40">
                 {React.Children.map(children, child => {
                     if (React.isValidElement(child)) {
-                        return React.cloneElement(child as React.ReactElement<any>, { user: user, userRole: user.role });
+                        return React.cloneElement(child as React.ReactElement<any>, { userRole: userRole });
                     }
                     return child;
                 })}

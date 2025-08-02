@@ -11,15 +11,10 @@ import SettingsForm from "@/components/admin/settings/settings-form";
 import SchoolInfoForm from "@/components/admin/settings/school-info-form";
 import AdminAccountForm from "@/components/admin/settings/admin-account-form";
 import type { SchoolInfo } from "@/lib/school-data";
-import type { AdminAccount } from "@/lib/actions/auth-actions";
 import { toDataURL } from "@/lib/utils";
 
-type AdminSettingsPageProps = {
-    user?: AdminAccount;
-    userRole: 'admin' | 'moderator' | 'visitor';
-}
 
-export default async function AdminSettingsPage({ user }: AdminSettingsPageProps) {
+export default async function AdminSettingsPage() {
   const settingsData = await getSiteSettings();
   
   // Convert any buffer data to base64 strings before passing to client components
@@ -62,7 +57,7 @@ export default async function AdminSettingsPage({ user }: AdminSettingsPageProps
                         <p className="text-muted-foreground -mt-4">
                             আপনার অ্যাকাউন্টের তথ্য এবং পাসওয়ার্ড পরিবর্তন করুন।
                         </p>
-                        {user && <AdminAccountForm account={user} />}
+                        <AdminAccountForm />
                     </CardContent>
                 </Card>
             </TabsContent>

@@ -9,7 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { updateAdminCredentials, AdminAccount } from "@/lib/actions/auth-actions";
+import { updateAdminCredentials } from "@/lib/actions/auth-actions";
+import { useAppSelector, useAppDispatch } from "@/lib/redux/hooks";
+import { selectUser, setUser } from "@/lib/redux/slices/user-slice";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters."),
@@ -28,22 +31,41 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function AdminAccountForm({ account }: { account: AdminAccount }) {
+export default function AdminAccountForm() {
   const { toast } = useToast();
   const router = useRouter();
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>({
+  const dispatch = useAppDispatch();
+  const account = useAppSelector(selectUser);
+
+  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-        username: account.username,
-        email: account.email,
-        phone: account.phone,
+        username: '',
+        email: '',
+        phone: '',
         currentPassword: '',
         newPassword: '',
         confirmPassword: '',
     },
   });
+  
+  useEffect(() => {
+    if(account) {
+        reset({
+            username: account.username,
+            email: account.email,
+            phone: account.phone,
+        });
+    }
+  }, [account, reset]);
+
 
   async function onSubmit(values: FormValues) {
+    if (!account) {
+        toast({ title: "ত্রুটি", description: "কোনো ব্যবহারকারী লগইন করা নেই।", variant: "destructive" });
+        return;
+    }
+    
     if (values.newPassword && values.newPassword !== values.confirmPassword) {
       toast({
         title: "ত্রুটি",
@@ -67,6 +89,9 @@ export default function AdminAccountForm({ account }: { account: AdminAccount })
     
     if (result.success) {
       toast({ title: "সফল!", description: "অ্যাডমিন তথ্য সফলভাবে আপডেট করা হয়েছে।" });
+      if (result.updatedUser) {
+        dispatch(setUser(result.updatedUser));
+      }
       router.refresh();
     } else {
       toast({ title: "ত্রুটি", description: result.error, variant: "destructive" });
@@ -74,6 +99,10 @@ export default function AdminAccountForm({ account }: { account: AdminAccount })
   }
 
   const FormItem = ({ children }: { children: React.ReactNode }) => <div className="space-y-2">{children}</div>;
+  
+  if (!account) {
+    return <p>Loading user data...</p>;
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-2xl">

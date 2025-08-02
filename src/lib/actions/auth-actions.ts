@@ -26,6 +26,7 @@ const userFormSchema = z.object({
 
 
 type AuthResult = { success: boolean; error?: string };
+type UpdateResult = AuthResult & { updatedUser?: AdminAccount };
 
 /*
 SQL for creating/updating the admin_users table:
@@ -238,7 +239,7 @@ export async function login(formData: FormData): Promise<AuthResult> {
 }
 
 
-export async function updateAdminCredentials(id: number, formData: FormData): Promise<AuthResult> {
+export async function updateAdminCredentials(id: number, formData: FormData): Promise<UpdateResult> {
     if (!pool) return { success: false, error: 'Database not connected' };
 
     try {
@@ -271,14 +272,16 @@ export async function updateAdminCredentials(id: number, formData: FormData): Pr
 
             fieldsToUpdate.password = await bcrypt.hash(data.newPassword, 10);
         } else if (data.newPassword) {
-            // This case should be caught by the form validation, but as a fallback:
             return { success: false, error: 'Current password is required to set a new one.'};
         }
 
 
         await pool.query('UPDATE admin_users SET ? WHERE id = ?', [fieldsToUpdate, id]);
+        
+        const updatedUser = await getUserById(id);
+
         revalidatePath('/admin/settings');
-        return { success: true };
+        return { success: true, updatedUser: updatedUser || undefined };
     } catch (e: any) {
         console.error("Failed to update admin credentials:", e);
         if (e.code === 'ER_DUP_ENTRY') {

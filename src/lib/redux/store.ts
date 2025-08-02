@@ -1,9 +1,11 @@
+
 import type { Action, ThunkAction } from "@reduxjs/toolkit";
 import { combineSlices, configureStore } from "@reduxjs/toolkit";
+import { userSlice } from "./slices/user-slice";
 
 // `combineSlices` automatically combines slices and their reducers.
 const rootReducer = combineSlices({
-    // Add your slices here
+    user: userSlice.reducer,
 });
 
 // `makeStore` encapsulates the store configuration to allow
