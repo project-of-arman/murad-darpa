@@ -1,24 +1,50 @@
 
+"use client";
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getFeeTypes, getFeeCollections } from "./actions";
 import { getStudents } from "@/lib/student-data";
 import FeeTypesManager from "@/components/admin/fees/fee-types-manager";
 import FeeCollectionsManager from "@/components/admin/fees/fee-collections-manager";
+import { useAppSelector } from "@/lib/redux/hooks";
+import { selectRole } from "@/lib/redux/slices/user-slice";
+import { useEffect, useState } from "react";
+import type { FeeType, FeeCollection } from "./actions";
+import type { Student } from "@/lib/student-data";
 
 type FeesPageProps = {
   searchParams: { class: string };
-  userRole: 'admin' | 'moderator' | 'visitor';
 }
 
-export default async function FeesPage({ searchParams, userRole }: FeesPageProps) {
+export default function FeesPage({ searchParams }: FeesPageProps) {
   const selectedClass = searchParams.class || 'all';
+  const userRole = useAppSelector(selectRole);
 
-  const [feeTypes, students, collections] = await Promise.all([
-    getFeeTypes(),
-    getStudents(),
-    getFeeCollections({ class_name: selectedClass }),
-  ]);
+  const [feeTypes, setFeeTypes] = useState<FeeType[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [collections, setCollections] = useState<FeeCollection[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+        setLoading(true);
+        const [feeTypesData, studentsData, collectionsData] = await Promise.all([
+            getFeeTypes(),
+            getStudents(),
+            getFeeCollections({ class_name: selectedClass }),
+        ]);
+        setFeeTypes(feeTypesData);
+        setStudents(studentsData);
+        setCollections(collectionsData);
+        setLoading(false);
+    }
+    fetchData();
+  }, [selectedClass]);
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
 
   return (
     <div className="space-y-6">
@@ -42,7 +68,7 @@ export default async function FeesPage({ searchParams, userRole }: FeesPageProps
                 students={students} 
                 feeTypes={feeTypes}
                 selectedClass={selectedClass}
-                userRole={userRole}
+                userRole={userRole || 'visitor'}
               />
             </CardContent>
           </Card>
