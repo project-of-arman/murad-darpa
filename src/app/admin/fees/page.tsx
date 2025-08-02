@@ -12,13 +12,12 @@ import { selectRole } from "@/lib/redux/slices/user-slice";
 import { useEffect, useState } from "react";
 import type { FeeType, FeeCollection } from "./actions";
 import type { Student } from "@/lib/student-data";
+import { useSearchParams } from "next/navigation";
 
-type FeesPageProps = {
-  searchParams: { class: string };
-}
 
-export default function FeesPage({ searchParams }: FeesPageProps) {
-  const selectedClass = searchParams.class || 'all';
+export default function FeesPage() {
+  const searchParams = useSearchParams();
+  const selectedClass = searchParams.get('class') || 'all';
   const userRole = useAppSelector(selectRole);
 
   const [feeTypes, setFeeTypes] = useState<FeeType[]>([]);
