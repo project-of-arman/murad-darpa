@@ -3,6 +3,7 @@
 
 import pool from './db';
 import { revalidatePath } from 'next/cache';
+import { toDataURL } from './utils';
 
 export interface CommitteeMember {
     id: number;
@@ -50,8 +51,11 @@ export async function getCommitteeMembers(): Promise<CommitteeMember[]> {
         return mockCommitteeMembers;
     }
     try {
-        const [rows] = await pool.query('SELECT * FROM committee_members ORDER BY sort_order ASC');
-        return rows as CommitteeMember[];
+        const [rows] = await pool.query<CommitteeMember[]>('SELECT * FROM committee_members ORDER BY sort_order ASC');
+        return rows.map(row => ({
+            ...row,
+            image: row.image ? toDataURL(row.image as Buffer) : ''
+        }));
     } catch (error) {
         console.error('Failed to fetch committee members, returning mock data:', error);
         return mockCommitteeMembers;
@@ -64,7 +68,11 @@ export async function getCommitteeMemberById(id: string | number): Promise<Commi
     }
     try {
         const [rows] = await pool.query<CommitteeMember[]>('SELECT * FROM committee_members WHERE id = ?', [id]);
-        return (rows as CommitteeMember[])[0] || null;
+        const member = (rows as CommitteeMember[])[0] || null;
+        if (member && member.image) {
+            member.image = toDataURL(member.image as Buffer);
+        }
+        return member;
     } catch (error) {
         console.error(`Failed to fetch committee member by id ${id}:`, error);
         return null;
@@ -139,3 +147,4 @@ export async function deleteCommitteeMember(id: number): Promise<SaveResult> {
         return { success: false, error: "একটি সার্ভার ত্রুটি হয়েছে।" };
     }
 }
+

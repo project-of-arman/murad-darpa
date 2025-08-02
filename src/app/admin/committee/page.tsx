@@ -19,12 +19,9 @@ export default function AdminCommitteePage() {
 
   useEffect(() => {
     async function fetchAndProcessMembers() {
+      setLoading(true);
       const membersRaw = await getCommitteeMembers();
-      const processedMembers = membersRaw.map(member => ({
-        ...member,
-        image: member.image ? toDataURL(member.image as Buffer) : null,
-      }));
-      setMembers(processedMembers as CommitteeMember[]);
+      setMembers(membersRaw);
       setLoading(false);
     }
     fetchAndProcessMembers();

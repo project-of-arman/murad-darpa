@@ -87,7 +87,7 @@ export default function CommitteeTable({ members }: { members: CommitteeMember[]
       setSelectedMember(null);
     }
   };
-
+  console.log(paginatedMembers,'person')
   return (
     <>
       <div className="mb-4">
@@ -112,10 +112,11 @@ export default function CommitteeTable({ members }: { members: CommitteeMember[]
           </TableHeader>
           <TableBody>
             {paginatedMembers.length > 0 ? paginatedMembers.map((person) => (
+             
               <TableRow key={person.id}>
                 <TableCell>
                     <Image 
-                        src={person.image || "https://placehold.co/40x40.png"}
+                        src={person?.image || "https://placehold.co/40x40.png"}
                         alt={person.name}
                         width={40}
                         height={40}
