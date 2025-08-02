@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAllStudentsForAdmin } from "@/lib/student-data";
 import Link from "next/link";
-import { PlusCircle } from "lucide-react";
+import { CloudCog, PlusCircle } from "lucide-react";
 import StudentTable from "@/components/admin/students/student-table";
 import { toDataURL } from "@/lib/utils";
 
@@ -18,6 +18,7 @@ export default async function AdminStudentsPage({ userRole }: AdminStudentsPageP
       ...student,
       image: student.image ? toDataURL(student.image as Buffer) : null,
   }));
+  console.log(userRole,'use role')
 
   return (
     <Card>
