@@ -32,14 +32,17 @@ import { Syllabus, deleteSyllabus } from "@/lib/syllabus-data";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
 
 const ITEMS_PER_PAGE = 10;
 
-export default function SyllabusTable({ syllabuses }: { syllabuses: Syllabus[] }) {
+export default function SyllabusTable({ syllabuses, userRole }: { syllabuses: Syllabus[], userRole: 'admin' | 'moderator' | 'visitor' | null }) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedSyllabus, setSelectedSyllabus] = useState<Syllabus | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
+  const router = useRouter();
+
 
   const totalPages = Math.ceil(syllabuses.length / ITEMS_PER_PAGE);
 
@@ -69,6 +72,7 @@ export default function SyllabusTable({ syllabuses }: { syllabuses: Syllabus[] }
           title: "সিলেবাস মোছা হয়েছে",
           description: "সিলেবাসটি সফলভাবে মুছে ফেলা হয়েছে।",
         });
+        router.refresh();
       } else {
         toast({
           title: "ত্রুটি",
@@ -91,7 +95,7 @@ export default function SyllabusTable({ syllabuses }: { syllabuses: Syllabus[] }
               <TableHead>শ্রেণী</TableHead>
               <TableHead>বিষয়</TableHead>
               <TableHead>ফাইল</TableHead>
-              <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>
+              {userRole !== 'visitor' && <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -111,35 +115,37 @@ export default function SyllabusTable({ syllabuses }: { syllabuses: Syllabus[] }
                         <span className="text-muted-foreground text-xs">ফাইল নেই</span>
                     )}
                 </TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">মেনু খুলুন</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/admin/syllabus/edit/${syllabus.id}`}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          সম্পাদনা
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onSelect={() => handleDeleteClick(syllabus)}
-                        className="text-destructive"
-                      >
-                        <Trash className="mr-2 h-4 w-4" />
-                        মুছুন
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+                {userRole !== 'visitor' && (
+                    <TableCell className="text-right">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">মেনু খুলুন</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                            <Link href={`/admin/syllabus/edit/${syllabus.id}`}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            সম্পাদনা
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onSelect={() => handleDeleteClick(syllabus)}
+                            className="text-destructive"
+                        >
+                            <Trash className="mr-2 h-4 w-4" />
+                            মুছুন
+                        </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    </TableCell>
+                )}
               </TableRow>
             )) : (
               <TableRow>
-                <TableCell colSpan={4} className="text-center h-24">
+                <TableCell colSpan={userRole !== 'visitor' ? 4 : 3} className="text-center h-24">
                   কোনো সিলেবাস পাওয়া যায়নি।
                 </TableCell>
               </TableRow>
@@ -170,12 +176,14 @@ export default function SyllabusTable({ syllabuses }: { syllabuses: Syllabus[] }
                         )}
                     </div>
                 </CardContent>
+                {userRole !== 'visitor' && (
                 <CardFooter className="flex justify-end gap-2">
                     <Button variant="outline" size="sm" asChild>
                         <Link href={`/admin/syllabus/edit/${syllabus.id}`}>সম্পাদনা</Link>
                     </Button>
                     <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(syllabus)}>মুছুন</Button>
                 </CardFooter>
+                )}
             </Card>
         )) : (
             <p className="text-center text-muted-foreground py-8">কোনো সিলেবাস পাওয়া যায়নি।</p>
