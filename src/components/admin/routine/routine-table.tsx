@@ -39,18 +39,21 @@ import { Routine, deleteRoutine } from "@/lib/routine-data";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
 
 const ITEMS_PER_PAGE = 10;
 const classes = ["all", "৬ষ্ঠ শ্রেণী", "৭ম শ্রেণী", "৮ম শ্রেণী", "৯ম শ্রেণী", "১০ম শ্রেণী"];
 const days = ["all", "রবিবার", "সোমবার", "মঙ্গলবার", "বুধবার", "বৃহস্পতিবার"];
 
-export default function RoutineTable({ routines }: { routines: Routine[] }) {
+export default function RoutineTable({ routines, userRole }: { routines: Routine[], userRole: 'admin' | 'moderator' | 'visitor' | null }) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedRoutine, setSelectedRoutine] = useState<Routine | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [classFilter, setClassFilter] = useState("all");
   const [dayFilter, setDayFilter] = useState("all");
   const { toast } = useToast();
+  const router = useRouter();
+
 
   const filteredRoutines = useMemo(() => {
     return routines.filter(
@@ -92,6 +95,7 @@ export default function RoutineTable({ routines }: { routines: Routine[] }) {
           title: "পিরিয়ড মোছা হয়েছে",
           description: "পিরিয়ডটি সফলভাবে মুছে ফেলা হয়েছে।",
         });
+        router.refresh();
       } else {
         toast({
           title: "ত্রুটি",
@@ -134,7 +138,7 @@ export default function RoutineTable({ routines }: { routines: Routine[] }) {
               <TableHead>পিরিয়ড</TableHead>
               <TableHead>বিষয়</TableHead>
               <TableHead>শিক্ষক</TableHead>
-              <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>
+              {userRole !== 'visitor' && <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -145,35 +149,37 @@ export default function RoutineTable({ routines }: { routines: Routine[] }) {
                 <TableCell>{routine.period}</TableCell>
                 <TableCell>{routine.subject}</TableCell>
                 <TableCell>{routine.teacher_name}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">মেনু খুলুন</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/admin/routine/edit/${routine.id}`}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          সম্পাদনা
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onSelect={() => handleDeleteClick(routine)}
-                        className="text-destructive"
-                      >
-                        <Trash className="mr-2 h-4 w-4" />
-                        মুছুন
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+                {userRole !== 'visitor' && (
+                    <TableCell className="text-right">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">মেনু খুলুন</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                            <Link href={`/admin/routine/edit/${routine.id}`}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            সম্পাদনা
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onSelect={() => handleDeleteClick(routine)}
+                            className="text-destructive"
+                        >
+                            <Trash className="mr-2 h-4 w-4" />
+                            মুছুন
+                        </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    </TableCell>
+                )}
               </TableRow>
             )) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center h-24">
+                <TableCell colSpan={userRole !== 'visitor' ? 6 : 5} className="text-center h-24">
                   কোনো রুটিন পাওয়া যায়নি।
                 </TableCell>
               </TableRow>
@@ -194,12 +200,14 @@ export default function RoutineTable({ routines }: { routines: Routine[] }) {
                     <p><strong>দিন:</strong> {routine.day_of_week} ({routine.period}তম পিরিয়ড)</p>
                     <p><strong>সময়:</strong> {routine.start_time.substring(0,5)} - {routine.end_time.substring(0,5)}</p>
                 </CardContent>
-                <CardFooter className="flex justify-end gap-2">
-                    <Button variant="outline" size="sm" asChild>
-                        <Link href={`/admin/routine/edit/${routine.id}`}>সম্পাদনা</Link>
-                    </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(routine)}>মুছুন</Button>
-                </CardFooter>
+                {userRole !== 'visitor' && (
+                    <CardFooter className="flex justify-end gap-2">
+                        <Button variant="outline" size="sm" asChild>
+                            <Link href={`/admin/routine/edit/${routine.id}`}>সম্পাদনা</Link>
+                        </Button>
+                        <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(routine)}>মুছুন</Button>
+                    </CardFooter>
+                )}
             </Card>
         )) : (
             <p className="text-center text-muted-foreground py-8">কোনো রুটিন পাওয়া যায়নি।</p>
