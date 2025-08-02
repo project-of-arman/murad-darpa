@@ -1,17 +1,16 @@
 
 "use client";
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getCommitteeMembers } from "@/lib/committee-data";
+import { getCommitteeMembers, CommitteeMember } from "@/lib/committee-data";
 import Link from "next/link";
 import { PlusCircle } from "lucide-react";
 import CommitteeTable from "@/components/admin/committee/committee-table";
 import { toDataURL } from "@/lib/utils";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { selectRole } from "@/lib/redux/slices/user-slice";
-import { useEffect, useState } from "react";
-import type { CommitteeMember } from "@/lib/committee-data";
 
 export default function AdminCommitteePage() {
   const [members, setMembers] = useState<CommitteeMember[]>([]);
@@ -23,13 +22,14 @@ export default function AdminCommitteePage() {
       const membersRaw = await getCommitteeMembers();
       const processedMembers = membersRaw.map(member => ({
         ...member,
-        image: member.image ? toDataURL(member.image as Buffer) : null,
+        image: member.image ? toDataURL(member.image as Buffer) : '',
       }));
-      setMembers(processedMembers as unknown as CommitteeMember[]);
+      setMembers(processedMembers);
       setLoading(false);
     }
     fetchAndProcessMembers();
   }, []);
+
 
   return (
     <Card>
@@ -45,7 +45,7 @@ export default function AdminCommitteePage() {
         )}
       </CardHeader>
       <CardContent>
-        {loading ? <p>Loading committee members...</p> : <CommitteeTable members={members} />}
+        {loading ? <p>Loading...</p> : <CommitteeTable members={members} />}
       </CardContent>
     </Card>
   );
