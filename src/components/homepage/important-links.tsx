@@ -8,12 +8,7 @@ import { getImportantLinkGroups, ImportantLinkGroup } from "@/lib/important-link
 import { toDataURL } from "@/lib/utils";
 
 export default async function ImportantLinks() {
-    const linkCardsRaw = await getImportantLinkGroups();
-
-    const linkCards = linkCardsRaw.map(card => ({
-        ...card,
-        image: toDataURL(card.image as Buffer, 'image/png'),
-    }));
+    const linkCards = await getImportantLinkGroups();
 
     return (
         <div className="container mx-auto ">
@@ -28,7 +23,7 @@ export default async function ImportantLinks() {
                             <div className="flex gap-6 items-center">
                                 <div className="w-[110px] h-[110px] flex-shrink-0">
                                     <Image 
-                                        src={card.image} 
+                                        src={card.image || "https://placehold.co/110x110.png"}
                                         alt={card.title}
                                         width={110}
                                         height={110}
