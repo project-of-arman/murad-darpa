@@ -87,12 +87,7 @@ function AdminLayoutContainer({ children }: { children: ReactNode }) {
         <div className="flex flex-col flex-1">
             <AdminHeader onLogout={handleLogout} />
             <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-muted/40">
-                {React.Children.map(children, child => {
-                    if (React.isValidElement(child)) {
-                        return React.cloneElement(child as React.ReactElement<any>, { userRole: userRole });
-                    }
-                    return child;
-                })}
+                {React.cloneElement(children as React.ReactElement, { userRole })}
             </main>
         </div>
     </SidebarProvider>
