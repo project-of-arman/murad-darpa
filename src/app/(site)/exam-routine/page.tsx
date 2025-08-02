@@ -36,9 +36,14 @@ export default function ExamRoutinePage() {
   useEffect(() => {
     async function fetchRoutines() {
       setLoading(true);
-      const data = await getExamRoutines();
-      setRoutines(data);
-      setLoading(false);
+      try {
+        const data = await getExamRoutines();
+        setRoutines(data);
+      } catch (error) {
+        console.error("Failed to fetch exam routines:", error);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchRoutines();
   }, []);
