@@ -34,6 +34,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
+import { useAppSelector } from "@/lib/redux/hooks";
+import { selectRole } from "@/lib/redux/slices/user-slice";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -44,6 +46,7 @@ export default function ResultsTable({ results }: { results: ResultWithStudentIn
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
   const router = useRouter();
+  const userRole = useAppSelector(selectRole);
 
   const filteredResults = useMemo(() => {
     return results.filter(result =>
@@ -108,7 +111,7 @@ export default function ResultsTable({ results }: { results: ResultWithStudentIn
               <TableHead>শ্রেণী</TableHead>
               <TableHead>পরীক্ষার নাম</TableHead>
               <TableHead>GPA</TableHead>
-              <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>
+              {userRole !== 'visitor' && <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -119,35 +122,37 @@ export default function ResultsTable({ results }: { results: ResultWithStudentIn
                 <TableCell>{result.class_name}</TableCell>
                 <TableCell>{result.exam_name}</TableCell>
                 <TableCell>{result.final_gpa}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">মেনু খুলুন</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/admin/results/edit/${result.id}`}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          সম্পাদনা
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onSelect={() => handleDeleteClick(result)}
-                        className="text-destructive"
-                      >
-                        <Trash className="mr-2 h-4 w-4" />
-                        মুছুন
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+                {userRole !== 'visitor' && (
+                    <TableCell className="text-right">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">মেনু খুলুন</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                            <Link href={`/admin/results/edit/${result.id}`}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            সম্পাদনা
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onSelect={() => handleDeleteClick(result)}
+                            className="text-destructive"
+                        >
+                            <Trash className="mr-2 h-4 w-4" />
+                            মুছুন
+                        </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    </TableCell>
+                )}
               </TableRow>
             )) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center h-24">
+                <TableCell colSpan={userRole !== 'visitor' ? 6 : 5} className="text-center h-24">
                   কোনো ফলাফল পাওয়া যায়নি।
                 </TableCell>
               </TableRow>
@@ -169,12 +174,14 @@ export default function ResultsTable({ results }: { results: ResultWithStudentIn
                     <p><strong>পরীক্ষা:</strong> {result.exam_name}</p>
                     <p><strong>GPA:</strong> {result.final_gpa}</p>
                 </CardContent>
-                <CardFooter className="flex justify-end gap-2 p-2 pt-0 border-t">
-                    <Button variant="outline" size="sm" asChild>
-                        <Link href={`/admin/results/edit/${result.id}`}>সম্পাদনা</Link>
-                    </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(result)}>মুছুন</Button>
-                </CardFooter>
+                {userRole !== 'visitor' && (
+                    <CardFooter className="flex justify-end gap-2 p-2 pt-0 border-t">
+                        <Button variant="outline" size="sm" asChild>
+                            <Link href={`/admin/results/edit/${result.id}`}>সম্পাদনা</Link>
+                        </Button>
+                        <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(result)}>মুছুন</Button>
+                    </CardFooter>
+                )}
             </Card>
         )) : (
             <div className="text-center text-muted-foreground py-8">
