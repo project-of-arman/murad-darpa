@@ -23,9 +23,9 @@ export default function AdminCommitteePage() {
       const membersRaw = await getCommitteeMembers();
       const processedMembers = membersRaw.map(member => ({
         ...member,
-        image: member.image ? toDataURL(member.image as Buffer) : '',
+        image: member.image ? toDataURL(member.image as Buffer) : null,
       }));
-      setMembers(processedMembers);
+      setMembers(processedMembers as unknown as CommitteeMember[]);
       setLoading(false);
     }
     fetchAndProcessMembers();
