@@ -22,14 +22,34 @@ export default function AdminCommitteePage() {
       const membersRaw = await getCommitteeMembers();
       const processedMembers = membersRaw.map(member => ({
         ...member,
-        image: member.image ? toDataURL(member.image as Buffer) : '',
+        image: member.image ? toDataURL(member.image as Buffer) : null,
       }));
-      setMembers(processedMembers);
+      setMembers(processedMembers as CommitteeMember[]);
       setLoading(false);
     }
     fetchAndProcessMembers();
   }, []);
 
+  if (loading) {
+    return (
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>কমিটি ব্যবস্থাপনা</CardTitle>
+                {userRole !== 'visitor' && (
+                  <Button asChild>
+                    <Link href="/admin/committee/new">
+                      <PlusCircle className="mx-2 h-4 w-4" />
+                      <span className="hidden sm:flex">নতুন সদস্য যোগ করুন</span>
+                    </Link>
+                  </Button>
+                )}
+            </CardHeader>
+            <CardContent>
+                <p>Loading...</p>
+            </CardContent>
+        </Card>
+    );
+  }
 
   return (
     <Card>
@@ -45,7 +65,7 @@ export default function AdminCommitteePage() {
         )}
       </CardHeader>
       <CardContent>
-        {loading ? <p>Loading...</p> : <CommitteeTable members={members} />}
+        <CommitteeTable members={members} />
       </CardContent>
     </Card>
   );

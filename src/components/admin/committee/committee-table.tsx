@@ -49,6 +49,7 @@ export default function CommitteeTable({ members }: { members: CommitteeMember[]
   const router = useRouter();
   const userRole = useAppSelector(selectRole);
 
+
   const filteredMembers = useMemo(() => {
     return members.filter(person =>
       person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
