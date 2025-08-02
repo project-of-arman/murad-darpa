@@ -115,7 +115,7 @@ export default function CommitteeTable({ members }: { members: CommitteeMember[]
               <TableRow key={person.id}>
                 <TableCell>
                     <Image 
-                        src={person.image ? toDataURL(person.image as Buffer) : "https://placehold.co/40x40.png"}
+                        src={person.image || "https://placehold.co/40x40.png"}
                         alt={person.name}
                         width={40}
                         height={40}
@@ -177,7 +177,7 @@ export default function CommitteeTable({ members }: { members: CommitteeMember[]
             <CardHeader>
               <div className="flex items-center gap-4">
                 <Image 
-                  src={person.image ? toDataURL(person.image as Buffer) : "https://placehold.co/40x40.png"}
+                  src={person.image || "https://placehold.co/40x40.png"}
                   alt={person.name}
                   width={40}
                   height={40}
