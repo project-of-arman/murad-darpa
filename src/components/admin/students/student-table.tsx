@@ -37,6 +37,14 @@ import { Input } from "@/components/ui/input";
 import { toDataURL } from "@/lib/utils";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { selectRole } from "@/lib/redux/slices/user-slice";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 
 const STUDENTS_PER_PAGE = 10;
 
@@ -60,21 +68,23 @@ function StudentTable({ students }: { students: StudentForAdmin[]}) {
   const [selectedStudent, setSelectedStudent] = useState<StudentForAdmin | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [classFilter, setClassFilter] = useState("all");
   const { toast } = useToast();
   const userRole = useAppSelector(selectRole);
 
 
   const filteredStudents = useMemo(() => {
     return students.filter(student =>
-      student.name_bn.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (student.name_bn.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.name_en.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.roll.toLowerCase().includes(searchTerm.toLowerCase())
+      student.roll.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (classFilter === "all" || student.class_name === classFilter)
     );
-  }, [students, searchTerm]);
+  }, [students, searchTerm, classFilter]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, classFilter]);
 
   const totalPages = Math.ceil(filteredStudents.length / STUDENTS_PER_PAGE);
 
@@ -121,13 +131,26 @@ function StudentTable({ students }: { students: StudentForAdmin[]}) {
 
   return (
     <>
-      <div className="mb-4">
+      <div className="flex gap-4 mb-4">
         <Input 
             placeholder="নাম বা রোল দিয়ে খুঁজুন..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="max-w-sm"
         />
+        <Select value={classFilter} onValueChange={setClassFilter}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="শ্রেণী নির্বাচন করুন" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">সকল শ্রেণী</SelectItem>
+            <SelectItem value="৬ষ্ঠ">৬ষ্ঠ</SelectItem>
+            <SelectItem value="৭ম">৭ম</SelectItem>
+            <SelectItem value="৮ম">৮ম</SelectItem>
+            <SelectItem value="৯ম">৯ম</SelectItem>
+            <SelectItem value="১০ম">১০ম</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       {/* Desktop View */}
       <div className="border rounded-md hidden md:block">
