@@ -35,6 +35,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { toDataURL } from "@/lib/utils";
+import { useAppSelector } from "@/lib/redux/hooks";
+import { selectRole } from "@/lib/redux/slices/user-slice";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -44,6 +46,7 @@ export default function TeacherTable({ teachers }: { teachers: Teacher[] }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
+  const userRole = useAppSelector(selectRole);
 
   const filteredTeachers = useMemo(() => {
     return teachers.filter(teacher =>
@@ -119,7 +122,7 @@ export default function TeacherTable({ teachers }: { teachers: Teacher[] }) {
               <TableHead>নাম</TableHead>
               <TableHead>পদবি</TableHead>
               <TableHead>ইমেইল</TableHead>
-              <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>
+              {userRole !== 'visitor' && <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -137,41 +140,43 @@ export default function TeacherTable({ teachers }: { teachers: Teacher[] }) {
                 <TableCell className="font-medium">{teacher.name}</TableCell>
                 <TableCell>{teacher.role}</TableCell>
                 <TableCell>{teacher.email}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">মেনু খুলুন</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/teachers/${teacher.id}`} target="_blank">
-                          <Eye className="mr-2 h-4 w-4" />
-                          দেখুন
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/admin/teachers/edit/${teacher.id}`}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          সম্পাদনা
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onSelect={() => handleDeleteClick(teacher)}
-                        className="text-destructive"
-                      >
-                        <Trash className="mr-2 h-4 w-4" />
-                        মুছুন
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+                {userRole !== 'visitor' && (
+                    <TableCell className="text-right">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">মেনু খুলুন</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                            <Link href={`/teachers/${teacher.id}`} target="_blank">
+                            <Eye className="mr-2 h-4 w-4" />
+                            দেখুন
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href={`/admin/teachers/edit/${teacher.id}`}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            সম্পাদনা
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onSelect={() => handleDeleteClick(teacher)}
+                            className="text-destructive"
+                        >
+                            <Trash className="mr-2 h-4 w-4" />
+                            মুছুন
+                        </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    </TableCell>
+                )}
               </TableRow>
             )) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center h-24">
+                <TableCell colSpan={userRole !== 'visitor' ? 5 : 4} className="text-center h-24">
                   কোনো শিক্ষক পাওয়া যায়নি।
                 </TableCell>
               </TableRow>
@@ -206,10 +211,14 @@ export default function TeacherTable({ teachers }: { teachers: Teacher[] }) {
                 <Button variant="ghost" size="sm" asChild>
                     <Link href={`/teachers/${teacher.id}`} target="_blank">দেখুন</Link>
                 </Button>
-                <Button variant="outline" size="sm" asChild>
-                    <Link href={`/admin/teachers/edit/${teacher.id}`}>সম্পাদনা</Link>
-                </Button>
-                <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(teacher)}>মুছুন</Button>
+                {userRole !== 'visitor' && (
+                    <>
+                        <Button variant="outline" size="sm" asChild>
+                            <Link href={`/admin/teachers/edit/${teacher.id}`}>সম্পাদনা</Link>
+                        </Button>
+                        <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(teacher)}>মুছুন</Button>
+                    </>
+                )}
             </CardFooter>
           </Card>
         )) : (
