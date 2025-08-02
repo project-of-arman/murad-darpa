@@ -40,7 +40,7 @@ import { selectRole } from "@/lib/redux/slices/user-slice";
 
 const STUDENTS_PER_PAGE = 10;
 
-const HeaderActions = () => {
+export const HeaderActions = () => {
     const userRole = useAppSelector(selectRole);
     if (userRole === 'visitor') return null;
     
@@ -298,7 +298,5 @@ function StudentTable({ students }: { students: StudentForAdmin[]}) {
     </>
   );
 }
-
-StudentTable.HeaderActions = HeaderActions;
 
 export default StudentTable;

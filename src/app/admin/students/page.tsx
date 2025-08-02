@@ -1,10 +1,11 @@
 
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAllStudentsForAdmin } from "@/lib/student-data";
 import Link from "next/link";
 import { CloudCog, PlusCircle } from "lucide-react";
-import StudentTable from "@/components/admin/students/student-table";
+import StudentTable, { HeaderActions } from "@/components/admin/students/student-table";
 import { toDataURL } from "@/lib/utils";
 
 type AdminStudentsPageProps = {
@@ -23,7 +24,7 @@ export default async function AdminStudentsPage({ userRole }: AdminStudentsPageP
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>শিক্ষার্থী ব্যবস্থাপনা</CardTitle>
-        <StudentTable.HeaderActions />
+        <HeaderActions />
       </CardHeader>
       <CardContent>
         <StudentTable students={students} />
