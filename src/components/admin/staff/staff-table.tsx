@@ -35,6 +35,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { toDataURL } from "@/lib/utils";
+import { useAppSelector } from "@/lib/redux/hooks";
+import { selectRole } from "@/lib/redux/slices/user-slice";
+import { useRouter } from "next/navigation";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -44,6 +47,9 @@ export default function StaffTable({ staff }: { staff: Staff[] }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
+  const userRole = useAppSelector(selectRole);
+  const router = useRouter();
+
 
   const filteredStaff = useMemo(() => {
     return staff.filter(person =>
@@ -87,6 +93,7 @@ export default function StaffTable({ staff }: { staff: Staff[] }) {
           title: "কর্মচারী মোছা হয়েছে",
           description: `"${selectedStaff.name}" সফলভাবে মুছে ফেলা হয়েছে।`,
         });
+        router.refresh();
       } else {
         toast({
           title: "ত্রুটি",
@@ -118,7 +125,7 @@ export default function StaffTable({ staff }: { staff: Staff[] }) {
               <TableHead>নাম</TableHead>
               <TableHead>পদবি</TableHead>
               <TableHead>ইমেইল</TableHead>
-              <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>
+              {userRole !== 'visitor' && <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -136,41 +143,43 @@ export default function StaffTable({ staff }: { staff: Staff[] }) {
                 <TableCell className="font-medium">{person.name}</TableCell>
                 <TableCell>{person.role}</TableCell>
                 <TableCell>{person.email}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">মেনু খুলুন</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/staff/${person.id}`} target="_blank">
-                          <Eye className="mr-2 h-4 w-4" />
-                          দেখুন
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/admin/staff/edit/${person.id}`}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          সম্পাদনা
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onSelect={() => handleDeleteClick(person)}
-                        className="text-destructive"
-                      >
-                        <Trash className="mr-2 h-4 w-4" />
-                        মুছুন
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+                {userRole !== 'visitor' && (
+                    <TableCell className="text-right">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">মেনু খুলুন</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                            <Link href={`/staff/${person.id}`} target="_blank">
+                            <Eye className="mr-2 h-4 w-4" />
+                            দেখুন
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href={`/admin/staff/edit/${person.id}`}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            সম্পাদনা
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onSelect={() => handleDeleteClick(person)}
+                            className="text-destructive"
+                        >
+                            <Trash className="mr-2 h-4 w-4" />
+                            মুছুন
+                        </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    </TableCell>
+                )}
               </TableRow>
             )) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center h-24">
+                <TableCell colSpan={userRole !== 'visitor' ? 5 : 4} className="text-center h-24">
                   কোনো কর্মচারী পাওয়া যায়নি।
                 </TableCell>
               </TableRow>
@@ -201,15 +210,17 @@ export default function StaffTable({ staff }: { staff: Staff[] }) {
                     <p><strong>পদবি:</strong> {person.role}</p>
                     <p><strong>ইমেইল:</strong> {person.email}</p>
                 </CardContent>
-                <CardFooter className="flex justify-end gap-2">
-                    <Button variant="ghost" size="sm" asChild>
-                         <Link href={`/staff/${person.id}`} target="_blank">দেখুন</Link>
-                    </Button>
-                    <Button variant="outline" size="sm" asChild>
-                        <Link href={`/admin/staff/edit/${person.id}`}>সম্পাদনা</Link>
-                    </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(person)}>মুছুন</Button>
-                </CardFooter>
+                {userRole !== 'visitor' && (
+                    <CardFooter className="flex justify-end gap-2">
+                        <Button variant="ghost" size="sm" asChild>
+                            <Link href={`/staff/${person.id}`} target="_blank">দেখুন</Link>
+                        </Button>
+                        <Button variant="outline" size="sm" asChild>
+                            <Link href={`/admin/staff/edit/${person.id}`}>সম্পাদনা</Link>
+                        </Button>
+                        <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(person)}>মুছুন</Button>
+                    </CardFooter>
+                )}
             </Card>
             )) : (
             <div className="text-center text-muted-foreground py-8">
