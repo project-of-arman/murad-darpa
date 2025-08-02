@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { getNotices, Notice } from '@/lib/notice-data';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const NOTICES_PER_PAGE = 5;
 
@@ -28,12 +29,15 @@ const NoticeDate = ({ date }: { date: string }) => {
 export default function NoticeListPage() {
   const [allNotices, setAllNotices] = useState<Notice[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
   const totalPages = Math.ceil(allNotices.length / NOTICES_PER_PAGE);
 
   useEffect(() => {
     async function fetchNotices() {
+      setLoading(true);
       const notices = await getNotices();
       setAllNotices(notices);
+      setLoading(false);
     }
     fetchNotices();
   }, []);
@@ -60,22 +64,28 @@ export default function NoticeListPage() {
             </div>
             <Card className="shadow-lg border-primary/20">
               <CardContent className="p-0">
-                <ul className="divide-y divide-border">
-                  {paginatedNotices.map((notice) => (
-                    <li key={notice.id} className="p-4 flex items-center gap-4 hover:bg-muted/50 transition-colors">
-                      <NoticeDate date={notice.date} />
-                      <div className="flex-grow">
-                        <Link href={`/notice/${notice.id}`} className="font-medium text-foreground leading-snug hover:text-primary transition-colors block">{notice.title}</Link>
-                        <p className="text-xs text-muted-foreground mt-1">{notice.date}</p>
-                      </div>
-                      <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/notice/${notice.id}`}>
-                          <ArrowRight className="h-5 w-5 text-primary/80" />
-                        </Link>
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
+                {loading ? (
+                    <div className="space-y-4 p-4">
+                      {Array.from({length: 5}).map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}
+                    </div>
+                ) : (
+                  <ul className="divide-y divide-border">
+                    {paginatedNotices.map((notice) => (
+                      <li key={notice.id} className="p-4 flex items-center gap-4 hover:bg-muted/50 transition-colors">
+                        <NoticeDate date={notice.date} />
+                        <div className="flex-grow">
+                          <Link href={`/notice/${notice.id}`} className="font-medium text-foreground leading-snug hover:text-primary transition-colors block">{notice.title}</Link>
+                          <p className="text-xs text-muted-foreground mt-1">{notice.date}</p>
+                        </div>
+                        <Button variant="ghost" size="icon" asChild>
+                          <Link href={`/notice/${notice.id}`}>
+                            <ArrowRight className="h-5 w-5 text-primary/80" />
+                          </Link>
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </CardContent>
                {totalPages > 1 && (
                 <CardFooter className="flex items-center justify-between pt-4 border-t">

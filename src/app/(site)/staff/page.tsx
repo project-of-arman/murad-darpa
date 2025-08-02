@@ -1,18 +1,40 @@
 
-import { getStaff } from "@/lib/staff-data";
-import { getTeachers } from "@/lib/teacher-data";
+"use client";
+
+import { getStaff, Staff } from "@/lib/staff-data";
+import { getTeachers, Teacher } from "@/lib/teacher-data";
 import StaffList from "./staff-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
-import type { Metadata } from 'next';
+import { Skeleton } from "@/components/ui/skeleton";
+import { useState, useEffect } from 'react';
 
-export const metadata: Metadata = {
-  title: 'শিক্ষক ও কর্মচারী',
-};
+const StaffSkeleton = () => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+    {Array.from({length: 4}).map((_, i) => (
+      <div key={i} className="space-y-2">
+        <Skeleton className="h-64 w-full" />
+        <Skeleton className="h-6 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
+      </div>
+    ))}
+  </div>
+)
 
-export default async function StaffPage() {
-  const teachers = await getTeachers();
-  const staff = await getStaff();
+export default function StaffPage() {
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [staff, setStaff] = useState<Staff[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      const [teachersData, staffData] = await Promise.all([getTeachers(), getStaff()]);
+      setTeachers(teachersData);
+      setStaff(staffData);
+      setLoading(false);
+    }
+    fetchData();
+  }, []);
 
   return (
     <div className="bg-white">
@@ -30,13 +52,12 @@ export default async function StaffPage() {
                 </TabsList>
             </div>
             <TabsContent value="teachers">
-              <StaffList members={teachers} memberType="teachers" />
+              {loading ? <StaffSkeleton /> : <StaffList members={teachers} memberType="teachers" />}
             </TabsContent>
             <TabsContent value="staff">
-              <StaffList members={staff} memberType="staff" />
+              {loading ? <StaffSkeleton /> : <StaffList members={staff} memberType="staff" />}
             </TabsContent>
         </Tabs>
-
       </div>
     </div>
   );

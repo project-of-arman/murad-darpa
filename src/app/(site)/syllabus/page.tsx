@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { getSyllabuses, Syllabus } from '@/lib/syllabus-data';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function SyllabusPage() {
   const [allSyllabuses, setAllSyllabuses] = useState<Syllabus[]>([]);
@@ -16,9 +17,14 @@ export default function SyllabusPage() {
   useEffect(() => {
     async function fetchSyllabuses() {
       setLoading(true);
-      const data = await getSyllabuses();
-      setAllSyllabuses(data);
-      setLoading(false);
+      try {
+        const data = await getSyllabuses();
+        setAllSyllabuses(data);
+      } catch (error) {
+        console.error("Failed to fetch syllabuses:", error);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchSyllabuses();
   }, []);
@@ -40,8 +46,15 @@ export default function SyllabusPage() {
   if (loading) {
       return (
           <div className="bg-white py-16">
-              <div className="container mx-auto px-4">
-                  <p>লোড হচ্ছে...</p>
+              <div className="container mx-auto px-4 max-w-4xl space-y-8">
+                  <div className="text-center mb-12">
+                    <h1 className="text-4xl font-bold text-primary font-headline">সিলেবাস</h1>
+                    <p className="text-muted-foreground mt-2">আপনার শ্রেণীর সিলেবাস ডাউনলোড করুন</p>
+                  </div>
+                  <Card>
+                    <CardHeader><Skeleton className="h-8 w-1/2 mx-auto" /></CardHeader>
+                    <CardContent><Skeleton className="h-64 w-full" /></CardContent>
+                  </Card>
               </div>
           </div>
       )
@@ -49,7 +62,7 @@ export default function SyllabusPage() {
 
   return (
     <div className="bg-white py-16">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 max-w-4xl">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-primary font-headline">সিলেবাস</h1>
           <p className="text-muted-foreground mt-2">আপনার শ্রেণীর সিলেবাস ডাউনলোড করুন</p>

@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { getStudents, Student } from '@/lib/student-data';
 import { User, Users } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const STUDENTS_PER_PAGE = 5;
 
@@ -97,7 +98,7 @@ export default function StudentsPage() {
                     <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">{loading ? '...' : totalStudents}</div>
+                    <div className="text-2xl font-bold">{loading ? <Skeleton className="h-8 w-16" /> : totalStudents}</div>
                 </CardContent>
             </Card>
             <Card>
@@ -106,7 +107,7 @@ export default function StudentsPage() {
                     <User className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">{loading ? '...' : maleStudents}</div>
+                    <div className="text-2xl font-bold">{loading ? <Skeleton className="h-8 w-16" /> : maleStudents}</div>
                 </CardContent>
             </Card>
             <Card>
@@ -115,7 +116,7 @@ export default function StudentsPage() {
                     <User className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">{loading ? '...' : femaleStudents}</div>
+                    <div className="text-2xl font-bold">{loading ? <Skeleton className="h-8 w-16" /> : femaleStudents}</div>
                 </CardContent>
             </Card>
         </div>
@@ -152,7 +153,7 @@ export default function StudentsPage() {
                   <SelectItem value="মেয়ে">মেয়ে</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={yearFilter} onValueChange={setYearFilter}>
+              <Select value={yearFilter} onValueChange={setYearFilter} disabled={loading}>
                 <SelectTrigger>
                   <SelectValue placeholder="বছর নির্বাচন করুন" />
                 </SelectTrigger>
@@ -179,11 +180,16 @@ export default function StudentsPage() {
               </TableHeader>
               <TableBody>
                 {loading ? (
-                    <TableRow>
-                        <TableCell colSpan={6} className="text-center">
-                            লোড হচ্ছে...
-                        </TableCell>
-                    </TableRow>
+                    Array.from({length: 5}).map((_, i) => (
+                      <TableRow key={i}>
+                          <TableCell><Skeleton className="h-5 w-12" /></TableCell>
+                          <TableCell><Skeleton className="h-5 w-48" /></TableCell>
+                          <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                          <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+                          <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+                          <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                      </TableRow>
+                    ))
                 ) : paginatedStudents.length > 0 ? (
                   paginatedStudents.map((student) => (
                     <TableRow key={student.id}>

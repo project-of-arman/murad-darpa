@@ -7,6 +7,7 @@ import { getVideos, Video } from "@/lib/video-data";
 import { PlayCircle } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function VideosPage() {
   const [videos, setVideos] = useState<Video[]>([]);
@@ -14,6 +15,7 @@ export default function VideosPage() {
 
   useEffect(() => {
     async function fetchVideos() {
+      setLoading(true);
       const data = await getVideos();
       setVideos(data);
       setLoading(false);
@@ -32,7 +34,9 @@ export default function VideosPage() {
           {loading ? (
             Array.from({ length: 3 }).map((_, i) => (
               <Card key={i} className="group overflow-hidden shadow-md">
-                <CardContent className="relative p-0 aspect-video bg-muted animate-pulse"></CardContent>
+                <CardContent className="relative p-0 aspect-video">
+                  <Skeleton className="h-full w-full" />
+                </CardContent>
               </Card>
             ))
           ) : (
