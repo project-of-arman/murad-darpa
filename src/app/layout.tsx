@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { Metadata, IconDescriptor } from 'next';
