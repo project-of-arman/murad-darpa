@@ -37,7 +37,7 @@ import { useRouter } from "next/navigation";
 
 const NOTICES_PER_PAGE = 10;
 
-export default function NoticeTable({ notices }: { notices: Notice[] }) {
+export default function NoticeTable({ notices, userRole }: { notices: Notice[], userRole: 'admin' | 'moderator' | 'visitor' | null }) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -111,7 +111,7 @@ export default function NoticeTable({ notices }: { notices: Notice[] }) {
               <TableHead>শিরোনাম</TableHead>
               <TableHead>তারিখ</TableHead>
               <TableHead>ফাইল</TableHead>
-              <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>
+              {userRole !== 'visitor' && <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -130,6 +130,7 @@ export default function NoticeTable({ notices }: { notices: Notice[] }) {
                     <span className="text-muted-foreground text-xs">ফাইল নেই</span>
                   )}
                 </TableCell>
+                {userRole !== 'visitor' && (
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -161,10 +162,11 @@ export default function NoticeTable({ notices }: { notices: Notice[] }) {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
+                )}
               </TableRow>
             )) : (
               <TableRow>
-                <TableCell colSpan={4} className="text-center h-24">
+                <TableCell colSpan={userRole !== 'visitor' ? 4 : 3} className="text-center h-24">
                   কোনো নোটিশ পাওয়া যায়নি।
                 </TableCell>
               </TableRow>
@@ -192,6 +194,7 @@ export default function NoticeTable({ notices }: { notices: Notice[] }) {
                 </div>
               )}
             </CardContent>
+            {userRole !== 'visitor' && (
             <CardFooter className="flex justify-end gap-2">
               <Button variant="ghost" size="sm" asChild>
                   <Link href={`/notice/${notice.id}`} target="_blank">দেখুন</Link>
@@ -201,6 +204,7 @@ export default function NoticeTable({ notices }: { notices: Notice[] }) {
               </Button>
               <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(notice)}>মুছুন</Button>
             </CardFooter>
+            )}
           </Card>
         )) : (
           <div className="text-center text-muted-foreground py-8">
