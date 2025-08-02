@@ -34,7 +34,6 @@ import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { toDataURL } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { selectRole } from "@/lib/redux/slices/user-slice";
