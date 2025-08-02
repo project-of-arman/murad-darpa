@@ -8,7 +8,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Calendar, User } from 'lucide-react';
 
-const allPosts = [
+const initialPosts = [
   {
     id: 1,
     title: "বার্ষিক ক্রীড়া প্রতিযোগিতার পুরস্কার বিতরণী",
@@ -68,6 +68,7 @@ const allPosts = [
 const POSTS_PER_PAGE = 4;
 
 export default function BlogPage() {
+    const [allPosts] = useState(initialPosts);
     const [currentPage, setCurrentPage] = useState(1);
     const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);
 
