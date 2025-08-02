@@ -37,7 +37,7 @@ import { useRouter } from "next/navigation";
 
 const ITEMS_PER_PAGE = 10;
 
-export default function ExamRoutineTable({ routines }: { routines: ExamRoutine[] }) {
+export default function ExamRoutineTable({ routines, userRole }: { routines: ExamRoutine[], userRole: 'admin' | 'moderator' | 'visitor' | null }) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedRoutine, setSelectedRoutine] = useState<ExamRoutine | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -108,7 +108,7 @@ export default function ExamRoutineTable({ routines }: { routines: ExamRoutine[]
               <TableHead>বিষয়</TableHead>
               <TableHead>তারিখ</TableHead>
               <TableHead>সময়</TableHead>
-              <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>
+              {userRole !== 'visitor' && <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -119,35 +119,37 @@ export default function ExamRoutineTable({ routines }: { routines: ExamRoutine[]
                 <TableCell>{routine.subject}</TableCell>
                 <TableCell>{new Date(routine.exam_date).toLocaleDateString('bn-BD')}</TableCell>
                 <TableCell>{routine.start_time.substring(0,5)} - {routine.end_time.substring(0,5)}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">মেনু খুলুন</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/admin/exam-routine/edit/${routine.id}`}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          সম্পাদনা
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onSelect={() => handleDeleteClick(routine)}
-                        className="text-destructive"
-                      >
-                        <Trash className="mr-2 h-4 w-4" />
-                        মুছুন
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+                {userRole !== 'visitor' && (
+                    <TableCell className="text-right">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">মেনু খুলুন</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                            <Link href={`/admin/exam-routine/edit/${routine.id}`}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            সম্পাদনা
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onSelect={() => handleDeleteClick(routine)}
+                            className="text-destructive"
+                        >
+                            <Trash className="mr-2 h-4 w-4" />
+                            মুছুন
+                        </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    </TableCell>
+                )}
               </TableRow>
             )) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center h-24">
+                <TableCell colSpan={userRole !== 'visitor' ? 6 : 5} className="text-center h-24">
                   কোনো রুটিন পাওয়া যায়নি।
                 </TableCell>
               </TableRow>
@@ -169,12 +171,14 @@ export default function ExamRoutineTable({ routines }: { routines: ExamRoutine[]
                     <p><strong>তারিখ:</strong> {new Date(routine.exam_date).toLocaleDateString('bn-BD')}</p>
                     <p><strong>সময়:</strong> {routine.start_time.substring(0,5)} - {routine.end_time.substring(0,5)}</p>
                 </CardContent>
-                <CardFooter className="flex justify-end gap-2">
-                    <Button variant="outline" size="sm" asChild>
-                        <Link href={`/admin/exam-routine/edit/${routine.id}`}>সম্পাদনা</Link>
-                    </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(routine)}>মুছুন</Button>
-                </CardFooter>
+                {userRole !== 'visitor' && (
+                    <CardFooter className="flex justify-end gap-2">
+                        <Button variant="outline" size="sm" asChild>
+                            <Link href={`/admin/exam-routine/edit/${routine.id}`}>সম্পাদনা</Link>
+                        </Button>
+                        <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(routine)}>মুছুন</Button>
+                    </CardFooter>
+                )}
             </Card>
         )) : (
             <div className="text-center text-muted-foreground py-8">
@@ -210,4 +214,3 @@ export default function ExamRoutineTable({ routines }: { routines: ExamRoutine[]
     </>
   );
 }
-
