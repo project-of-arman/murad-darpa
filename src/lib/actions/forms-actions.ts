@@ -72,18 +72,76 @@ export async function getSubmissionDetails(formType: string, id: number): Promis
 
 type MutationResult = { success: boolean; error?: string };
 
+async function createStudentFromApplication(application: any) {
+  if (!pool) throw new Error("Database not connected");
+
+  // Find the next available roll number for the given class and year
+  const year = new Date().getFullYear();
+  const [lastRollRows] = await pool.query<any[]>('SELECT MAX(CAST(roll AS UNSIGNED)) as max_roll FROM students WHERE class_name = ? AND year = ?', [application.applying_for_class, year]);
+  
+  const lastRoll = lastRollRows[0]?.max_roll || 0;
+  const newRoll = (lastRoll + 1).toString();
+
+  const studentData = {
+    name_bn: application.student_name_bn,
+    name_en: application.student_name_en,
+    roll: newRoll,
+    class_name: application.applying_for_class,
+    year,
+    dob: application.dob,
+    birth_cert_no: application.birth_cert_no,
+    gender: application.gender,
+    religion: application.religion,
+    blood_group: application.blood_group,
+    previous_school: application.previous_school,
+    father_name_bn: application.father_name_bn,
+    father_name_en: application.father_name_en,
+    father_nid: application.father_nid,
+    father_mobile: application.father_mobile,
+    mother_name_bn: application.mother_name_bn,
+    mother_name_en: application.mother_name_en,
+    mother_nid: application.mother_nid,
+    mother_mobile: application.mother_mobile,
+    present_address: application.present_address,
+    permanent_address: application.permanent_address,
+    image: application.student_photo_path,
+  };
+
+  await pool.query('INSERT INTO students SET ?', [studentData]);
+}
+
+
 export async function updateSubmissionStatus(formType: string, id: number, status: 'approved' | 'rejected'): Promise<MutationResult> {
   const config = formConfigs[formType];
   if (!config || !pool) return { success: false, error: 'Invalid request' };
 
+  const connection = await pool.getConnection();
+
   try {
+    await connection.beginTransaction();
+
     const query = `UPDATE ${config.tableName} SET status = ? WHERE id = ?`;
-    await queryWithRetry(query, [status, id]);
+    await connection.query(query, [status, id]);
+
+    if (formType === 'admission_applications' && status === 'approved') {
+        const [appRows] = await connection.query<any[]>('SELECT * FROM admission_applications WHERE id = ?', [id]);
+        if (appRows.length > 0) {
+            await createStudentFromApplication(appRows[0]);
+        }
+    }
+    
+    await connection.commit();
+    
     revalidatePath('/admin/forms');
+    revalidatePath('/admin/students');
+
     return { success: true };
   } catch (error) {
+    await connection.rollback();
     console.error(`Failed to update status for ${formType} with id ${id}:`, (error as Error).message);
     return { success: false, error: 'Database error' };
+  } finally {
+      connection.release();
   }
 }
 
