@@ -35,6 +35,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { toDataURL } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { useAppSelector } from "@/lib/redux/hooks";
+import { selectRole } from "@/lib/redux/slices/user-slice";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -44,6 +47,8 @@ export default function CommitteeTable({ members }: { members: CommitteeMember[]
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
+  const router = useRouter();
+  const userRole = useAppSelector(selectRole);
 
   const filteredMembers = useMemo(() => {
     return members.filter(person =>
@@ -74,6 +79,7 @@ export default function CommitteeTable({ members }: { members: CommitteeMember[]
       const result = await deleteCommitteeMember(selectedMember.id);
       if (result.success) {
         toast({ title: "সদস্য মোছা হয়েছে", description: `"${selectedMember.name}" সফলভাবে মুছে ফেলা হয়েছে।` });
+        router.refresh();
       } else {
         toast({ title: "ত্রুটি", description: result.error, variant: "destructive" });
       }
@@ -101,7 +107,7 @@ export default function CommitteeTable({ members }: { members: CommitteeMember[]
               <TableHead>নাম</TableHead>
               <TableHead>পদবি</TableHead>
               <TableHead>অবস্থান</TableHead>
-              <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>
+              {userRole !== 'visitor' && <TableHead className="w-[100px] text-right">অ্যাকশন</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -119,41 +125,43 @@ export default function CommitteeTable({ members }: { members: CommitteeMember[]
                 <TableCell className="font-medium">{person.name}</TableCell>
                 <TableCell>{person.role}</TableCell>
                 <TableCell>{person.sort_order}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">মেনু খুলুন</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/committee`} target="_blank">
-                          <Eye className="mr-2 h-4 w-4" />
-                          দেখুন
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/admin/committee/edit/${person.id}`}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          সম্পাদনা
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onSelect={() => handleDeleteClick(person)}
-                        className="text-destructive"
-                      >
-                        <Trash className="mr-2 h-4 w-4" />
-                        মুছুন
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+                {userRole !== 'visitor' && (
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">মেনু খুলুন</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                          <Link href={`/committee`} target="_blank">
+                            <Eye className="mr-2 h-4 w-4" />
+                            দেখুন
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/admin/committee/edit/${person.id}`}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            সম্পাদনা
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onSelect={() => handleDeleteClick(person)}
+                          className="text-destructive"
+                        >
+                          <Trash className="mr-2 h-4 w-4" />
+                          মুছুন
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                )}
               </TableRow>
             )) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center h-24">
+                <TableCell colSpan={userRole !== 'visitor' ? 5 : 4} className="text-center h-24">
                   কোনো সদস্য পাওয়া যায়নি।
                 </TableCell>
               </TableRow>
@@ -184,12 +192,14 @@ export default function CommitteeTable({ members }: { members: CommitteeMember[]
               <p><strong>পদবি:</strong> {person.role}</p>
               <p><strong>অবস্থান:</strong> {person.sort_order}</p>
             </CardContent>
-            <CardFooter className="flex justify-end gap-2">
-              <Button variant="outline" size="sm" asChild>
-                <Link href={`/admin/committee/edit/${person.id}`}>সম্পাদনা</Link>
-              </Button>
-              <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(person)}>মুছুন</Button>
-            </CardFooter>
+            {userRole !== 'visitor' && (
+              <CardFooter className="flex justify-end gap-2">
+                <Button variant="outline" size="sm" asChild>
+                  <Link href={`/admin/committee/edit/${person.id}`}>সম্পাদনা</Link>
+                </Button>
+                <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(person)}>মুছুন</Button>
+              </CardFooter>
+            )}
           </Card>
         )) : (
           <div className="text-center text-muted-foreground py-8">
