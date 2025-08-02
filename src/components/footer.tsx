@@ -1,9 +1,29 @@
+"use client";
+
 import Link from 'next/link';
 import { GraduationCap, Facebook, Twitter, Youtube } from 'lucide-react';
-import { getSchoolInfo } from '@/lib/school-data';
+import { getSchoolInfo, SchoolInfo } from '@/lib/school-data';
+import { useEffect, useState } from 'react';
 
-export default async function Footer() {
-  const schoolInfo = await getSchoolInfo();
+export default function Footer() {
+  const [schoolInfo, setSchoolInfo] = useState<SchoolInfo | null>(null);
+
+  useEffect(() => {
+    async function fetchInfo() {
+      const info = await getSchoolInfo();
+      setSchoolInfo(info);
+    }
+    fetchInfo();
+  }, []);
+
+  if (!schoolInfo) {
+    return (
+        <footer className="bg-white border-t">
+            <div className="container mx-auto px-4 py-8">
+            </div>
+        </footer>
+    );
+  }
 
   return (
     <footer className="bg-white border-t">

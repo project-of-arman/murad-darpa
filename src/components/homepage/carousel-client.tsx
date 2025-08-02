@@ -23,10 +23,9 @@ export default function CarouselClient({ schoolInfo, carouselItems: initialItems
   const [api, setApi] = React.useState<any>();
   const [current, setCurrent] = React.useState(0);
   
-  // Convert any Buffer data to base64 strings
-   const carouselItems = React.useMemo(() => initialItems.map(item => ({
+  const carouselItems = React.useMemo(() => initialItems.map(item => ({
     ...item,
-    src: toDataURL(item.src as Buffer)
+    src: item.src ? toDataURL(item.src as Buffer) : "https://placehold.co/1920x600.png"
   })), [initialItems]);
 
 
