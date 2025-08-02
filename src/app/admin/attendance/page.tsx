@@ -1,4 +1,6 @@
 
+"use client";
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getStudents } from "@/lib/student-data";
@@ -6,23 +8,49 @@ import AttendanceManager from "@/components/admin/attendance/attendance-manager"
 import AttendanceReport from "@/components/admin/attendance/attendance-report";
 import { getAttendanceByDate } from "@/lib/actions/attendance-actions";
 import { format } from 'date-fns';
+import { useAppSelector } from "@/lib/redux/hooks";
+import { selectRole } from "@/lib/redux/slices/user-slice";
+import { useEffect, useState } from "react";
+import type { Student } from "@/lib/student-data";
+import type { AttendanceReportRecord } from "@/lib/actions/attendance-actions";
+import { useSearchParams } from "next/navigation";
 
-type AttendancePageProps = {
-    searchParams: { date?: string };
-    userRole: 'admin' | 'moderator' | 'visitor';
-}
-
-export default async function AttendancePage({ searchParams, userRole }: AttendancePageProps) {
-    const allStudents = await getStudents();
-    const reportDate = searchParams.date || format(new Date(), 'yyyy-MM-dd');
-    const attendanceRecords = await getAttendanceByDate(reportDate);
+export default function AttendancePage() {
+    const userRole = useAppSelector(selectRole);
+    const searchParams = useSearchParams();
     
+    const [allStudents, setAllStudents] = useState<Student[]>([]);
+    const [attendanceRecords, setAttendanceRecords] = useState<AttendanceReportRecord[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const reportDate = searchParams.get('date') || format(new Date(), 'yyyy-MM-dd');
+
+    useEffect(() => {
+        async function fetchData() {
+            setLoading(true);
+            const [students, records] = await Promise.all([
+                getStudents(),
+                getAttendanceByDate(reportDate)
+            ]);
+            setAllStudents(students);
+            setAttendanceRecords(records);
+            setLoading(false);
+        }
+        fetchData();
+    }, [reportDate]);
+    
+    if(loading) {
+        return <div>Loading...</div>
+    }
+
     return (
         <Tabs defaultValue="report" className="w-full">
-            <TabsList className={userRole === 'visitor' ? "hidden" : "grid w-full grid-cols-2"}>
-                <TabsTrigger value="report">হাজিরা রিপোর্ট</TabsTrigger>
-                <TabsTrigger value="update">হাজিরা আপডেট</TabsTrigger>
-            </TabsList>
+            {userRole !== 'visitor' && (
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="report">হাজিরা রিপোর্ট</TabsTrigger>
+                    <TabsTrigger value="update">হাজিরা আপডেট</TabsTrigger>
+                </TabsList>
+            )}
             <TabsContent value="report">
                  <Card>
                     <CardHeader>
