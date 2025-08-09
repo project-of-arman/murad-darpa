@@ -234,6 +234,7 @@ export async function saveAboutSchool(formData: FormData): Promise<SaveResult> {
         revalidatePath('/(site)/school-details');
         return { success: true };
     } catch(e: any) {
+        console.error("Failed to save about school info:", e);
         return { success: false, error: e.message };
     }
 }
