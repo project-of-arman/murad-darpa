@@ -18,10 +18,9 @@ CREATE TABLE `notices` (
   PRIMARY KEY (`id`)
 );
 
--- Use this SQL to add new columns to an existing table:
-ALTER TABLE `notices`
-ADD COLUMN `file_data` LONGBLOB DEFAULT NULL,
-ADD COLUMN `file_name` VARCHAR(255) DEFAULT NULL;
+-- Use this SQL to alter existing tables:
+ALTER TABLE `notices` MODIFY COLUMN `file_data` LONGBLOB DEFAULT NULL;
+ALTER TABLE `notices` MODIFY COLUMN `file_name` VARCHAR(255) DEFAULT NULL;
 
 */
 
@@ -125,14 +124,6 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
             const extension = getFileExtension(data.file.name);
             fieldsToUpdate.file_data = fileBuffer;
             fieldsToUpdate.file_name = `${data.title.replace(/\s/g, '_')}.${extension}`;
-        } else if (id) {
-            // This is an update, and no new file was provided.
-            // Don't change the existing file fields.
-            // If you wanted to allow file *removal*, you'd need a separate checkbox.
-        } else {
-            // This is an insert, and no file was provided.
-            fieldsToUpdate.file_data = null;
-            fieldsToUpdate.file_name = null;
         }
         
         if (id) {
