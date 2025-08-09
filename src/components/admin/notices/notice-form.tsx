@@ -16,9 +16,13 @@ import { Switch } from "@/components/ui/switch";
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_FILE_TYPES = ["application/pdf"];
 
+// This schema is now truly optional. It only validates if a file is present.
 const fileSchema = z.any()
   .optional()
-  .refine((files) => !files || files.length === 0 || files?.[0]?.size <= MAX_FILE_SIZE, `ফাইলের সর্বোচ্চ আকার 10MB।`)
+  .refine(
+    (files) => !files || files.length === 0 || files?.[0]?.size <= MAX_FILE_SIZE, 
+    `ফাইলের সর্বোচ্চ আকার 10MB।`
+  )
   .refine(
     (files) => !files || files.length === 0 || ACCEPTED_FILE_TYPES.includes(files?.[0]?.type),
     "শুধুমাত্র .pdf ফরম্যাট সাপোর্ট করবে।"
