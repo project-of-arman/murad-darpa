@@ -14,7 +14,7 @@ export default function LogoLoader() {
         async function fetchLogo() {
             try {
                 const info = await getSchoolInfo();
-                setLogoUrl(info.logo_url);
+                setLogoUrl(info?.logo_url || null); // Check if info is not null
             } catch (error) {
                 console.error("Failed to fetch school logo for loader:", error);
             } finally {

@@ -40,12 +40,21 @@ export async function getSiteSettings(): Promise<SiteSettings | null> {
             si.logo_url as school_logo_url,
             si.mpo_code,
             si.eiin_number
-        FROM site_settings ss, school_info si 
-        WHERE ss.id = 1 AND si.id = 1;
+        FROM site_settings ss
+        LEFT JOIN school_info si ON ss.id = si.id
+        WHERE ss.id = 1;
     `;
     const [rows] = await pool.query<any[]>(query);
     
     if (rows.length === 0) {
+        // If site_settings doesn't exist, try to get school_info at least
+        const [schoolRows] = await pool.query<any[]>('SELECT * from school_info where id = 1');
+        if (schoolRows.length > 0) {
+            return {
+                id: 0, site_title: '', meta_description: '', meta_keywords: '', favicon_url: null,
+                ...schoolRows[0]
+            } as SiteSettings;
+        }
         return null;
     }
     

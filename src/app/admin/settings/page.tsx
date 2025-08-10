@@ -20,17 +20,17 @@ export default async function AdminSettingsPage() {
   // Convert any buffer data to base64 strings before passing to client components
   const settings = {
       ...settingsData,
-      favicon_url: settingsData.favicon_url ? toDataURL(settingsData.favicon_url as Buffer) : null,
-      school_logo_url: settingsData.school_logo_url ? toDataURL(settingsData.school_logo_url as Buffer) : '',
+      favicon_url: settingsData?.favicon_url ? toDataURL(settingsData?.favicon_url as Buffer) : null,
+      school_logo_url: settingsData?.school_logo_url ? toDataURL(settingsData?.school_logo_url as Buffer) : '',
   };
 
   const schoolInfo: SchoolInfo = {
-      id: settings.school_id,
-      name: settings.school_name,
-      address: settings.school_address,
-      logo_url: settings.school_logo_url,
-      mpo_code: settings.mpo_code,
-      eiin_number: settings.eiin_number,
+      id: settings?.school_id,
+      name: settings?.school_name,
+      address: settings?.school_address,
+      logo_url: settings?.school_logo_url,
+      mpo_code: settings?.mpo_code,
+      eiin_number: settings?.eiin_number,
   }
 
   return (
