@@ -143,33 +143,35 @@ export async function deleteCarouselItem(id: number): Promise<SaveResult> {
 
 // ========= SCHOOL INFO ACTIONS =========
 export async function getSchoolInfo(): Promise<SchoolInfo> {
-    if (!pool) {
-        console.warn("Database not connected. Returning mock school info.");
-        return mockSchoolInfo;
-    }
-    try {
-        const query = 'SELECT id, name, address, mpo_code, eiin_number, IF(logo_url IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(logo_url)), NULL) as logo_url FROM school_info LIMIT 1';
-        const rows = await queryWithRetry<SchoolInfo[]>(query);
-        return rows[0] || mockSchoolInfo;
-    } catch (error) {
-        console.error("Failed to fetch school info:", error);
-        return mockSchoolInfo;
-    }
+  if (!pool) {
+    console.warn("Database not connected. Returning mock school info.");
+    return mockSchoolInfo;
+  }
+  try {
+    const query = 'SELECT id, name, address, mpo_code, eiin_number, IF(logo_url IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(logo_url)), NULL) as logo_url FROM school_info LIMIT 1';
+    const rows = await queryWithRetry<SchoolInfo[]>(query);
+    if (rows.length === 0) return mockSchoolInfo;
+    return rows[0];
+  } catch (error) {
+    console.error("Failed to fetch school info:", error);
+    return mockSchoolInfo;
+  }
 }
 
 // ========= ABOUT SCHOOL ACTIONS =========
 export async function getAboutSchool(): Promise<AboutSchoolInfo> {
-    if (!pool) {
-        console.warn("Database not connected. Returning mock about school info.");
-        return mockAboutSchoolInfo;
-    }
-    try {
-        const [rows] = await pool.query('SELECT id, title, description, IF(image_url IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image_url)), NULL) as image_url FROM about_school LIMIT 1');
-        return (rows as AboutSchoolInfo[])[0] || mockAboutSchoolInfo;
-    } catch (error) {
-        console.error("Failed to fetch about school info:", error);
-        return mockAboutSchoolInfo;
-    }
+  if (!pool) {
+    console.warn("Database not connected. Returning mock about school info.");
+    return mockAboutSchoolInfo;
+  }
+  try {
+    const [rows] = await pool.query('SELECT id, title, description, IF(image_url IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image_url)), NULL) as image_url FROM about_school LIMIT 1');
+    if ((rows as AboutSchoolInfo[]).length === 0) return mockAboutSchoolInfo;
+    return (rows as AboutSchoolInfo[])[0];
+  } catch (error) {
+    console.error("Failed to fetch about school info:", error);
+    return mockAboutSchoolInfo;
+  }
 }
 
 export async function saveAboutSchool(formData: FormData): Promise<SaveResult> {
@@ -180,14 +182,20 @@ export async function saveAboutSchool(formData: FormData): Promise<SaveResult> {
             description: formData.get('description') as string,
             image: formData.get('image_url') as Blob | null
         };
-        const imageBuffer = data.image ? Buffer.from(await data.image.arrayBuffer()) : null;
+        
+        const imageBuffer = data.image && data.image.size > 0 ? Buffer.from(await data.image.arrayBuffer()) : null;
 
-        const fieldsToUpdate: any = { title: data.title, description: data.description };
-        if (imageBuffer && imageBuffer.length > 0) {
+        const fieldsToUpdate: any = { 
+            title: data.title, 
+            description: data.description 
+        };
+        
+        if (imageBuffer) {
             fieldsToUpdate.image_url = imageBuffer;
         }
         
         await pool.query('UPDATE about_school SET ? WHERE id = 1', [fieldsToUpdate]);
+
         revalidatePath('/admin/school-details');
         revalidatePath('/(site)/');
         revalidatePath('/(site)/school-details');
@@ -197,6 +205,7 @@ export async function saveAboutSchool(formData: FormData): Promise<SaveResult> {
         return { success: false, error: e.message };
     }
 }
+
 
 // ========= SCHOOL FEATURES ACTIONS =========
 const featureSchema = z.object({

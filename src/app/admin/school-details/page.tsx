@@ -5,8 +5,20 @@ import SchoolFeatures from "@/components/admin/school-details/school-features";
 import { toDataURL } from "@/lib/utils";
 
 export default async function AdminSchoolDetailsPage() {
-  const aboutInfoData = await getAboutSchool();
-  const features = await getSchoolFeatures();
+  const [aboutInfoData, features] = await Promise.all([
+    getAboutSchool(),
+    getSchoolFeatures()
+  ]);
+
+  // Handle case where data might not be available yet
+  if (!aboutInfoData) {
+    return (
+        <Card>
+            <CardHeader><CardTitle>স্কুল সম্পর্কে তথ্য</CardTitle></CardHeader>
+            <CardContent><p>Loading data or initial setup required...</p></CardContent>
+        </Card>
+    );
+  }
 
   // Convert buffer to data URL before passing to client component
   const aboutInfo = {
