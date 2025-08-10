@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,7 @@ function AboutSchoolContent({ aboutInfo, features }: { aboutInfo: AboutSchoolInf
         <div className="absolute -top-4 -left-4 w-full h-full border-4 border-accent rounded-lg transform -rotate-2"></div>
         <Card className="overflow-hidden shadow-lg relative rounded-lg">
           <Image
-            src={aboutInfo.image_url}
+            src={aboutInfo.image_url as string}
             alt="School Building"
             width={400}
             height={500}
@@ -36,7 +37,7 @@ function AboutSchoolContent({ aboutInfo, features }: { aboutInfo: AboutSchoolInf
       <div className="w-full md:w-7/12">
         <h2 className="text-3xl font-bold text-primary mb-4 font-headline">{aboutInfo.title}</h2>
         <p className="text-muted-foreground mb-6 text-base leading-relaxed">
-          {aboutInfo.description?.slice(0,200)}{aboutInfo.description?.length>=200 ? '...':''}
+          {aboutInfo.description?.slice(0, 200)}{aboutInfo.description && aboutInfo.description.length >= 200 ? '...' : ''}
         </p>
         <div className="space-y-4 mb-8">
             {features.slice(0, 3).map((feature) => (
@@ -46,7 +47,7 @@ function AboutSchoolContent({ aboutInfo, features }: { aboutInfo: AboutSchoolInf
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">{feature.title}</h3>
-                  <p className="text-muted-foreground text-sm">{feature.description.substring(0, 100)}...</p>
+                  <p className="text-muted-foreground text-sm">{feature.description?.substring(0, 100)}...</p>
                 </div>
               </div>
             ))}
