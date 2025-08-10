@@ -47,23 +47,6 @@ export interface SchoolInfo {
     eiin_number: string | null;
 }
 
-const mockSchoolInfo: SchoolInfo = {
-    id: 1,
-    name: 'মুরাদদর্প নারায়নপুর নিম্ন মাধ্যমিক বিদ্যালয়',
-    address: 'কাফ্রিখাল, মিঠাপুকুর, রংপুর।',
-    logo_url: 'https://placehold.co/80x80.png',
-    mpo_code: '12345',
-    eiin_number: '67890',
-};
-
-const mockAboutSchoolInfo: AboutSchoolInfo = {
-    id: 1,
-    title: 'আমাদের সম্পর্কে',
-    description: 'মুরাদদর্প নারায়নপুর নিম্ন মাধ্যমিক বিদ্যালয় একটি ঐতিহ্যবাহী শিক্ষা প্রতিষ্ঠান। আমরা শিক্ষার্থীদের মানসম্মত শিক্ষা প্রদানে প্রতিশ্রুতিবদ্ধ।',
-    image_url: 'https://placehold.co/400x500.png'
-};
-
-
 type SaveResult = { success: boolean; error?: string };
 
 // ========= CAROUSEL ACTIONS =========
@@ -142,35 +125,34 @@ export async function deleteCarouselItem(id: number): Promise<SaveResult> {
 }
 
 // ========= SCHOOL INFO ACTIONS =========
-export async function getSchoolInfo(): Promise<SchoolInfo> {
+export async function getSchoolInfo(): Promise<SchoolInfo | null> {
   if (!pool) {
-    console.warn("Database not connected. Returning mock school info.");
-    return mockSchoolInfo;
+    console.warn("Database not connected. School info will be null.");
+    return null;
   }
   try {
     const query = 'SELECT id, name, address, mpo_code, eiin_number, IF(logo_url IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(logo_url)), NULL) as logo_url FROM school_info LIMIT 1';
     const rows = await queryWithRetry<SchoolInfo[]>(query);
-    if (rows.length === 0) return mockSchoolInfo;
+    if (rows.length === 0) return null;
     return rows[0];
   } catch (error) {
     console.error("Failed to fetch school info:", error);
-    return mockSchoolInfo;
+    return null;
   }
 }
 
 // ========= ABOUT SCHOOL ACTIONS =========
-export async function getAboutSchool(): Promise<AboutSchoolInfo> {
+export async function getAboutSchool(): Promise<AboutSchoolInfo | null> {
   if (!pool) {
-    console.warn("Database not connected. Returning mock about school info.");
-    return mockAboutSchoolInfo;
+    console.warn("Database not connected. About school info will be null.");
+    return null;
   }
   try {
     const [rows] = await pool.query('SELECT id, title, description, IF(image_url IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image_url)), NULL) as image_url FROM about_school LIMIT 1');
-    if ((rows as AboutSchoolInfo[]).length === 0) return mockAboutSchoolInfo;
-    return (rows as AboutSchoolInfo[])[0];
+    return (rows as AboutSchoolInfo[])[0] || null;
   } catch (error) {
     console.error("Failed to fetch about school info:", error);
-    return mockAboutSchoolInfo;
+    return null;
   }
 }
 

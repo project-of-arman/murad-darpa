@@ -20,26 +20,11 @@ export interface SiteSettings extends RowDataPacket {
   eiin_number: string | null;
 }
 
-// ========= MOCK DATA (for fallback) =========
-const mockSiteSettings: SiteSettings = {
-  id: 1,
-  site_title: 'মুরাদদর্প নারায়নপুর নিম্ন মাধ্যমিক বিদ্যালয়',
-  meta_description: 'Official website for মুরাদদর্প নারায়নপুর নিম্ন মাধ্যমিক বিদ্যালয়',
-  meta_keywords: 'school, education, bangladesh',
-  favicon_url: '/favicon.ico',
-  school_id: 1,
-  school_name: 'মুরাদদর্প নারায়নপুর নিম্ন মাধ্যমিক বিদ্যালয়',
-  school_address: 'কাফ্রিখাল, মিঠাপুকুর, রংপুর।',
-  school_logo_url: 'https://placehold.co/80x80.png',
-  mpo_code: '12345',
-  eiin_number: '67890',
-};
-
 // ========= DATABASE ACTIONS =========
-export async function getSiteSettings(): Promise<SiteSettings> {
+export async function getSiteSettings(): Promise<SiteSettings | null> {
   if (!pool) {
-      console.warn("Database not connected. Returning mock data for site settings.");
-      return mockSiteSettings;
+      console.warn("Database not connected. Site settings will be null.");
+      return null;
   }
   try {
     const query = `
@@ -61,7 +46,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     const [rows] = await pool.query<any[]>(query);
     
     if (rows.length === 0) {
-        return mockSiteSettings;
+        return null;
     }
     
     const settings = rows[0];
@@ -78,10 +63,10 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 
   } catch (error: any) {
     if (error.code === 'ER_NO_SUCH_TABLE') {
-        console.warn('`site_settings` or `school_info` table not found. Returning mock data.');
-        return mockSiteSettings;
+        console.warn('`site_settings` or `school_info` table not found. Returning null.');
+        return null;
     }
     console.error('Failed to fetch site settings:', error);
-    return mockSiteSettings;
+    return null;
   }
 }

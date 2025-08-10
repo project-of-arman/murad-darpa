@@ -34,23 +34,12 @@ export interface Notice {
   file_name: string | null;
 }
 
-const mockNotices: Notice[] = [
-    {
-        id: 1,
-        title: 'প্রিটেস্ট পরিক্ষা শুরু । ',
-        date: '১ নভেম্বর ২০২৫',
-        description: 'দশম শ্রেণির প্রিটেস্ট পরিক্ষা শুরু হতে যাচ্ছে আগামী ১ নভেম্বর ২০২৫ তারিখ হতে। তাই সকল শিক্ষার্থীকে বাকী বেতন সহ স্কুলের ফি পরিশোধ করার জন্য জানানো যাচ্ছে।',
-        is_marquee: true,
-        file_name: null,
-    },
-];
-
 export async function getNotices(options: { is_marquee?: boolean } = {}): Promise<Notice[]> {
     const { is_marquee } = options;
 
     if (!pool) {
-        console.warn("Database not connected. Returning mock data for notices.");
-        return mockNotices.filter(n => (is_marquee ? n.is_marquee : true));
+        console.warn("Database not connected. Notices will be empty.");
+        return [];
     }
     
     try {
@@ -66,14 +55,14 @@ export async function getNotices(options: { is_marquee?: boolean } = {}): Promis
         return rows;
     } catch (error) {
         console.error('Failed to fetch notices:', error);
-        return mockNotices.filter(n => (is_marquee ? n.is_marquee : true));
+        return [];
     }
 }
 
 export async function getNoticeById(id: string): Promise<Notice | null> {
     if (!pool) {
-        console.warn("Database not connected. Returning mock data for notice.");
-        return mockNotices.find(n => n.id.toString() === id) || null;
+        console.warn("Database not connected. Notice will be null.");
+        return null;
     }
     try {
         const rows = await queryWithRetry<Notice[]>('SELECT id, title, date, description, is_marquee, file_name FROM notices WHERE id = ?', [id]);
@@ -119,12 +108,22 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
         }
         
         if (id) {
-            await pool.query('UPDATE notices SET ? WHERE id = ?', [fieldsToUpdate, id]);
+            // If updating and no new file is provided, we might want to keep the old one.
+            // This logic assumes we replace or clear. If we want to clear, we should set fields to NULL.
+            if (!fileBuffer) {
+                // If you want to allow clearing the file on update, you'd do:
+                // fieldsToUpdate.file_data = null;
+                // fieldsToUpdate.file_name = null;
+            }
+             await pool.query('UPDATE notices SET ? WHERE id = ?', [fieldsToUpdate, id]);
         } else {
-             const {file_data, file_name, ...restOfFields} = fieldsToUpdate;
+             // On insert, if there's no file, don't include those columns in the insert
              const query = 'INSERT INTO notices SET ?';
-             const dataToInsert = file_data ? fieldsToUpdate : restOfFields;
-            await pool.query(query, [dataToInsert]);
+             if (!fileBuffer) {
+                 delete fieldsToUpdate.file_data;
+                 delete fieldsToUpdate.file_name;
+             }
+            await pool.query(query, [fieldsToUpdate]);
         }
         
         revalidatePath('/admin/notices');

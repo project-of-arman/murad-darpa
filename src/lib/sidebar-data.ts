@@ -16,24 +16,10 @@ export interface SidebarWidget {
   sort_order: number;
 }
 
-const mockSidebarWidgets: SidebarWidget[] = [
-    {
-        id: 1,
-        widget_type: 'profile',
-        title: 'প্রধান শিক্ষক',
-        subtitle: 'মোঃ আব্দুল্লাহ',
-        image_url: 'https://placehold.co/280x380.png',
-        link_url: '/teachers/1',
-        link_text: 'বিস্তারিত দেখুন',
-        content: null,
-        sort_order: 1
-    }
-]
-
 export async function getSidebarWidgets(): Promise<SidebarWidget[]> {
     if (!pool) {
-        console.warn("Database not connected. Returning mock data for sidebar widgets.");
-        return mockSidebarWidgets;
+        console.warn("Database not connected. Sidebar widgets will be empty.");
+        return [];
     }
     try {
         const query = 'SELECT id, widget_type, title, subtitle, link_url, link_text, content, sort_order, IF(image_url IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image_url)), NULL) as image_url FROM sidebar_widgets ORDER BY sort_order ASC';
@@ -41,7 +27,7 @@ export async function getSidebarWidgets(): Promise<SidebarWidget[]> {
         return rows as SidebarWidget[];
     } catch (error) {
         console.error('Failed to fetch sidebar widgets:', error);
-        return mockSidebarWidgets;
+        return [];
     }
 }
 

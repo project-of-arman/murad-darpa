@@ -1,9 +1,11 @@
+
 "use client";
 
 import Link from 'next/link';
 import { GraduationCap, Facebook, Twitter, Youtube } from 'lucide-react';
 import { getSchoolInfo, SchoolInfo } from '@/lib/school-data';
 import { useEffect, useState } from 'react';
+import { Skeleton } from './ui/skeleton';
 
 export default function Footer() {
   const [schoolInfo, setSchoolInfo] = useState<SchoolInfo | null>(null);
@@ -20,6 +22,11 @@ export default function Footer() {
     return (
         <footer className="bg-white border-t">
             <div className="container mx-auto px-4 py-8">
+                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                    <Skeleton className="h-7 w-64" />
+                    <Skeleton className="h-5 w-80" />
+                    <Skeleton className="h-5 w-24" />
+                </div>
             </div>
         </footer>
     );

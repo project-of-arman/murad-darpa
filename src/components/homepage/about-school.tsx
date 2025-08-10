@@ -1,4 +1,6 @@
 
+"use client";
+
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +8,8 @@ import { BookOpen } from "lucide-react";
 import Link from "next/link";
 import { getAboutSchool, getSchoolFeatures, AboutSchoolInfo, SchoolFeature } from "@/lib/school-data";
 import * as LucideIcons from "lucide-react";
+import { useEffect, useState } from "react";
+import { Skeleton } from "../ui/skeleton";
 
 type IconName = keyof typeof LucideIcons;
 
@@ -60,14 +64,47 @@ function AboutSchoolContent({ aboutInfo, features }: { aboutInfo: AboutSchoolInf
   );
 }
 
+const AboutSchoolSkeleton = () => (
+    <div className="flex flex-col md:flex-row gap-12 items-center">
+        <div className="w-full md:w-5/12 relative">
+             <Skeleton className="h-[500px] w-full rounded-lg" />
+        </div>
+        <div className="w-full md:w-7/12 space-y-4">
+            <Skeleton className="h-10 w-3/4" />
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-2/3" />
+            <div className="space-y-4 pt-4">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+            </div>
+             <Skeleton className="h-10 w-32" />
+        </div>
+    </div>
+)
 
-export default async function AboutSchool() {
-  const aboutInfo = await getAboutSchool();
-  const features = await getSchoolFeatures();
+
+export default function AboutSchool() {
+  const [aboutInfo, setAboutInfo] = useState<AboutSchoolInfo | null>(null);
+  const [features, setFeatures] = useState<SchoolFeature[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      const [about, f] = await Promise.all([getAboutSchool(), getSchoolFeatures()]);
+      setAboutInfo(about);
+      setFeatures(f);
+      setLoading(false);
+    }
+    fetchData();
+  }, []);
+  
   return (
     <div className="bg-white py-12 sm:py-16 lg:py-20">
       <div className="container mx-auto px-4">
-        <AboutSchoolContent aboutInfo={aboutInfo} features={features} />
+        {loading ? <AboutSchoolSkeleton /> : (aboutInfo && <AboutSchoolContent aboutInfo={aboutInfo} features={features} />)}
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 
+
 import Footer from '@/components/footer';
 import HeroCarousel from '@/components/homepage/hero-carousel';
 import SecondaryNav from '@/components/homepage/secondary-nav';
@@ -21,7 +22,7 @@ export default async function SiteLayout({
     <div className="relative flex min-h-screen flex-col">
         <HeroCarousel />
         {schoolInfo && <SiteHeaderClientWrapper schoolInfo={schoolInfo} marqueeNotices={marqueeNotices} />}
-        <SecondaryNav schoolName={schoolInfo.name} />
+        <SecondaryNav schoolName={schoolInfo?.name || 'School Name'} />
         <main className="flex-1">
             <div className="container mx-auto py-12 sm:py-16 lg:py-20 ">
                 <div className="grid grid-cols-10 gap-8"> 

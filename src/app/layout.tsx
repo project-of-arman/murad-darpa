@@ -1,6 +1,6 @@
+
 "use client";
 
-import type { Metadata, IconDescriptor } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { getSiteSettings } from '@/lib/settings-data';
@@ -17,19 +17,21 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [siteTitle, setSiteTitle] = useState('মুরাদদর্প নারায়নপুর নিম্ন মাধ্যমিক বিদ্যালয়');
+  const [siteTitle, setSiteTitle] = useState('School Website');
   const [favicon, setFavicon] = useState('/favicon.ico');
 
   useEffect(() => {
     async function fetchSettings() {
       try {
         const settings = await getSiteSettings();
-        if (settings.site_title) {
-          setSiteTitle(settings.site_title);
-          document.title = settings.site_title;
-        }
-        if (settings.favicon_url && typeof settings.favicon_url === 'string') {
-          setFavicon(settings.favicon_url);
+        if (settings) {
+            if (settings.site_title) {
+              setSiteTitle(settings.site_title);
+              document.title = settings.site_title;
+            }
+            if (settings.favicon_url && typeof settings.favicon_url === 'string') {
+              setFavicon(settings.favicon_url);
+            }
         }
       } catch (error) {
         console.error("Failed to fetch site settings, using defaults.", error);
