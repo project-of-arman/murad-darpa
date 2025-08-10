@@ -11,22 +11,21 @@ export default async function AdminSchoolDetailsPage() {
     getSchoolFeatures()
   ]);
 
-  if (!aboutInfoData) {
-    return (
-        <Card>
-            <CardHeader><CardTitle>স্কুল সম্পর্কে তথ্য</CardTitle></CardHeader>
-            <CardContent><p>No school information found in the database. Please add it first.</p></CardContent>
-        </Card>
-    );
-  }
-
-  // Convert buffer to data URL before passing to client component
-  const aboutInfo = {
-      ...aboutInfoData,
-      image_url: aboutInfoData.image_url && Buffer.isBuffer(aboutInfoData.image_url)
-        ? toDataURL(aboutInfoData.image_url) 
-        : aboutInfoData.image_url || ''
-  }
+  // If aboutInfoData is null, create a default object to pass to the form
+  // This allows creating the information for the first time.
+  const aboutInfo = aboutInfoData 
+    ? {
+        ...aboutInfoData,
+        image_url: aboutInfoData.image_url && Buffer.isBuffer(aboutInfoData.image_url)
+          ? toDataURL(aboutInfoData.image_url) 
+          : aboutInfoData.image_url || ''
+      }
+    : {
+        id: 0, // Placeholder ID
+        title: "",
+        description: "",
+        image_url: ""
+    };
 
   return (
     <div className="space-y-8">
