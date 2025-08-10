@@ -12,40 +12,35 @@ export interface Syllabus extends RowDataPacket {
   file_url: string | null;
 }
 
-const mockSyllabuses: Syllabus[] = [
-  { id: 1, class_name: '১০ম শ্রেণী', subject: 'বাংলা ১ম পত্র', file_url: '#' },
-  { id: 2, class_name: '১০ম শ্রেণী', subject: 'গণিত', file_url: '#' },
-];
-
 export async function getSyllabuses(): Promise<Syllabus[]> {
   if (!pool) {
-    console.warn("Database not connected. Returning mock data for syllabuses.");
-    return mockSyllabuses as Syllabus[];
+    console.error("Database not connected.");
+    return [];
   }
   try {
     const [rows] = await pool.query('SELECT * FROM syllabuses ORDER BY class_name, subject');
     return rows as Syllabus[];
   } catch (error: any) {
     if (error.code === 'ER_NO_SUCH_TABLE') {
-        console.warn("`syllabuses` table not found. Returning mock data.");
-        return mockSyllabuses as Syllabus[];
+        console.warn("`syllabuses` table not found. Returning empty array.");
+        return [];
     }
-    console.error('Failed to fetch syllabuses, returning mock data:', error);
-    return mockSyllabuses as Syllabus[];
+    console.error('Failed to fetch syllabuses:', error);
+    return [];
   }
 }
 
 export async function getSyllabusById(id: string | number): Promise<Syllabus | null> {
     if (!pool) {
-        console.warn("Database not connected. Returning mock data for a syllabus.");
-        return mockSyllabuses.find(r => r.id.toString() === id.toString()) || null;
+        console.error("Database not connected.");
+        return null;
     }
     try {
         const [rows] = await pool.query<Syllabus[]>('SELECT * FROM syllabuses WHERE id = ?', [id]);
         return rows[0] || null;
     } catch (error) {
-        console.error(`Failed to fetch syllabus by id ${id}, returning mock data:`, error);
-        return mockSyllabuses.find(r => r.id.toString() === id.toString()) || null;
+        console.error(`Failed to fetch syllabus by id ${id}:`, error);
+        return null;
     }
 }
 

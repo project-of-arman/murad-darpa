@@ -6,13 +6,14 @@ import LoginPage from './login/page';
 import { SidebarProvider, Sidebar } from '@/components/ui/sidebar';
 import AdminSidebarNav from '@/components/admin/sidebar-nav';
 import AdminHeader from '@/components/admin/header';
-import { hasAdminAccount, login, getLoggedInUser, AdminAccount } from '@/lib/actions/auth-actions';
+import { hasAdminAccount, getLoggedInUser, createAdmin } from '@/lib/actions/auth-actions';
 import { useRouter } from 'next/navigation';
 import AdminSetupPage from './setup/page';
 import LogoLoader from '@/components/admin/logo-loader';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { setUser, selectUser, selectRole, clearUser } from '@/lib/redux/slices/user-slice';
 import NextNProgress from 'nextjs-progressbar';
+import { login } from '@/lib/actions/auth-actions';
 
 function AdminLayoutContainer({ children }: { children: ReactNode }) {
   const dispatch = useAppDispatch();

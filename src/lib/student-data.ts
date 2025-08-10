@@ -81,29 +81,23 @@ export interface StudentForAdmin {
     data_ai_hint: string | null;
 }
 
-const mockStudents: Student[] = [
-  { id: 1, roll: '101', name: "আরিফ হোসেন", class_name: "১০ম", gender: "ছেলে", year: 2024, image: "https://placehold.co/300x400.png", data_ai_hint: "male student portrait" },
-  { id: 2, roll: '102', name: "সুমি আক্তার", class_name: "১০ম", gender: "মেয়ে", year: 2024, image: "https://placehold.co/300x400.png", data_ai_hint: "female student portrait" },
-  { id: 3, roll: '201', name: "জাহিদ হাসান", class_name: "৯ম", gender: "ছেলে", year: 2024, image: "https://placehold.co/300x400.png", data_ai_hint: "male student portrait" },
-];
-
 export async function getStudents(): Promise<Student[]> {
     if (!pool) {
-        console.warn("Database not connected. Returning mock data for students.");
-        return mockStudents;
+        console.error("Database not connected.");
+        return [];
     }
     try {
         const [rows] = await pool.query('SELECT id, roll, name_bn as name, class_name, gender, year, IF(image IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image)), NULL) as image, data_ai_hint FROM students ORDER BY year DESC, class_name, roll ASC');
         return rows as Student[];
     } catch (error) {
-        console.error('Failed to fetch students, returning mock data:', error);
-        return mockStudents;
+        console.error('Failed to fetch students:', error);
+        return [];
     }
 }
 
 export async function getAllStudentsForAdmin(): Promise<StudentForAdmin[]> {
     if (!pool) {
-        console.warn("Database not connected. Cannot fetch full student data.");
+        console.error("Database not connected.");
         return [];
     }
      try {
@@ -130,8 +124,8 @@ export async function getStudentForAdmin(id: string | number): Promise<StudentFo
 
 export async function getStudentByRoll(roll: string): Promise<Student | null> {
     if (!pool) {
-        console.warn("Database not connected. Returning mock data for a student.");
-        return mockStudents.find(s => s.roll === roll) || null;
+        console.error("Database not connected.");
+        return null;
     }
     try {
         const [rows] = await pool.query(`
@@ -152,8 +146,8 @@ export async function getStudentByRoll(roll: string): Promise<Student | null> {
         const students = rows as Student[];
         return students[0] || null;
     } catch (error) {
-        console.error(`Failed to fetch student by roll ${roll}, returning mock data:`, error);
-        return mockStudents.find(s => s.roll === roll) || null;
+        console.error(`Failed to fetch student by roll ${roll}:`, error);
+        return null;
     }
 }
 
@@ -245,5 +239,3 @@ export async function deleteStudent(id: number): Promise<SaveResult> {
     return { success: false, error: "একটি সার্ভার ত্রুটি হয়েছে।" };
   }
 }
-
-    

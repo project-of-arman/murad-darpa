@@ -36,21 +36,13 @@ export interface Notice {
 
 const mockNotices: Notice[] = [
     {
-    id: 1,
-    title: "ভর্তি পরীক্ষার ফলাফল প্রকাশ",
-    date: "۲۰ জুলাই, ২০২৪",
-    description: "২০২৪-২৫ শিক্ষাবর্ষের ভর্তি পরীক্ষার ফলাফল প্রকাশিত হয়েছে। উত্তীর্ণ শিক্ষার্থীদের তালিকা এবং ভর্তির পরবর্তী নির্দেশনা জানতে পারবেন συνημμένο ফাইল থেকে।",
-    is_marquee: true,
-    file_name: "result.pdf"
-  },
-  {
-    id: 2,
-    title: "বার্ষিক ক্রীড়া প্রতিযোগিতার সময়সূচী",
-    date: "১৮ জুলাই, ২০২৪",
-    description: "প্রতিষ্ঠানের বার্ষিক ক্রীড়া প্রতিযোগিতা আগামী ২৫শে জুলাই অনুষ্ঠিত হবে। বিস্তারিত সময়সূচী জানতে পারবেন συνημμένο ফাইল থেকে।",
-    file_name: "sports-schedule.pdf"
-  },
-  // ... other notices
+        id: 1,
+        title: 'প্রিটেস্ট পরিক্ষা শুরু । ',
+        date: '১ নভেম্বর ২০২৫',
+        description: 'দশম শ্রেণির প্রিটেস্ট পরিক্ষা শুরু হতে যাচ্ছে আগামী ১ নভেম্বর ২০২৫ তারিখ হতে। তাই সকল শিক্ষার্থীকে বাকী বেতন সহ স্কুলের ফি পরিশোধ করার জন্য জানানো যাচ্ছে।',
+        is_marquee: true,
+        file_name: null,
+    },
 ];
 
 export async function getNotices(options: { is_marquee?: boolean } = {}): Promise<Notice[]> {
@@ -58,7 +50,7 @@ export async function getNotices(options: { is_marquee?: boolean } = {}): Promis
 
     if (!pool) {
         console.warn("Database not connected. Returning mock data for notices.");
-        return is_marquee ? mockNotices.filter(n => n.is_marquee) : mockNotices;
+        return mockNotices.filter(n => (is_marquee ? n.is_marquee : true));
     }
     
     try {
@@ -73,8 +65,8 @@ export async function getNotices(options: { is_marquee?: boolean } = {}): Promis
         const rows = await queryWithRetry<Notice[]>(query, params);
         return rows;
     } catch (error) {
-        console.error('Failed to fetch notices, returning mock data:', error);
-        return is_marquee ? mockNotices.filter(n => n.is_marquee) : mockNotices;
+        console.error('Failed to fetch notices:', error);
+        return mockNotices.filter(n => (is_marquee ? n.is_marquee : true));
     }
 }
 
@@ -87,8 +79,8 @@ export async function getNoticeById(id: string): Promise<Notice | null> {
         const rows = await queryWithRetry<Notice[]>('SELECT id, title, date, description, is_marquee, file_name FROM notices WHERE id = ?', [id]);
         return rows[0] || null;
     } catch (error) {
-        console.error(`Failed to fetch notice by id ${id}, returning mock data:`, error);
-        return mockNotices.find(n => n.id.toString() === id) || null;
+        console.error(`Failed to fetch notice by id ${id}:`, error);
+        return null;
     }
 }
 
@@ -129,7 +121,10 @@ export async function saveNotice(formData: FormData, id?: number): Promise<SaveR
         if (id) {
             await pool.query('UPDATE notices SET ? WHERE id = ?', [fieldsToUpdate, id]);
         } else {
-            await pool.query('INSERT INTO notices SET ?', [fieldsToUpdate]);
+             const {file_data, file_name, ...restOfFields} = fieldsToUpdate;
+             const query = 'INSERT INTO notices SET ?';
+             const dataToInsert = file_data ? fieldsToUpdate : restOfFields;
+            await pool.query(query, [dataToInsert]);
         }
         
         revalidatePath('/admin/notices');

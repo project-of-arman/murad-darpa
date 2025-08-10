@@ -12,24 +12,17 @@ export interface GalleryImage {
     sort_order: number;
 }
 
-const mockImages: GalleryImage[] = [
-  { id: 1, title: 'Classroom', image_url: "https://placehold.co/600x400.png", data_ai_hint: "classroom students", sort_order: 1 },
-  { id: 2, title: 'School library', image_url: "https://placehold.co/600x400.png", data_ai_hint: "school library", sort_order: 2 },
-  { id: 3, title: 'Science lab', image_url: "https://placehold.co/600x400.png", data_ai_hint: "science lab", sort_order: 3 },
-  { id: 4, title: 'Playground', image_url: "https://placehold.co/600x400.png", data_ai_hint: "school playground", sort_order: 4 },
-];
-
 export async function getGalleryImages(): Promise<GalleryImage[]> {
     if (!pool) {
-        console.warn("Database not connected. Returning mock data for gallery images.");
-        return mockImages;
+        console.error("Database not connected.");
+        return [];
     }
     try {
         const [rows] = await pool.query('SELECT id, title, data_ai_hint, sort_order, IF(image_url IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image_url)), NULL) as image_url FROM gallery_images ORDER BY sort_order ASC');
         return rows as GalleryImage[];
     } catch (error) {
-        console.error('Failed to fetch gallery images, returning mock data:', error);
-        return mockImages;
+        console.error('Failed to fetch gallery images:', error);
+        return [];
     }
 }
 

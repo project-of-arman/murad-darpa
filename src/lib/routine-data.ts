@@ -16,16 +16,10 @@ export interface Routine extends RowDataPacket {
   teacher_name: string;
 }
 
-const mockRoutines: Routine[] = [
-  // This is just for fallback if DB is not connected
-  { id: 1, class_name: '১০ম শ্রেণী', day_of_week: 'রবিবার', period: 1, start_time: '09:00', end_time: '09:40', subject: 'বাংলা ১ম পত্র', teacher_name: 'আয়েশা সিদ্দিকা' },
-  { id: 2, class_name: '১০ম শ্রেণী', day_of_week: 'রবিবার', period: 2, start_time: '09:40', end_time: '10:20', subject: 'ইংরেজি ১ম পত্র', teacher_name: 'কামরুল হাসান' },
-];
-
 export async function getRoutines(): Promise<Routine[]> {
   if (!pool) {
-    console.warn("Database not connected. Returning mock data for routines.");
-    return mockRoutines as Routine[];
+    console.error("Database not connected.");
+    return [];
   }
   try {
     const [rows] = await pool.query<Routine[]>('SELECT * FROM routines');
@@ -46,22 +40,22 @@ export async function getRoutines(): Promise<Routine[]> {
 
     return rows;
   } catch (error) {
-    console.error('Failed to fetch routines, returning mock data:', error);
-    return mockRoutines as Routine[];
+    console.error('Failed to fetch routines:', error);
+    return [];
   }
 }
 
 export async function getRoutineById(id: string | number): Promise<Routine | null> {
     if (!pool) {
-        console.warn("Database not connected. Returning mock data for a routine.");
-        return mockRoutines.find(r => r.id.toString() === id.toString()) || null;
+      console.error("Database not connected.");
+      return null;
     }
     try {
         const [rows] = await pool.query<Routine[]>('SELECT * FROM routines WHERE id = ?', [id]);
         return rows[0] || null;
     } catch (error) {
-        console.error(`Failed to fetch routine by id ${id}, returning mock data:`, error);
-        return mockRoutines.find(r => r.id.toString() === id.toString()) || null;
+        console.error(`Failed to fetch routine by id ${id}:`, error);
+        return null;
     }
 }
 

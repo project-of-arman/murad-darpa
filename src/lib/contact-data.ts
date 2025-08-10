@@ -26,28 +26,21 @@ export interface ContactSubmission extends RowDataPacket {
 
 type SaveResult = { success: boolean; error?: string };
 
-// ========= MOCK DATA (for fallback) =========
-const mockContactInfo: ContactInfo = {
-  id: 1,
-  school_name: 'মুরাদদর্প নারায়নপুর নিম্ন মাধ্যমিক বিদ্যালয়',
-  address: '১ নং রোড, ব্লক এ, মিরপুর, ঢাকা-১২১৬',
-  phone: '+৮৮০ ১২৩৪ ৫৬৭৮৯০',
-  email: 'info@shikkhaangan.edu',
-  map_embed_url: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3650.0950338381005!2d90.36399991544456!3d23.81513519228574!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c1e6c38a79ef%3A0x28637993b8f683f2!2sMirpur%2C%20Dhaka!5e0!3m2!1sen!2sbd!4v1675868516053!5m2!1sen!2sbd'
-};
-
 // ========= DATABASE ACTIONS =========
 
 // --- Contact Info Actions ---
 
-export async function getContactInfo(): Promise<ContactInfo> {
-  if (!pool) return mockContactInfo;
+export async function getContactInfo(): Promise<ContactInfo | null> {
+  if (!pool) {
+    console.error("Database not connected.");
+    return null;
+  }
   try {
     const [rows] = await pool.query<ContactInfo[]>('SELECT * FROM contact_info LIMIT 1');
-    return rows[0] || mockContactInfo;
+    return rows[0] || null;
   } catch (error) {
     console.error('Failed to fetch contact info:', error);
-    return mockContactInfo;
+    return null;
   }
 }
 

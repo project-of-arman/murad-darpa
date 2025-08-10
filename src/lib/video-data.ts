@@ -14,54 +14,25 @@ export interface Video {
   dataAiHint: string;
 }
 
-const mockVideos: Video[] = [
-  {
-    id: "1",
-    title: "বার্ষিক সাংস্কৃতিক অনুষ্ঠান",
-    thumbnail: "https://placehold.co/600x400.png",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    description: "আমাদের প্রতিষ্ঠানের বার্ষিক সাংস্কৃতিক অনুষ্ঠানের মনোমুগ্ধকর কিছু মুহূর্ত।",
-    dataAiHint: "school event"
-  },
-  {
-    id: "2",
-    title: "স্বাধীনতা দিবস উদযাপন",
-    thumbnail: "https://placehold.co/600x400.png",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    description: "মহান স্বাধীনতা দিবস উপলক্ষে আয়োজিত বিশেষ অনুষ্ঠানের কিছু অংশ।",
-    dataAiHint: "independence day"
-  },
-  {
-    id: "3",
-    title: "বৃক্ষরোপণ কর্মসূচি",
-    thumbnail: "https://placehold.co/600x400.png",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    description: "পরিবেশ রক্ষায় আমাদের শিক্ষার্থীদের স্বতঃস্ফূর্ত অংশগ্রহণ।",
-    dataAiHint: "tree plantation"
-  },
-];
-
-
 export async function getVideos(): Promise<Video[]> {
     if (!pool) {
-        console.warn("Database not connected. Returning mock data for videos.");
-        return mockVideos;
+        console.error("Database not connected.");
+        return [];
     }
     try {
         const query = 'SELECT id, title, description, videoUrl, dataAiHint, IF(thumbnail IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(thumbnail)), NULL) as thumbnail FROM videos ORDER BY id ASC';
         const rows = await queryWithRetry<Video[]>(query);
         return rows as Video[];
     } catch (error) {
-        console.error('Failed to fetch videos, returning mock data:', error);
-        return mockVideos;
+        console.error('Failed to fetch videos:', error);
+        return [];
     }
 }
 
 export async function getVideoById(id: string): Promise<Video | null> {
     if (!pool) {
-        console.warn("Database not connected. Returning mock data for video.");
-        const video = mockVideos.find(v => v.id === id) || null;
-        return video;
+        console.error("Database not connected.");
+        return null;
     }
     try {
         const rows = await queryWithRetry<Video[]>('SELECT * FROM videos WHERE id = ?', [id]);
@@ -79,9 +50,8 @@ export async function getVideoById(id: string): Promise<Video | null> {
         
         return video;
     } catch (error) {
-        console.error(`Failed to fetch video by id ${id}, returning mock data:`, error);
-        const video = mockVideos.find(v => v.id === id) || null;
-        return video;
+        console.error(`Failed to fetch video by id ${id}:`, error);
+        return null;
     }
 }
 

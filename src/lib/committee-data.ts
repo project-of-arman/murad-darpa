@@ -14,18 +14,6 @@ export interface CommitteeMember {
     sort_order: number;
 }
 
-const mockCommitteeMembers: CommitteeMember[] = [
-  {
-    id: 1,
-    name: "প্রফেসর ড. মোঃ আখতারুজ্জামান",
-    role: "সভাপতি",
-    image: "https://placehold.co/300x400.png",
-    dataAiHint: "male portrait",
-    sort_order: 1,
-  },
-  // ... other mock members
-];
-
 /*
 SQL for table `committee_members`:
 
@@ -47,8 +35,8 @@ ALTER TABLE `committee_members` MODIFY COLUMN `image` LONGBLOB;
 
 export async function getCommitteeMembers(): Promise<CommitteeMember[]> {
     if (!pool) {
-        console.warn("Database not connected. Returning mock data for committee members.");
-        return mockCommitteeMembers;
+        console.error("Database not connected.");
+        return [];
     }
     try {
         const [rows] = await pool.query<CommitteeMember[]>('SELECT * FROM committee_members ORDER BY sort_order ASC');
@@ -57,8 +45,8 @@ export async function getCommitteeMembers(): Promise<CommitteeMember[]> {
             image: row.image ? toDataURL(row.image as Buffer) : ''
         }));
     } catch (error) {
-        console.error('Failed to fetch committee members, returning mock data:', error);
-        return mockCommitteeMembers;
+        console.error('Failed to fetch committee members:', error);
+        return [];
     }
 }
 
@@ -147,4 +135,3 @@ export async function deleteCommitteeMember(id: number): Promise<SaveResult> {
         return { success: false, error: "একটি সার্ভার ত্রুটি হয়েছে।" };
     }
 }
-

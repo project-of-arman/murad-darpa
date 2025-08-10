@@ -15,26 +15,21 @@ export interface ExamRoutine extends RowDataPacket {
   end_time: string; // Stored as TIME, retrieved as string
 }
 
-const mockRoutines: ExamRoutine[] = [
-  { id: 1, class_name: '১০ম শ্রেণী', exam_name: 'বার্ষিক পরীক্ষা', subject: 'বাংলা ১ম পত্র', exam_date: '2024-12-10', start_time: '10:00:00', end_time: '13:00:00' },
-  { id: 2, class_name: '১০ম শ্রেণী', exam_name: 'বার্ষিক পরীক্ষা', subject: 'ইংরেজি ১ম পত্র', exam_date: '2024-12-12', start_time: '10:00:00', end_time: '13:00:00' },
-];
-
 export async function getExamRoutines(): Promise<ExamRoutine[]> {
   if (!pool) {
-    console.warn("Database not connected. Returning mock data for exam routines.");
-    return mockRoutines;
+    console.error("Database not connected.");
+    return [];
   }
   try {
     const [rows] = await pool.query('SELECT * FROM exam_routines ORDER BY exam_date, start_time');
     return rows as ExamRoutine[];
   } catch (error: any) {
     if (error.code === 'ER_NO_SUCH_TABLE') {
-        console.warn('`exam_routines` table not found. Returning mock data.');
-        return mockRoutines;
+        console.warn('`exam_routines` table not found. Returning empty array.');
+        return [];
     }
-    console.error('Failed to fetch exam routines, returning mock data:', error);
-    return mockRoutines;
+    console.error('Failed to fetch exam routines:', error);
+    return [];
   }
 }
 

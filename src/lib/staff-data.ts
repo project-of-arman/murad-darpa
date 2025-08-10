@@ -36,47 +36,24 @@ export interface Staff {
   data_ai_hint: string;
 }
 
-const mockStaff: Staff[] = [
-    {
-      id: 1,
-      name: "মোঃ রফিকুল ইসলাম",
-      role: "হিসাবরক্ষক",
-      image: "https://placehold.co/300x400.png",
-      address: "ঢাকা, বাংলাদেশ",
-      phone: "01712345678",
-      email: "rafiqul@example.com",
-      data_ai_hint: "male staff portrait"
-    },
-    {
-      id: 2,
-      name: "আকলিমা খাতুন",
-      role: "অফিস সহকারী",
-      image: "https://placehold.co/300x400.png",
-      address: "ঢাকা, বাংলাদেশ",
-      phone: "01812345678",
-      email: "aklima@example.com",
-      data_ai_hint: "female staff portrait"
-    }
-  ];
-
 export async function getStaff(): Promise<Staff[]> {
     if (!pool) {
-        console.warn("Database not connected. Returning mock data.");
-        return mockStaff;
+        console.error("Database not connected.");
+        return [];
     }
     try {
         const [rows] = await pool.query('SELECT *, IF(image IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image)), NULL) as image FROM staff');
         return rows as Staff[];
     } catch (error) {
-        console.error('Failed to fetch staff, returning mock data:', error);
-        return mockStaff;
+        console.error('Failed to fetch staff:', error);
+        return [];
     }
 }
 
 export async function getStaffById(id: number): Promise<Staff | null> {
     if (!pool) {
-        console.warn("Database not connected. Returning mock data.");
-        return mockStaff.find(t => t.id === id) || null;
+        console.error("Database not connected.");
+        return null;
     }
     try {
         const [rows] = await pool.query('SELECT *, IF(image IS NOT NULL, CONCAT("data:image/png;base64,", TO_BASE64(image)), NULL) as image FROM staff WHERE id = ?', [id]);
@@ -84,7 +61,7 @@ export async function getStaffById(id: number): Promise<Staff | null> {
         return staff[0] || null;
     } catch (error) {
         console.error(`Failed to fetch staff by id ${id}:`, error);
-        return mockStaff.find(t => t.id === id) || null;
+        return null;
     }
 }
 
