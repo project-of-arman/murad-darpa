@@ -14,6 +14,7 @@ export interface AdminAccount extends RowDataPacket {
   email: string;
   phone: string;
   role: 'admin' | 'moderator' | 'visitor';
+  created_at: string; // Ensure it's a string
 }
 
 const userFormSchema = z.object({
@@ -51,6 +52,15 @@ ADD COLUMN `role` ENUM('admin', 'moderator', 'visitor') NOT NULL DEFAULT 'visito
 
 */
 
+// Helper to make user object serializable
+function makeUserSerializable(user: any): AdminAccount {
+    if (user && user.created_at instanceof Date) {
+        user.created_at = user.created_at.toISOString();
+    }
+    return user;
+}
+
+
 export async function hasAdminAccount(): Promise<boolean> {
     if (!pool) return false;
     try {
@@ -68,8 +78,9 @@ export async function hasAdminAccount(): Promise<boolean> {
 export async function getAdminAccount(): Promise<AdminAccount | null> {
     if (!pool) return null;
     try {
-        const [rows] = await pool.query<AdminAccount[]>(`SELECT id, username, email, phone, role FROM admin_users WHERE role = 'admin' LIMIT 1`);
-        return rows[0] || null;
+        const [rows] = await pool.query<AdminAccount[]>(`SELECT id, username, email, phone, role, created_at FROM admin_users WHERE role = 'admin' LIMIT 1`);
+        const user = rows[0] || null;
+        return user ? makeUserSerializable(user) : null;
     } catch (error) {
         console.error("Failed to get admin account:", error);
         return null;
@@ -81,10 +92,11 @@ export async function getLoggedInUser(identifier: string): Promise<AdminAccount 
 
     try {
         const [rows] = await pool.query<AdminAccount[]>(
-            `SELECT id, username, email, phone, role FROM admin_users WHERE username = ? OR email = ? OR phone = ?`, 
+            `SELECT id, username, email, phone, role, created_at FROM admin_users WHERE username = ? OR email = ? OR phone = ?`, 
             [identifier, identifier, identifier]
         );
-        return rows[0] || null;
+        const user = rows[0] || null;
+        return user ? makeUserSerializable(user) : null;
     } catch(e) {
         console.error("Failed to get logged in user", e);
         return null;
@@ -95,8 +107,8 @@ export async function getLoggedInUser(identifier: string): Promise<AdminAccount 
 export async function getAllUsers(): Promise<AdminAccount[]> {
     if (!pool) return [];
     try {
-        const [rows] = await pool.query<AdminAccount[]>(`SELECT id, username, email, phone, role FROM admin_users ORDER BY username ASC`);
-        return rows;
+        const [rows] = await pool.query<AdminAccount[]>(`SELECT id, username, email, phone, role, created_at FROM admin_users ORDER BY username ASC`);
+        return rows.map(makeUserSerializable);
     } catch (error) {
         console.error("Failed to get all users:", error);
         return [];
@@ -107,7 +119,8 @@ export async function getUserById(id: number | string): Promise<AdminAccount | n
     if (!pool) return null;
     try {
         const [rows] = await pool.query<AdminAccount[]>(`SELECT * FROM admin_users WHERE id = ?`, [id]);
-        return rows[0] || null;
+        const user = rows[0] || null;
+        return user ? makeUserSerializable(user) : null;
     } catch (error) {
         console.error(`Failed to get user by id ${id}:`, error);
         return null;
