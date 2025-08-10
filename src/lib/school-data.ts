@@ -127,7 +127,6 @@ export async function deleteCarouselItem(id: number): Promise<SaveResult> {
 // ========= SCHOOL INFO ACTIONS =========
 export async function getSchoolInfo(): Promise<SchoolInfo | null> {
   if (!pool) {
-    console.warn("Database not connected. School info will be null.");
     return null;
   }
   try {
@@ -144,7 +143,6 @@ export async function getSchoolInfo(): Promise<SchoolInfo | null> {
 // ========= ABOUT SCHOOL ACTIONS =========
 export async function getAboutSchool(): Promise<AboutSchoolInfo | null> {
   if (!pool) {
-    console.warn("Database not connected. About school info will be null.");
     return null;
   }
   try {
@@ -168,6 +166,7 @@ export async function saveAboutSchool(formData: FormData): Promise<SaveResult> {
         const imageBuffer = data.image && data.image.size > 0 ? Buffer.from(await data.image.arrayBuffer()) : null;
 
         const fieldsToUpdate: any = { 
+            id: 1, // Always operate on the single row with id=1
             title: data.title, 
             description: data.description 
         };
@@ -176,7 +175,17 @@ export async function saveAboutSchool(formData: FormData): Promise<SaveResult> {
             fieldsToUpdate.image_url = imageBuffer;
         }
         
-        await pool.query('UPDATE about_school SET ? WHERE id = 1', [fieldsToUpdate]);
+        // Use INSERT ... ON DUPLICATE KEY UPDATE to handle both create and update
+        const query = `
+            INSERT INTO about_school (id, title, description, image_url) 
+            VALUES (1, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE 
+            title = VALUES(title), 
+            description = VALUES(description),
+            image_url = IF(VALUES(image_url) IS NOT NULL, VALUES(image_url), image_url);
+        `;
+        
+        await pool.query(query, [fieldsToUpdate.title, fieldsToUpdate.description, fieldsToUpdate.image_url]);
 
         revalidatePath('/admin/school-details');
         revalidatePath('/(site)/');
