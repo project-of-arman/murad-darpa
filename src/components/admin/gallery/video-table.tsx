@@ -82,7 +82,7 @@ export default function VideoTable({ videos }: { videos: Video[] }) {
       setSelectedVideo(null);
     }
   };
-
+console.log('video.id',paginatedVideos)
   return (
     <>
       <div className="mb-4">
