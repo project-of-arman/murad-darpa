@@ -7,6 +7,7 @@ import { getSiteSettings } from '@/lib/settings-data';
 import NextNProgress from 'nextjs-progressbar';
 import { useEffect, useState } from 'react';
 import StoreProvider from '@/lib/redux/StoreProvider';
+import { Analytics } from "@vercel/analytics/next"
 
 // We can't use generateMetadata in a client component, so we manage the title dynamically.
 // SEO-critical metadata should be handled in a parent Server Component layout if possible,
@@ -54,6 +55,7 @@ export default function RootLayout({
             {children}
             <Toaster />
           </StoreProvider>
+          <Analytics />
       </body>
     </html>
   );
