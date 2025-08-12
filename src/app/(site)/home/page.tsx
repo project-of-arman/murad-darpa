@@ -4,13 +4,21 @@ import TeachersCarousel from '@/components/homepage/teachers-carousel';
 import VideoGallery from '@/components/homepage/video-gallery';
 import ImportantLinks from '@/components/homepage/important-links';
 import ImageGallery from '@/components/school-details/image-gallery';
+import { getAboutSchool, getSchoolFeatures } from '@/lib/school-data';
+import { getTeachers } from '@/lib/teacher-data';
 
 
-export default function Home() {
+export default async function Home() {
+    const [aboutInfo, features, teachers] = await Promise.all([
+        getAboutSchool(),
+        getSchoolFeatures(),
+        getTeachers(),
+    ]);
+
   return (
     <div className="space-y-12">
         <NoticeBoard />
-        <AboutSchool />
+        <AboutSchool aboutInfo={aboutInfo} features={features} />
         <div className="bg-white py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto px-4">
             <ImportantLinks />
@@ -18,7 +26,7 @@ export default function Home() {
         </div>
         <div className="bg-white py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto px-4">
-            <TeachersCarousel />
+            <TeachersCarousel teachers={teachers} />
         </div>
         </div>
         <div className="bg-white py-12 sm:py-16 lg:py-20">

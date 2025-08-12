@@ -39,7 +39,9 @@ export default function CarouselClient({ schoolInfo, carouselItems: initialItems
     }, 5000); // Autoplay every 5 seconds
 
     api.on("select", () => {
-      setCurrent(api.selectedScrollSnap());
+      if (api.selectedScrollSnap) {
+        setCurrent(api.selectedScrollSnap());
+      }
     });
     
     return () => clearInterval(interval);

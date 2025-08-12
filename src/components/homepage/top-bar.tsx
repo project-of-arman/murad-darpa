@@ -1,10 +1,10 @@
 
-"use client";
+"use client"
 
 import { useState, useEffect } from 'react';
 import type { SchoolInfo } from '@/lib/school-data';
 
-export default function TopBar({ schoolInfo }: { schoolInfo: SchoolInfo }) {
+export default function TopBar({ schoolInfo }: { schoolInfo: SchoolInfo | null }) {
     const [currentDate, setCurrentDate] = useState('');
 
     useEffect(() => {
@@ -17,6 +17,16 @@ export default function TopBar({ schoolInfo }: { schoolInfo: SchoolInfo }) {
         // This will only run on the client, preventing hydration mismatches.
         setCurrentDate(new Date().toLocaleDateString('bn-BD', dateOptions));
     }, []);
+    
+    if (!schoolInfo) {
+      return (
+          <div className="bg-primary/10 text-primary text-sm py-2">
+              <div className="container mx-auto px-4 flex justify-between items-center h-[36px]">
+                  {/* Skeleton or empty state */}
+              </div>
+          </div>
+      );
+    }
 
     return (
         <div className="bg-primary/10 text-primary text-sm py-2">

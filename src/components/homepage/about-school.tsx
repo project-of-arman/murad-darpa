@@ -1,14 +1,11 @@
 
-"use client";
-
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
-import { getAboutSchool, getSchoolFeatures, AboutSchoolInfo, SchoolFeature } from "@/lib/school-data";
+import { AboutSchoolInfo, SchoolFeature } from "@/lib/school-data";
 import * as LucideIcons from "lucide-react";
-import { useEffect, useState } from "react";
 import { Skeleton } from "../ui/skeleton";
 
 type IconName = keyof typeof LucideIcons;
@@ -21,48 +18,6 @@ const IconComponent = ({ name }: { name: string }) => {
     return <Icon className="h-5 w-5" />;
 };
 
-
-function AboutSchoolContent({ aboutInfo, features }: { aboutInfo: AboutSchoolInfo, features: SchoolFeature[] }) {
-  return (
-    <div className="flex flex-col md:flex-row gap-12 items-center">
-      <div className="w-full md:w-5/12 relative">
-        <div className="absolute -top-4 -left-4 w-full h-full border-4 border-accent rounded-lg transform -rotate-2"></div>
-        <Card className="overflow-hidden shadow-lg relative rounded-lg">
-          <Image
-            src={aboutInfo.image_url as string}
-            alt="School Building"
-            width={400}
-            height={500}
-            className="object-cover w-full h-full"
-            data-ai-hint="school building"
-          />
-        </Card>
-      </div>
-      <div className="w-full md:w-7/12">
-        <h2 className="text-3xl font-bold text-primary mb-4 font-headline">{aboutInfo.title}</h2>
-        <p className="text-muted-foreground mb-6 text-base leading-relaxed">
-          {aboutInfo.description && aboutInfo.description.length > 200 ? `${aboutInfo.description.slice(0, 200)}...` : aboutInfo.description}
-        </p>
-        <div className="space-y-4 mb-8">
-            {features.slice(0, 3).map((feature) => (
-              <div key={feature.id} className="flex items-start gap-4">
-                <div className="flex-shrink-0 bg-primary/10 text-primary p-2 rounded-full">
-                  <IconComponent name={feature.icon} />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground">{feature.title}</h3>
-                  <p className="text-muted-foreground text-sm">{feature.description && feature.description.length > 100 ? `${feature.description.substring(0, 100)}...` : feature.description}</p>
-                </div>
-              </div>
-            ))}
-        </div>
-        <Button asChild>
-          <Link href="/school-details">আরো জানুন</Link>
-        </Button>
-      </div>
-    </div>
-  );
-}
 
 const AboutSchoolSkeleton = () => (
     <div className="flex flex-col md:flex-row gap-12 items-center">
@@ -85,26 +40,52 @@ const AboutSchoolSkeleton = () => (
 )
 
 
-export default function AboutSchool() {
-  const [aboutInfo, setAboutInfo] = useState<AboutSchoolInfo | null>(null);
-  const [features, setFeatures] = useState<SchoolFeature[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchData() {
-        setLoading(true);
-        const [info, ftrs] = await Promise.all([getAboutSchool(), getSchoolFeatures()]);
-        setAboutInfo(info);
-        setFeatures(ftrs);
-        setLoading(false);
-    }
-    fetchData();
-  }, []);
+export default function AboutSchool({ aboutInfo, features }: { aboutInfo: AboutSchoolInfo | null, features: SchoolFeature[] }) {
   
+  if (!aboutInfo) {
+    return <AboutSchoolSkeleton />;
+  }
+
   return (
     <div className="bg-white py-12 sm:py-16 lg:py-20">
       <div className="container mx-auto px-4">
-        {loading ? <AboutSchoolSkeleton /> : (aboutInfo && <AboutSchoolContent aboutInfo={aboutInfo} features={features} />)}
+         <div className="flex flex-col md:flex-row gap-12 items-center">
+            <div className="w-full md:w-5/12 relative">
+                <div className="absolute -top-4 -left-4 w-full h-full border-4 border-accent rounded-lg transform -rotate-2"></div>
+                <Card className="overflow-hidden shadow-lg relative rounded-lg">
+                <Image
+                    src={aboutInfo.image_url as string}
+                    alt="School Building"
+                    width={400}
+                    height={500}
+                    className="object-cover w-full h-full"
+                    data-ai-hint="school building"
+                />
+                </Card>
+            </div>
+            <div className="w-full md:w-7/12">
+                <h2 className="text-3xl font-bold text-primary mb-4 font-headline">{aboutInfo.title}</h2>
+                <p className="text-muted-foreground mb-6 text-base leading-relaxed">
+                {aboutInfo.description && aboutInfo.description.length > 200 ? `${aboutInfo.description.slice(0, 200)}...` : aboutInfo.description}
+                </p>
+                <div className="space-y-4 mb-8">
+                    {features.slice(0, 3).map((feature) => (
+                    <div key={feature.id} className="flex items-start gap-4">
+                        <div className="flex-shrink-0 bg-primary/10 text-primary p-2 rounded-full">
+                        <IconComponent name={feature.icon} />
+                        </div>
+                        <div>
+                        <h3 className="font-semibold text-foreground">{feature.title}</h3>
+                        <p className="text-muted-foreground text-sm">{feature.description && feature.description.length > 100 ? `${feature.description.substring(0, 100)}...` : feature.description}</p>
+                        </div>
+                    </div>
+                    ))}
+                </div>
+                <Button asChild>
+                <Link href="/school-details">আরো জানুন</Link>
+                </Button>
+            </div>
+            </div>
       </div>
     </div>
   );

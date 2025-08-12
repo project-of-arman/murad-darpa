@@ -1,6 +1,4 @@
 
-"use client";
-
 import * as React from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,7 +11,7 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { getTeachers, Teacher } from "@/lib/teacher-data";
+import { Teacher } from "@/lib/teacher-data";
 import { Skeleton } from "../ui/skeleton";
 
 const TeacherCardSkeleton = () => (
@@ -27,19 +25,26 @@ const TeacherCardSkeleton = () => (
 );
 
 
-export default function TeachersCarousel() {
-  const [teachers, setTeachers] = React.useState<Teacher[]>([]);
-  const [loading, setLoading] = React.useState(true);
+export default function TeachersCarousel({ teachers }: { teachers: Teacher[] }) {
+  if (!teachers || teachers.length === 0) {
+    return (
+        <div className="container mx-auto px-4">
+            <div className="flex justify-between items-center mb-8">
+                <h2 className="text-3xl font-bold text-primary font-headline">আমাদের অভিজ্ঞ শিক্ষকগণ</h2>
+                <Button asChild variant="outline">
+                <Link href="/staff">সকলকে দেখুন</Link>
+                </Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0.5">
+               <TeacherCardSkeleton />
+               <TeacherCardSkeleton />
+               <TeacherCardSkeleton />
+               <TeacherCardSkeleton />
+           </div>
+        </div>
+    );
+  }
 
-  React.useEffect(() => {
-    async function fetchTeachers() {
-        setLoading(true);
-        const data = await getTeachers();
-        setTeachers(data);
-        setLoading(false);
-    }
-    fetchTeachers();
-  }, []);
 
   return (
     <div className="container mx-auto px-4">
@@ -49,14 +54,6 @@ export default function TeachersCarousel() {
           <Link href="/staff">সকলকে দেখুন</Link>
         </Button>
       </div>
-       {loading ? (
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0.5">
-               <TeacherCardSkeleton />
-               <TeacherCardSkeleton />
-               <TeacherCardSkeleton />
-               <TeacherCardSkeleton />
-           </div>
-      ) : (
       <Carousel
         opts={{
           align: "start",
@@ -92,7 +89,6 @@ export default function TeachersCarousel() {
         <CarouselPrevious className="hidden md:flex" />
         <CarouselNext className="hidden md:flex" />
       </Carousel>
-      )}
     </div>
   );
 }
