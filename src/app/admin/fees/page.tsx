@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -41,10 +42,6 @@ export default function FeesPage() {
     fetchData();
   }, [selectedClass]);
 
-  if (loading) {
-    return <div>Loading...</div>
-  }
-
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">ফি ও পেমেন্ট ব্যবস্থাপনা</h1>
@@ -62,13 +59,15 @@ export default function FeesPage() {
               <CardTitle>ফি কালেকশন</CardTitle>
             </CardHeader>
             <CardContent>
-              <FeeCollectionsManager 
-                initialCollections={collections} 
-                students={students} 
-                feeTypes={feeTypes}
-                selectedClass={selectedClass}
-                userRole={userRole || 'visitor'}
-              />
+              {loading ? <p>Loading...</p> : (
+                <FeeCollectionsManager 
+                  initialCollections={collections} 
+                  students={students} 
+                  feeTypes={feeTypes}
+                  selectedClass={selectedClass}
+                  userRole={userRole || 'visitor'}
+                />
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -79,7 +78,7 @@ export default function FeesPage() {
                 <CardTitle>ফির প্রকারভেদ</CardTitle>
               </CardHeader>
               <CardContent>
-                <FeeTypesManager initialFeeTypes={feeTypes} />
+                {loading ? <p>Loading...</p> : <FeeTypesManager initialFeeTypes={feeTypes} />}
               </CardContent>
             </Card>
           </TabsContent>

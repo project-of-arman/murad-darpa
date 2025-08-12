@@ -41,7 +41,7 @@ function AboutSchoolContent({ aboutInfo, features }: { aboutInfo: AboutSchoolInf
       <div className="w-full md:w-7/12">
         <h2 className="text-3xl font-bold text-primary mb-4 font-headline">{aboutInfo.title}</h2>
         <p className="text-muted-foreground mb-6 text-base leading-relaxed">
-          {aboutInfo.description?.slice(0, 200)}{aboutInfo.description && aboutInfo.description.length >= 200 ? '...' : ''}
+          {aboutInfo.description && aboutInfo.description.length > 200 ? `${aboutInfo.description.slice(0, 200)}...` : aboutInfo.description}
         </p>
         <div className="space-y-4 mb-8">
             {features.slice(0, 3).map((feature) => (
@@ -51,7 +51,7 @@ function AboutSchoolContent({ aboutInfo, features }: { aboutInfo: AboutSchoolInf
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">{feature.title}</h3>
-                  <p className="text-muted-foreground text-sm">{feature.description?.substring(0, 100)}...</p>
+                  <p className="text-muted-foreground text-sm">{feature.description && feature.description.length > 100 ? `${feature.description.substring(0, 100)}...` : feature.description}</p>
                 </div>
               </div>
             ))}
@@ -92,11 +92,11 @@ export default function AboutSchool() {
 
   useEffect(() => {
     async function fetchData() {
-      setLoading(true);
-      const [about, f] = await Promise.all([getAboutSchool(), getSchoolFeatures()]);
-      setAboutInfo(about);
-      setFeatures(f);
-      setLoading(false);
+        setLoading(true);
+        const [info, ftrs] = await Promise.all([getAboutSchool(), getSchoolFeatures()]);
+        setAboutInfo(info);
+        setFeatures(ftrs);
+        setLoading(false);
     }
     fetchData();
   }, []);

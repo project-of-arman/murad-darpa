@@ -28,31 +28,17 @@ const TeacherCardSkeleton = () => (
 
 
 export default function TeachersCarousel() {
-  const [api, setApi] = React.useState<any>();
   const [teachers, setTeachers] = React.useState<Teacher[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    if (!api) return;
-
-    const interval = setInterval(() => {
-      if (api.canScrollNext()) {
-        api.scrollNext();
-      } else {
-        api.scrollTo(0);
-      }
-    }, 5000); // autoplay
-    return () => clearInterval(interval);
-  }, [api]);
-  
-  React.useEffect(() => {
-    async function fetchTeachersData() {
-      setLoading(true);
-      const fetchedTeachers = await getTeachers();
-      setTeachers(fetchedTeachers);
-      setLoading(false);
+    async function fetchTeachers() {
+        setLoading(true);
+        const data = await getTeachers();
+        setTeachers(data);
+        setLoading(false);
     }
-    fetchTeachersData();
+    fetchTeachers();
   }, []);
 
   return (
@@ -72,7 +58,6 @@ export default function TeachersCarousel() {
            </div>
       ) : (
       <Carousel
-        setApi={setApi}
         opts={{
           align: "start",
           loop: true,
@@ -87,7 +72,7 @@ export default function TeachersCarousel() {
                     <Card className="group overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
                     <CardContent className="relative flex aspect-[3/4] items-center justify-center p-0">
                         <Image
-                        src={teacher.image}
+                        src={teacher.image as string}
                         alt={teacher.name}
                         fill
                         className="object-cover transition-transform duration-300 group-hover:scale-105"

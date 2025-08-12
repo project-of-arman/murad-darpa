@@ -34,7 +34,6 @@ import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { toDataURL } from "@/lib/utils";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { selectRole } from "@/lib/redux/slices/user-slice";
 
@@ -130,7 +129,7 @@ export default function TeacherTable({ teachers }: { teachers: Teacher[] }) {
               <TableRow key={teacher.id}>
                 <TableCell>
                     <Image 
-                        src={teacher.image ? toDataURL(teacher.image as Buffer) : "https://placehold.co/40x40.png"}
+                        src={teacher.image as string || "https://placehold.co/40x40.png"}
                         alt={teacher.name}
                         width={40}
                         height={40}
@@ -192,7 +191,7 @@ export default function TeacherTable({ teachers }: { teachers: Teacher[] }) {
             <CardHeader>
               <div className="flex items-center gap-4">
                 <Image 
-                    src={teacher.image ? toDataURL(teacher.image as Buffer) : "https://placehold.co/40x40.png"}
+                    src={teacher.image as string || "https://placehold.co/40x40.png"}
                     alt={teacher.name}
                     width={40}
                     height={40}
