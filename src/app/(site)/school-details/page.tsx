@@ -9,6 +9,8 @@ import VideoGallery from "@/components/homepage/video-gallery";
 import { getTeachers } from "@/lib/teacher-data";
 import { getAboutSchool, getSchoolFeatures, SchoolFeature } from "@/lib/school-data";
 import * as LucideIcons from "lucide-react";
+import { getGalleryImages } from '@/lib/gallery-data';
+import { getVideos } from '@/lib/video-data';
 
 export const metadata: Metadata = {
   title: 'স্কুল বিস্তারিত',
@@ -27,9 +29,21 @@ const IconComponent = ({ name }: { name: string }) => {
 
 
 export default async function SchoolDetailsPage() {
-  const teachers = await getTeachers();
-  const aboutSchool = await getAboutSchool();
-  const features = await getSchoolFeatures();
+  const [teachers, aboutSchool, features, galleryImages, videos] = await Promise.all([
+      getTeachers(),
+      getAboutSchool(),
+      getSchoolFeatures(),
+      getGalleryImages(),
+      getVideos(),
+  ]);
+
+  if (!aboutSchool) {
+      return (
+            <div className="text-center text-muted-foreground py-8">
+                স্কুল সম্পর্কিত তথ্য পাওয়া যায়নি।
+            </div>
+      )
+  }
 
   return (
     <div className="bg-white py-16 sm:py-20 lg:py-24">
@@ -39,33 +53,27 @@ export default async function SchoolDetailsPage() {
               <p className="text-muted-foreground mt-2">আমাদের প্রতিষ্ঠান সম্পর্কে আরো জানুন</p>
             </div>
 
-            {aboutSchool ? (
-                <div className="flex flex-col md:flex-row gap-12 items-center">
-                    <div className="w-full md:w-5/12 relative">
-                        <div className="absolute -top-4 -left-4 w-full h-full border-4 border-accent rounded-lg transform -rotate-2"></div>
-                        <Card className="overflow-hidden shadow-lg relative rounded-lg">
-                        <Image
-                            src={aboutSchool.image_url as string}
-                            alt={aboutSchool.title}
-                            width={400}
-                            height={500}
-                            className="object-cover w-full h-full"
-                            data-ai-hint="school building"
-                        />
-                        </Card>
-                    </div>
-                    <div className="w-full md:w-7/12">
-                        <h2 className="text-3xl font-bold text-primary mb-4 font-headline">{aboutSchool.title}</h2>
-                        <p className="text-muted-foreground mb-6 text-base leading-relaxed">
-                            {aboutSchool.description}
-                        </p>
-                    </div>
+            <div className="flex flex-col md:flex-row gap-12 items-center">
+                <div className="w-full md:w-5/12 relative">
+                    <div className="absolute -top-4 -left-4 w-full h-full border-4 border-accent rounded-lg transform -rotate-2"></div>
+                    <Card className="overflow-hidden shadow-lg relative rounded-lg">
+                    <Image
+                        src={aboutSchool.image_url as string}
+                        alt={aboutSchool.title}
+                        width={400}
+                        height={500}
+                        className="object-cover w-full h-full"
+                        data-ai-hint="school building"
+                    />
+                    </Card>
                 </div>
-            ) : (
-                <div className="text-center text-muted-foreground py-8">
-                    স্কুল সম্পর্কিত তথ্য পাওয়া যায়নি।
+                <div className="w-full md:w-7/12">
+                    <h2 className="text-3xl font-bold text-primary mb-4 font-headline">{aboutSchool.title}</h2>
+                    <p className="text-muted-foreground mb-6 text-base leading-relaxed">
+                        {aboutSchool.description}
+                    </p>
                 </div>
-            )}
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {features.map((feature, index) => (
@@ -82,10 +90,10 @@ export default async function SchoolDetailsPage() {
             </div>
 
             <TeachersSection teachers={teachers} />
-            <ImageGallery />
+            <ImageGallery images={galleryImages} />
             <div className="bg-white py-12 sm:py-16 lg:py-20">
               <div className="container mx-auto px-4">
-                <VideoGallery />
+                <VideoGallery videos={videos} />
               </div>
             </div>
 
