@@ -1,5 +1,4 @@
 
-
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "../ui/button";
@@ -8,6 +7,9 @@ import { Teacher } from "@/lib/teacher-data";
 
 
 export default function TeachersSection({ teachers }: { teachers: Teacher[] }) {
+  if (!Array.isArray(teachers)) {
+    return null; // or a loading skeleton
+  }
 
   return (
     <section id="teachers-section">

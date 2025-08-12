@@ -1,5 +1,4 @@
 
-
 import Image from "next/image";
 import { PlayCircle } from "lucide-react";
 import { Card, CardContent } from "../ui/card";
@@ -9,6 +8,9 @@ import { Video } from "@/lib/video-data";
 
 
 export default function VideoGallery({ videos }: { videos: Video[] }) {
+  if (!Array.isArray(videos)) {
+    return null;
+  }
 
   return (
     <section id="video-gallery" className="w-full">

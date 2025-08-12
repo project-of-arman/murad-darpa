@@ -1,5 +1,4 @@
 
-
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "../ui/button";
@@ -13,6 +12,9 @@ import {
 } from "@/components/ui/dialog";
 
 export default function ImageGallery({ images }: { images: GalleryImage[] }) {
+  if (!Array.isArray(images)) {
+    return null;
+  }
   
   return (
     <section id="image-gallery">
