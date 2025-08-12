@@ -1,10 +1,10 @@
 
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Bell } from "lucide-react";
 import Link from "next/link";
-import { getNotices, Notice } from "@/lib/notice-data";
-import { Skeleton } from "../ui/skeleton";
+import { Notice } from "@/lib/notice-data";
 
 const NoticeDate = ({ date }: { date: string }) => {
     const parts = date.split(' ');
@@ -21,9 +21,7 @@ const NoticeDate = ({ date }: { date: string }) => {
     )
 }
 
-export default async function NoticeBoard() {
-  const notices = await getNotices();
-
+export default function NoticeBoard({ notices }: { notices: Notice[] }) {
   return (
     <Card className="w-full shadow-lg border-primary/20">
       <CardHeader className="bg-primary/5">

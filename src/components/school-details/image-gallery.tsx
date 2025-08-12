@@ -1,9 +1,10 @@
 
+
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { getGalleryImages } from "@/lib/gallery-data";
+import { GalleryImage } from "@/lib/gallery-data";
 import {
   Dialog,
   DialogContent,
@@ -11,8 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-export default async function ImageGallery() {
-  const images = await getGalleryImages();
+export default function ImageGallery({ images }: { images: GalleryImage[] }) {
   
   return (
     <section id="image-gallery">

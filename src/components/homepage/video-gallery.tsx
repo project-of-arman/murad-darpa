@@ -1,14 +1,14 @@
 
+
 import Image from "next/image";
 import { PlayCircle } from "lucide-react";
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { getVideos } from "@/lib/video-data";
+import { Video } from "@/lib/video-data";
 
 
-export default async function VideoGallery() {
-  const videos = await getVideos();
+export default function VideoGallery({ videos }: { videos: Video[] }) {
 
   return (
     <section id="video-gallery" className="w-full">

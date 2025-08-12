@@ -1,20 +1,19 @@
 
+
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { getImportantLinkGroups, ImportantLinkGroup } from "@/lib/important-links-data";
-import { toDataURL } from "@/lib/utils";
+import { ImportantLinkGroup } from "@/lib/important-links-data";
 
-export default async function ImportantLinks() {
-    const linkCards = await getImportantLinkGroups();
+export default function ImportantLinks({ linkGroups }: { linkGroups: ImportantLinkGroup[] }) {
 
     return (
         <div className="container mx-auto ">
             <h2 className="text-3xl font-bold text-primary font-headline mb-8 text-center">গুরুত্বপূর্ণ লিংকসমূহ</h2>
             <div className="grid grid-cols-1 gap-2 lg:grid-cols-2 ">
-                {linkCards.map((card, index) => (
+                {linkGroups.map((card, index) => (
                     <Card key={index} className="shadow-lg hover:shadow-xl transition-shadow duration-300">
                         <CardHeader>
                             <CardTitle className="text-primary">{card.title}</CardTitle>

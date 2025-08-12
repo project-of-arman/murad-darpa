@@ -6,21 +6,22 @@ import SecondaryNav from '@/components/homepage/secondary-nav';
 import DynamicSidebar from '@/components/homepage/dynamic-sidebar';
 import SiteHeaderClientWrapper from '@/components/homepage/site-header-client-wrapper';
 import { getNotices } from '@/lib/notice-data';
-import { getSchoolInfo } from '@/lib/school-data';
+import { getSchoolInfo, getCarouselItems } from '@/lib/school-data';
 
 export default async function SiteLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [schoolInfo, marqueeNotices] = await Promise.all([
+  const [schoolInfo, marqueeNotices, carouselItems] = await Promise.all([
     getSchoolInfo(),
-    getNotices({ is_marquee: true })
+    getNotices({ is_marquee: true }),
+    getCarouselItems()
   ]);
   
   return (
     <div className="relative flex min-h-screen flex-col">
-        <HeroCarousel />
+        <HeroCarousel schoolInfo={schoolInfo} carouselItems={carouselItems} />
         {schoolInfo && <SiteHeaderClientWrapper schoolInfo={schoolInfo} marqueeNotices={marqueeNotices} />}
         <SecondaryNav schoolName={schoolInfo?.name || 'School Name'} />
         <main className="flex-1">
